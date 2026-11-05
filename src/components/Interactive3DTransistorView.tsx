@@ -1,26 +1,52 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
   HicumParameter,
   CircuitElement,
   CircuitNode,
   BiasState,
   OperatingPointResult,
-  SpatialNature,
 } from '../data/hicumTypes';
+import { HICUM_EQUATIONS } from '../data/hicumEquations';
+import {
+  SENTAURUS_3D_REGIONS,
+  EMBEDDED_3D_NODE_PINS,
+  EMBEDDED_3D_COMPONENTS,
+  Sentaurus3DRegionSpec,
+  Embedded3DComponentSpec,
+  EmbeddedComponentCategory,
+  getExplodedPointUm,
+} from '../data/sentaurus3DModel';
+import { OrientationCube3D, CameraPresetId } from './OrientationCube3D';
+import { CircuitSymbolGlyph } from './CircuitSymbol3DOverlay';
+import { FormulaView } from './FormulaView';
 import {
   Box,
   Layers,
+  RotateCcw,
   ZoomIn,
   ZoomOut,
-  Cpu,
-  Flame,
-  Zap,
-  Compass,
-  ArrowUpRight,
-  Info,
+  Maximize2,
+  Minimize2,
+  Hand,
+  Orbit,
+  Scissors,
+  Eye,
+  EyeOff,
+  Camera,
+  Search,
   Download,
-  Code2,
-  Image as ImageIcon,
+  Focus,
+  Tag,
+  Sliders,
+  ChevronDown,
+  ChevronUp,
+  ArrowUpRight,
+  Compass,
+  Info,
+  CheckCircle2,
+  Cpu,
 } from 'lucide-react';
 
 interface Interactive3DTransistorViewProps {
@@ -35,1548 +61,2223 @@ interface Interactive3DTransistorViewProps {
   onSelectElementInLab: (elementId: string) => void;
 }
 
-type OverlayMode = 'doping' | 'circuit_overlay' | 'carrier_kirk' | 'thermal';
-type CutawayMode = 'step_cutaway' | 'sde_half_cell' | 'full_3d';
-type ViewportTab = 'interactive_3d' | 'blender_renders' | 'sentaurus_table';
+type InteractionTool = 'orbit' | 'pan';
+type CutawayAxis = 'none' | 'z_cross' | 'x_half' | 'y_depth';
+type ViewModePreset = 'cross_section' | 'assembled_3d' | 'exploded_3d';
 
-export interface Prism2DProfile {
-  /**
-   * 2D polygon vertices in exact Sentaurus SDE micrometers (um):
-   * x: lateral coordinate in [0.0, 1.20] um (mirrored to [-1.20, 0.0] um for left half)
-   * z: vertical height in [-0.63, +0.33] um where z = -Y_sentaurus (Z=0 is Ybas=0.0 base-collector interface)
-   */
-  xzPointsUm: [number, number][];
+interface ProjectedOverlayState {
+  nodes: Record<string, { x: number; y: number; visible: boolean }>;
+  components: Record<
+    string,
+    {
+      x: number;
+      y: number;
+      visible: boolean;
+      wirePoints: { x: number; y: number }[];
+    }
+  >;
 }
 
-export interface Region3DSpec {
-  id: string;
-  name: string;
-  shortLabel: string;
-  sentaurusId: string;
-  blenderMeshName: string;
-  sentaurusCoordsUm: string;
-  sentaurusSdeSnippet: string;
-  dopingTag: string;
-  spatialNature: 'localized' | 'distributed';
-  layerGroup: number; // 0 (bottom substrate) to 6 (top metal) for exploded Z view
-  colorFill: string;
-  colorStroke: string;
-  defaultOpacity?: number;
-  thermalWeight: number;
-  manualSection: string;
-  description: string;
-  localizedVsDistributedNote: string;
-  nodesInRegion: string[];
-  circuitElements: string[];
-  keyParameters: string[];
-  prisms: Prism2DProfile[];
-}
-
-/**
- * Exact Sentaurus SDE & sprocess coordinates (in micrometers):
- * Xmin = 0.0, Xer = 0.075, Xbcr = 0.150, Xbr = 0.225, Xcr = 0.325, Xbcm = 0.450,
- * Xsl = 0.700, Xscl = 0.800, Xscr = 1.000, Xsr = 1.100, Xmax = 1.200
- * Vertical Z = -Y_sde:
- * Z_max_top = +0.300 (Ymin = -0.300), Z_bc = +0.150 (Ybc = -0.150),
- * Z_emi = +0.075 (Yemi = -0.075), Z_bas = 0.000 (Ybas = 0.000),
- * Z_sub = -0.300 (Ysub = +0.300), Z_min_bot = -0.600 (Ymax = +0.600)
- */
-export const HBT_3D_REGIONS: Region3DSpec[] = [
-  {
-    id: 'p_substrate_bulk',
-    name: 'p⁻ Silicon Wafer Substrate & Substrate Terminal (R.Substrate / S, S\')',
-    shortLabel: 'R.Substrate (p⁻ Si)',
-    sentaurusId: 'R.Substrate (Const.Sub + Contact: substrate)',
-    blenderMeshName: 'R_Substrate_P & Contact_Substrate',
-    sentaurusCoordsUm: 'X ∈ [0.00, 1.20] μm, Y_sde ∈ [0.42, 0.60] μm',
-    sentaurusSdeSnippet: `(sdepe:doping-constant-placement "Const.Sub" "BoronActiveConcentration" 1e15 "R.Substrate")\ncontact name=substrate bottomSilicon`,
-    dopingTag: 'Boron 10¹⁵ cm⁻³ (Const.Sub)',
-    spatialNature: 'distributed',
-    layerGroup: 0,
-    colorFill: '#CBD5E1',
-    colorStroke: '#475569',
-    thermalWeight: 0.2,
-    manualSection: 'Sections 2.11 & 2.12 (Fig. 2.11.0/1)',
-    description:
-      'Lightly doped p-type silicon wafer beneath the n⁺ buried subcollector (Y_sde > 0.30 μm in Sentaurus SDE, extending to 9.5 μm in sprocess). Hosts internal substrate node S\' and bulk coupling network (R_su, C_su) to bottom substrate contact S.',
-    localizedVsDistributedNote:
-      'C_jS is localized at the n⁺ buried-layer / p⁻ substrate metallurgical junction around Y_sub = 0.30 μm, whereas R_su and C_su represent distributed 3D spreading impedance through the p⁻ wafer.',
-    nodesInRegion: ["S'", 'S'],
-    circuitElements: ['cjs', 'cscp', 'ijsc', 'its', 'qdsu', 'rsu', 'csu'],
-    keyParameters: ['cjs0', 'vds', 'zs', 'vpts', 'cscp0', 'vdsp', 'zsp', 'rsu', 'csu', 'itss', 'msf', 'tsf', 'iscs'],
-    prisms: [
-      {
-        xzPointsUm: [
-          [0.0, -0.60],
-          [1.20, -0.60],
-          [1.20, -0.42],
-          [0.0, -0.42],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'buried_subcollector',
-    name: 'n⁺ Buried Subcollector Layer (Impl.SubCol / Node C\' Bottom Plane)',
-    shortLabel: 'Impl.SubCol (n⁺ Buried)',
-    sentaurusId: 'Impl.SubCol (Def.SubCol / Ref.SubCol)',
-    blenderMeshName: 'Impl_SubCol_BuriedNPlus',
-    sentaurusCoordsUm: 'X ∈ [0.00, 1.20] μm, Y_sde = 0.30 μm (Peak 2×10¹⁹ cm⁻³)',
-    sentaurusSdeSnippet: `(sdegeo:insert-vertex (position Ysub Xmin 0.0))\n(sdepe:doping-analytical-profile-definition "Def.SubCol" "ArsenicActiveConcentration" "PeakPos" 0.0 "PeakVal" 2e19 "ValueAtDepth"DopingSub "Depth" 0.2 "Gauss" "Factor" 0.2)\n; sprocess: implant phosphorus dose=1e14 energy=350`,
-    dopingTag: 'As/P Peak 2×10¹⁹ cm⁻³ (Impl.SubCol)',
-    spatialNature: 'localized',
-    layerGroup: 1,
-    colorFill: '#3B82F6',
-    colorStroke: '#1D4ED8',
-    thermalWeight: 0.42,
-    manualSection: 'Section 2.8.2 (Fig. 2.8.2/1)',
-    description:
-      'Heavily doped n⁺ buried subcollector centered at Y_sub = 0.30 μm across X ∈ [0, 1.20] μm. Collects vertical electron current from the intrinsic collector mesa (X ∈ [0, 0.325] μm) and conducts it laterally beneath the STI oxide trench to the collector sinker mesa (X ∈ [0.70, 1.10] μm).',
-    localizedVsDistributedNote:
-      'Physically localized low-sheet-resistance buried layer; combines with the n⁺ collector sinker mesa and contact into lumped external collector resistance R_Cx.',
-    nodesInRegion: ["C'"],
-    circuitElements: ['rcx', 'cjs', 'ijsc'],
-    keyParameters: ['rcx', 'zetarcx', 'cjs0', 'vds', 'zs'],
-    prisms: [
-      {
-        xzPointsUm: [
-          [0.0, -0.42],
-          [1.20, -0.42],
-          [1.20, -0.30],
-          [0.0, -0.30],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'extrinsic_bc_junction',
-    name: 'Shallow Trench Isolation (STI) Oxide & Active Collector Mesa Slope (R.Insulation / R.Substrate)',
-    shortLabel: 'R.Insulation (STI Oxide)',
-    sentaurusId: 'R.Insulation (Oxide) + R.Substrate Active Mesa',
-    blenderMeshName: 'R_Insulation_STI_Inner & R_CollectorMesa_EpiN',
-    sentaurusCoordsUm: 'Active Mesa: X ∈ [0, 0.225→0.325] μm; STI Trench: X ∈ [0.225..0.325 → 0.70..0.80] μm, Y_sde ∈ [0, 0.30] μm',
-    sentaurusSdeSnippet: `; Sloped mesa wall dWc = 0.10 um (Xbr=0.225 at Ybas=0 -> Xcr=0.325 at Ysub=0.30)\n(position Ybas Xbr 0) (position Ysub Xcr 0) (position Ysub Xsl 0) (position Ybas Xscl 0)`,
-    dopingTag: 'n-Collector Mesa & SiO₂ STI (dWc = 0.10 μm)',
-    spatialNature: 'distributed',
-    layerGroup: 2,
-    colorFill: '#7DD3FC',
-    colorStroke: '#0369A1',
-    defaultOpacity: 0.72,
-    thermalWeight: 0.48,
-    manualSection: 'Sections 2.4.2, 2.6, 2.8.3 (Fig. 2.7.0/2)',
-    description:
-      'Trapezoidal active silicon collector mesa (widening from X_br = 0.225 μm at Y_bas = 0 to X_cr = 0.325 μm at Y_sub = 0.30 μm with slope dWc = 0.10 μm) flanked by the Shallow Trench Isolation (STI) oxide trench that isolates the intrinsic mesa from the collector sinker.',
-    localizedVsDistributedNote:
-      'Distributed B-C capacitance across the extrinsic mesa periphery is partitioned via f_BCpar into C_jCx1 (to B) and C_jCx2 (to B*), while the STI oxide trench governs lateral thermal confinement (R_th) and parasitic capacitance C_BCpar.',
-    nodesInRegion: ['B', 'B*', "C'"],
-    circuitElements: ['cjcx1', 'cjcx2', 'ijbcx', 'its', 'qdsu', 'rth'],
-    keyParameters: ['cjcx0', 'vdcx', 'zcx', 'vptcx', 'cbcpar', 'fbcpar', 'ibcxs', 'mbcx', 'rth', 'cth'],
-    prisms: [
-      // Active collector mesa outer sloped wing around SIC
-      {
-        xzPointsUm: [
-          [0.0, -0.30],
-          [0.325, -0.30],
-          [0.285, -0.18],
-          [0.0, -0.18],
-        ],
-      },
-      {
-        xzPointsUm: [
-          [0.150, -0.18],
-          [0.285, -0.18],
-          [0.225, 0.0],
-          [0.150, 0.0],
-        ],
-      },
-      // Inner STI Oxide Trench (between Xbr..Xcr and Xsl..Xscl)
-      {
-        xzPointsUm: [
-          [0.325, -0.30],
-          [0.700, -0.30],
-          [0.800, 0.0],
-          [0.225, 0.0],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'intrinsic_collector_sic',
-    name: 'Selectively Implanted Collector Pedestal (Impl.Col / SIC Core B\'–C\')',
-    shortLabel: 'Impl.Col (n-SIC Pedestal)',
-    sentaurusId: 'Impl.Col (Def.Col / Ref.Col)',
-    blenderMeshName: 'Impl_Col_SIC',
-    sentaurusCoordsUm: 'X ∈ [0.00, 0.150] μm (Xbcr), Y_sde = 0.075 μm (Peak 10¹⁸ cm⁻³)',
-    sentaurusSdeSnippet: `(sdegeo:insert-vertex (position 0.075 Xmin 0.0))\n(sdegeo:insert-vertex (position 0.075 Xbcr 0.0))\n(sdepe:doping-analytical-profile-definition "Def.Col" "PhosphorusActiveConcentration" "PeakPos" 0.0 "PeakVal" PeakCol ...)\n; sprocess: implant phosphorus dose=2e12 energy=150`,
-    dopingTag: 'Phosphorus Peak 10¹⁸ cm⁻³ (Impl.Col / SIC)',
-    spatialNature: 'distributed',
-    layerGroup: 2,
-    colorFill: '#0EA5E9',
-    colorStroke: '#0369A1',
-    thermalWeight: 1.0,
-    manualSection: 'Sections 2.2.1, 2.2.2, 2.4.2, 2.10 (Fig. 2.2.0/2)',
-    description:
-      'Selectively Implanted Collector (SIC) pedestal implanted through the emitter window across X ∈ [0, X_bcr = 0.150 μm] centered at depth Y = 0.075 μm beneath the SiGe base. Sustains the high B\'-C\' electric field, boosts Kirk critical current I_CK(v_C\'E\'), and controls high-current base push-out Δτ_fh and avalanche generation i_AVL.',
-    localizedVsDistributedNote:
-      'HICUM models the distributed electric-field collapse, velocity saturation (v_lim), and high-injection space-charge widening of this SIC core directly inside I_CK(v_C\'E\') and Q_f(i_Tf).',
-    nodesInRegion: ["B'", "C'"],
-    circuitElements: ['it', 'cjci', 'ibci', 'iavl', 'qr'],
-    keyParameters: [
-      'rci0',
-      'vlim',
-      'vces',
-      'vpt',
-      'aick',
-      'delck',
-      'thcs',
-      'ahc',
-      'fthc',
-      'vcbar',
-      'icbar',
-      'acbar',
-      'cjci0',
-      'vdci',
-      'zci',
-      'vptci',
-      'favl',
-      'qavl',
-    ],
-    prisms: [
-      {
-        xzPointsUm: [
-          [0.0, -0.18],
-          [0.150, -0.18],
-          [0.150, 0.0],
-          [0.0, 0.0],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'collector_sinker_contact',
-    name: 'n⁺ Collector Sinker Mesa & Aluminium Collector Contact (Impl.ColCont + R.CollectorCont)',
-    shortLabel: 'Impl.ColCont & R.CollectorCont',
-    sentaurusId: 'Impl.ColCont (Def.ColCont) + R.CollectorCont (Aluminium)',
-    blenderMeshName: 'Impl_ColCont_SinkerNPlus & R_CollectorCont',
-    sentaurusCoordsUm: 'Sinker Mesa: X ∈ [0.80..1.00 top → 0.70..1.10 bottom], Y_sde ∈ [0, 0.30] μm; Al Contact: X ∈ [0.80, 1.00], Y_sde ∈ [-0.30, 0] μm',
-    sentaurusSdeSnippet: `(sdegeo:create-rectangle (position Ybas Xscl 0.0) (position Ymin Xscr 0.0) "Aluminium" "R.CollectorCont")\n(sdepe:doping-analytical-profile-definition "Def.ColCont" "PhosphorusActiveConcentration" "PeakPos" 0.0 "PeakVal" 1e20 ...)`,
-    dopingTag: 'n⁺ Sinker (10²⁰ cm⁻³) + Al Contact C',
-    spatialNature: 'localized',
-    layerGroup: 2,
-    colorFill: '#2563EB',
-    colorStroke: '#1E3A8A',
-    thermalWeight: 0.32,
-    manualSection: 'Section 2.8.2 (Fig. 2.8.2/1)',
-    description:
-      'Trapezoidal collector sinker mesa (X ∈ [0.80, 1.00] μm at Y_bas = 0 widening with slope dWc = 0.10 μm to X ∈ [0.70, 1.10] μm at Y_sub = 0.30 μm, doped 10²⁰ cm⁻³) topped by the Aluminium collector contact R.CollectorCont (Y_sde ∈ [-0.30, 0.0] μm).',
-    localizedVsDistributedNote:
-      'Physically localized vertical ohmic reach-through path connecting the n⁺ buried subcollector to external collector terminal C (modeled by R_Cx).',
-    nodesInRegion: ['C', "C'"],
-    circuitElements: ['rcx', 'cscp'],
-    keyParameters: ['rcx', 'zetarcx'],
-    prisms: [
-      // Sloped n+ collector sinker mesa (Y_sde in [0, 0.30] -> Z in [-0.30, 0.0])
-      {
-        xzPointsUm: [
-          [0.700, -0.30],
-          [1.100, -0.30],
-          [1.000, 0.0],
-          [0.800, 0.0],
-        ],
-      },
-      // Aluminium R.CollectorCont (Y_sde in [-0.30, 0.0] -> Z in [0.0, +0.30])
-      {
-        xzPointsUm: [
-          [0.800, 0.0],
-          [1.000, 0.0],
-          [1.000, 0.30],
-          [0.800, 0.30],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'intrinsic_sige_base',
-    name: 'Epitaxial Graded p-Si₁₋ₓGeₓ Base Layer (R.SiGeBase / Node B\')',
-    shortLabel: 'R.SiGeBase (75 nm SiGe)',
-    sentaurusId: 'R.SiGeBase (Place.Bas + Prof.Mole)',
-    blenderMeshName: 'R_SiGeBase',
-    sentaurusCoordsUm: 'X ∈ [0.00, 0.225] μm (Xbr), Y_sde ∈ [-0.075, 0.00] μm (Hbas = 75 nm)',
-    sentaurusSdeSnippet: `(sdegeo:create-rectangle (position Ybas Xmin 0.0) (position Yemi Xbr 0.0) "SiliconGermanium" "R.SiGeBase")\n(sdepe:Graded-Strained-Mole-Fraction "Prof.Mole" "R.SiGeBase" "x" 0.0 0.16)`,
-    dopingTag: 'Boron 5×10¹⁸ cm⁻³ · Ge x = 0 → 0.16',
-    spatialNature: 'distributed',
-    layerGroup: 3,
-    colorFill: '#10B981',
-    colorStroke: '#065F46',
-    thermalWeight: 0.94,
-    manualSection: 'Sections 2.2, 2.3.1, 2.5, 2.13, 2.14 (Fig. 2.2.0/2)',
-    description:
-      'Epitaxial SiliconGermanium base layer of thickness H_bas = 75 nm (Y_sde ∈ [-0.075, 0.0] μm, half-width X_br = 0.225 μm). Features a linear Germanium mole fraction ramp from x_Ge = 0 at Y_emi = -0.075 μm to x_Ge = 0.16 at Y_bas = 0.0 μm (compressively strained up to 4.25% in sprocess) and Gaussian Boron doping (PeakBas = 5×10¹⁸ cm⁻³ in SDE, 7.8×10¹⁸ cm⁻³ in sprocess).',
-    localizedVsDistributedNote:
-      'Vertically bounded between Y_emi = -0.075 μm and Y_bas = 0.0 μm, and laterally distributed from the intrinsic window (X ≤ 0.075 μm) out to the extrinsic poly-base overlap (X ∈ [0.150, 0.225] μm): governs GICCR transfer current i_T and sheet/crowding resistance R_bi*.',
-    nodesInRegion: ["B'", 'B*', "E'", "C'"],
-    circuitElements: ['it', 'ibei', 'cjei', 'qf', 'rbi', 'crbi', 'nqs_qf', 'nqs_it', 'noise_corr'],
-    keyParameters: [
-      'c10',
-      'qp0',
-      'hjei',
-      'ahjei',
-      'rhjei',
-      'hjci',
-      'hf0',
-      't0',
-      'dt0h',
-      'tbvl',
-      'rbi0',
-      'fdqr0',
-      'fgeo',
-      'fcrbi',
-      'cjei0',
-      'vdei',
-      'zei',
-      'ajei',
-      'ibeis',
-      'mbei',
-      'ireis',
-      'mrei',
-    ],
-    prisms: [
-      {
-        xzPointsUm: [
-          [0.0, 0.0],
-          [0.225, 0.0],
-          [0.225, 0.052],
-          [0.0, 0.052],
-        ],
-      },
-      {
-        xzPointsUm: [
-          [0.075, 0.052],
-          [0.225, 0.052],
-          [0.225, 0.075],
-          [0.075, 0.075],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'extrinsic_base_poly',
-    name: 'Extrinsic p⁺ Poly-Base & Aluminium Base Contact (R.Baseright + R.BaseContR)',
-    shortLabel: 'R.Baseright & R.BaseContR',
-    sentaurusId: 'R.Baseright (PolySilicon 10²⁰) + R.BaseContR (Aluminium)',
-    blenderMeshName: 'R_Baseright_PolyBase & R_BaseContR',
-    sentaurusCoordsUm: 'Poly-Base: X ∈ [0.150, 0.450] μm, Y_sde ∈ [-0.150, -0.075] μm; Al Contact: X ∈ [0.225, 0.450] μm, Y_sde ∈ [-0.300, -0.150] μm',
-    sentaurusSdeSnippet: `(sdegeo:create-rectangle (position Yemi Xbcr 0.0) (position Ybc Xbcm 0.0) "PolySilicon" "R.Baseright")\n(sdegeo:create-rectangle (position Ybc Xbr 0.0) (position Ymin Xbcm 0.0) "Aluminium" "R.BaseContR")`,
-    dopingTag: 'p⁺ Poly Boron 10²⁰ cm⁻³ + Al Base Contact B',
-    spatialNature: 'distributed',
-    layerGroup: 4,
-    colorFill: '#F43F5E',
-    colorStroke: '#9F1239',
-    thermalWeight: 0.46,
-    manualSection: 'Sections 2.5, 2.7 (Figs. 2.7.0/1, 2.7.0/2)',
-    description:
-      'Heavily doped p⁺ PolySilicon extrinsic base contact layer R.Baseright (X ∈ [0.150, 0.450] μm, Y_sde ∈ [-0.150, -0.075] μm, Boron 10²⁰ cm⁻³) overlapping the top of R.SiGeBase by dWb = 0.075 μm across X ∈ [0.150, 0.225] μm, contacted above by Aluminium terminal R.BaseContR (X ∈ [0.225, 0.450] μm, Y_sde ∈ [-0.300, -0.150] μm).',
-    localizedVsDistributedNote:
-      'Connects external base terminal B through extrinsic base resistance R_Bx to the perimeter base node B* at the edge of the intrinsic emitter-base window.',
-    nodesInRegion: ['B', 'B*'],
-    circuitElements: ['rbx', 'cjcx1', 'cjcx2', 'cbepar1'],
-    keyParameters: ['rbx', 'zetarbx', 'fgeo', 'cbcpar', 'fbcpar'],
-    prisms: [
-      // R.Baseright p+ Poly-Base (Y_sde in [-0.150, -0.075] -> Z in [0.075, 0.150])
-      {
-        xzPointsUm: [
-          [0.150, 0.075],
-          [0.450, 0.075],
-          [0.450, 0.150],
-          [0.150, 0.150],
-        ],
-      },
-      // R.BaseContR Aluminium contact (Y_sde in [-0.300, -0.150] -> Z in [0.150, 0.300])
-      {
-        xzPointsUm: [
-          [0.225, 0.150],
-          [0.450, 0.150],
-          [0.450, 0.300],
-          [0.225, 0.300],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'be_oxide_spacer',
-    name: 'Nitride Sidewall Spacer & B-E Perimeter Junction (sprocess Spacer / B*–E\')',
-    shortLabel: 'Si₃N₄ Sidewall Spacer',
-    sentaurusId: 'sprocess Nitride Spacer (X ∈ [0.075, 0.150] μm)',
-    blenderMeshName: 'Nitride_Spacer_Sidewall',
-    sentaurusCoordsUm: 'X ∈ [0.075, 0.150] μm (Xer → Xbcr), Y_sde ∈ [-0.26, -0.075] μm',
-    sentaurusSdeSnippet: `; sprocess nitride spacer inside emitter window:\ndeposit nitride thickness=0.05 isotropic\netch nitride thickness=0.054 anisotropic`,
-    dopingTag: 'Si₃N₄ Sidewall Spacer (75 nm gap Xer → Xbcr)',
-    spatialNature: 'localized',
-    layerGroup: 5,
-    colorFill: '#A78BFA',
-    colorStroke: '#5B21B6',
-    thermalWeight: 0.56,
-    manualSection: 'Sections 2.3.2, 2.4.1, 2.8.3, 2.9 (Fig. 2.8.3/1)',
-    description:
-      'Silicon nitride (Si₃N₄) sidewall spacer occupying the 75 nm lateral separation between the n⁺ poly-emitter edge (X_er = 0.075 μm) and the p⁺ poly-base inner edge (X_bcr = 0.150 μm) on top of R.SiGeBase.',
-    localizedVsDistributedNote:
-      'Physically localized along the emitter stripe perimeter; governs peripheral injection i_jBEp, perimeter depletion capacitance C_jEp, B-E tunneling i_BEt, and sidewall spacer parasitic capacitance C_BEpar (partitioned via f_BEpar).',
-    nodesInRegion: ['B*', "E'", 'B', 'E'],
-    circuitElements: ['cjep', 'ibep', 'ibet', 'cbepar1', 'cbepar2'],
-    keyParameters: ['cjep0', 'vdep', 'zep', 'ajep', 'ibeps', 'mbep', 'ireps', 'mrep', 'ibets', 'abet', 'tunode', 'cbepar', 'fbepar'],
-    prisms: [
-      {
-        xzPointsUm: [
-          [0.075, 0.075],
-          [0.150, 0.075],
-          [0.150, 0.220],
-          [0.075, 0.260],
-        ],
-      },
-    ],
-  },
-  {
-    id: 'emitter_poly_mono',
-    name: 'n⁺ Poly-Emitter Pedestal, Mono-Emitter Window & Emitter Contact (R.Emitter + Impl.Emi)',
-    shortLabel: 'R.Emitter & Impl.Emi (E → E\')',
-    sentaurusId: 'R.Emitter (PolySilicon 10²⁰) + Impl.Emi (Peak 5×10¹⁹) + Contact: emitter',
-    blenderMeshName: 'R_Emitter_Poly, Impl_Emi_MonoWindow & Contact_Emitter',
-    sentaurusCoordsUm: 'X ∈ [0.00, 0.075] μm (Xer = Wemi/2), Y_sde ∈ [-0.300, -0.075] μm (Hemi = 0.225 μm) + out-diffusion into R.SiGeBase',
-    sentaurusSdeSnippet: `(sdegeo:create-rectangle (position Yemi Xmin 0.0) (position Ymin Xer 0.0) "PolySilicon" "R.Emitter")\n(sdepe:doping-constant-placement "Place.Emitter" "ArsenicActiveConcentration" 1e20 "R.Emitter")\n(sdepe:doping-analytical-profile-definition "Def.Emi" "ArsenicActiveConcentration" "PeakPos" 0.0 "PeakVal" 5e19 ...)`,
-    dopingTag: 'n⁺ Poly 10²⁰ cm⁻³ + Mono-Emi 5×10¹⁹ cm⁻³',
-    spatialNature: 'localized',
-    layerGroup: 6,
-    colorFill: '#F59E0B',
-    colorStroke: '#B45309',
-    thermalWeight: 0.62,
-    manualSection: 'Sections 2.2.2, 2.8.1 (Fig. 2.8.1/1)',
-    description:
-      'n⁺ PolySilicon emitter pedestal R.Emitter (half-width X_er = 0.075 μm, full width W_emi = 0.15 μm, height H_emi = 0.225 μm from Y_emi = -0.075 μm to Y_min = -0.300 μm, doped 10²⁰ cm⁻³), shallow n⁺ out-diffusion Impl.Emi (PeakEmi = 5×10¹⁹ cm⁻³) into the top of R.SiGeBase, and top ohmic emitter contact.',
-    localizedVsDistributedNote:
-      'Physically localized above the intrinsic B\'-E\' window; determines emitter series resistance R_E (between terminal E and internal node E\') and neutral emitter minority hole charge storage ΔQ_Ef (τ_Ef0, g_tfe, h_fe).',
-    nodesInRegion: ['E', "E'"],
-    circuitElements: ['re', 'qf', 'cjei', 'ibei'],
-    keyParameters: ['re', 'zetare', 'tef0', 'gtfe', 'hfe', 'kfre', 'afre'],
-    prisms: [
-      // Impl.Emi mono-emitter out-diffusion window at top of R.SiGeBase
-      {
-        xzPointsUm: [
-          [0.0, 0.052],
-          [0.075, 0.052],
-          [0.075, 0.075],
-          [0.0, 0.075],
-        ],
-      },
-      // R.Emitter n+ Poly-Emitter pedestal
-      {
-        xzPointsUm: [
-          [0.0, 0.075],
-          [0.075, 0.075],
-          [0.075, 0.300],
-          [0.0, 0.300],
-        ],
-      },
-      // Top Emitter Contact strip at Ymin = -0.300 um
-      {
-        xzPointsUm: [
-          [0.0, 0.300],
-          [0.075, 0.300],
-          [0.075, 0.330],
-          [0.0, 0.330],
-        ],
-      },
-    ],
-  },
-];
-
-// Scale factor converting exact Sentaurus micrometers (um) to 3D viewport units
-const UM_TO_VIEW = 98;
-
-// 3D Circuit Node Pin Coordinates inside the Sentaurus 3D Transistor (in Sentaurus micrometers)
-const NODE_3D_PINS: {
-  id: string;
-  label: string;
-  xUm: number;
-  yUm: number;
-  zUm: number;
-  layerGroup: number;
-  ext: boolean;
-}[] = [
-  { id: 'E', label: 'E (Emitter Contact Y=-0.30)', xUm: 0.0, yUm: -0.05, zUm: 0.325, layerGroup: 6, ext: true },
-  { id: "E'", label: "E' (Int. Mono-Emitter Y=-0.075)", xUm: 0.0, yUm: -0.05, zUm: 0.072, layerGroup: 5, ext: false },
-  { id: 'B', label: 'B (R.BaseContR Contact)', xUm: 0.34, yUm: -0.05, zUm: 0.285, layerGroup: 4, ext: true },
-  { id: 'B*', label: 'B* (Perimeter Base X=0.15)', xUm: 0.16, yUm: -0.05, zUm: 0.068, layerGroup: 4, ext: false },
-  { id: "B'", label: "B' (Int. R.SiGeBase)", xUm: 0.0, yUm: -0.05, zUm: 0.032, layerGroup: 3, ext: false },
-  { id: "C'", label: "C' (Int. Collector / SubCol)", xUm: 0.0, yUm: -0.05, zUm: -0.18, layerGroup: 2, ext: false },
-  { id: 'C', label: 'C (R.CollectorCont X=0.90)', xUm: 0.90, yUm: -0.05, zUm: 0.285, layerGroup: 2, ext: true },
-  { id: "S'", label: "S' (Int. Substrate Interface)", xUm: 0.0, yUm: -0.05, zUm: -0.43, layerGroup: 0, ext: false },
-  { id: 'S', label: 'S (Bottom Substrate Y=+0.60)', xUm: 0.55, yUm: -0.05, zUm: -0.59, layerGroup: 0, ext: true },
-  { id: 'T', label: 'T (ΔTj Peak in SIC)', xUm: 0.11, yUm: -0.05, zUm: -0.08, layerGroup: 2, ext: true },
-];
-
-// 3D Branch Links between 3D Node Pins for the Circuit Overlay Mode
-const BRANCH_3D_LINKS: {
-  elementId: string;
-  label: string;
-  fromNode: string;
-  toNode: string;
-  color: string;
-}[] = [
-  { elementId: 're', label: 'R_E', fromNode: 'E', toNode: "E'", color: '#B45309' },
-  { elementId: 'rbx', label: 'R_Bx', fromNode: 'B', toNode: 'B*', color: '#9F1239' },
-  { elementId: 'rbi', label: 'R_bi* || C_rBi', fromNode: 'B*', toNode: "B'", color: '#065F46' },
-  { elementId: 'it', label: 'i_T (GICCR)', fromNode: "C'", toNode: "E'", color: '#1E40AF' },
-  { elementId: 'cjei', label: 'Q_jEi, Q_f, i_jBEi', fromNode: "B'", toNode: "E'", color: '#0F766E' },
-  { elementId: 'cjep', label: 'Q_jEp, i_jBEp, C_BEpar', fromNode: 'B*', toNode: "E'", color: '#5B21B6' },
-  { elementId: 'cjci', label: 'Q_jCi, i_jBCi, i_AVL', fromNode: "B'", toNode: "C'", color: '#0369A1' },
-  { elementId: 'cjcx2', label: 'C_jCx2, C_BCpar', fromNode: 'B*', toNode: "C'", color: '#475569' },
-  { elementId: 'rcx', label: 'R_Cx (SubCol+Sinker)', fromNode: "C'", toNode: 'C', color: '#1D4ED8' },
-  { elementId: 'cjs', label: 'C_jS, i_jSC, i_TS', fromNode: "C'", toNode: "S'", color: '#334155' },
-  { elementId: 'rsu', label: 'R_su || C_su', fromNode: "S'", toNode: 'S', color: '#475569' },
-];
-
-// Summary table of exact Sentaurus SDE parameters for the Sentaurus Specification tab
-const SENTAURUS_SDE_SPEC_ROWS = [
-  { param: 'Xmin, Xmax', value: '0.00 μm, 1.20 μm', role: 'Half-device symmetry axis (X=0) to outer STI boundary (X=1.20 μm)' },
-  { param: 'Wemi / Xer', value: '0.15 μm / 0.075 μm', role: 'Full emitter window width Wemi = 150 nm; half-width Xer = 75 nm' },
-  { param: 'Wbas / Xbr', value: '0.45 μm / 0.225 μm', role: 'Full SiGe base mesa width Wbas = 450 nm; half-width Xbr = 225 nm' },
-  { param: 'dWb / Xbcr', value: '0.075 μm / 0.150 μm', role: 'Extrinsic p⁺ poly-base overlap on SiGe base (Xbcr = Xbr − dWb = 150 nm)' },
-  { param: 'dWc / Xcr', value: '0.10 μm / 0.325 μm', role: 'Sloped STI trench wall offset (Xcr = Xbr + dWc = 325 nm at Ysub = 0.30 μm)' },
-  { param: 'Xcol, Wcol (Xscl..Xscr)', value: '0.90 μm, 0.20 μm (0.80..1.00 μm)', role: 'Collector sinker contact top window; widens to Xsl=0.70..Xsr=1.10 μm at Ysub' },
-  { param: 'Ymin, Ybc, Yemi, Ybas, Ysub, Ymax', value: '−0.30, −0.15, −0.075, 0.0, +0.30, +0.60 μm', role: 'Vertical depth levels in Sentaurus SDE (Hbas = 75 nm, Hbc = 75 nm, Hemi = 225 nm)' },
-  { param: 'Prof.Mole (R.SiGeBase)', value: 'x_Ge = 0.00 → 0.16', role: 'Linear Ge mole fraction ramp across 75 nm SiGe base (compressive strain up to 4.25%)' },
-  { param: 'PeakEmi, PeakBas, PeakCol', value: '5×10¹⁹, 5×10¹⁸ (7.8×10¹⁸), 1×10¹⁸ cm⁻³', role: 'Gaussian analytical peak concentrations for Mono-Emitter, SiGe Base, and SIC Collector' },
-  { param: 'SubCol, ColCont, Poly Doping', value: '2×10¹⁹, 1×10²⁰, 1×10²⁰ cm⁻³', role: 'Buried subcollector (Ysub=0.30 μm), collector sinker plug, and n⁺/p⁺ polysilicon regions' },
-];
-
-interface ProjectedFace {
-  regionId: string;
-  points: { x: number; y: number }[];
-  depth: number;
-  fill: string;
-  stroke: string;
-  opacity: number;
-}
-
-function shadeHexColor(hex: string, factor: number): string {
-  const clean = hex.replace('#', '');
-  if (clean.length !== 6) return hex;
-  const r = Math.min(255, Math.max(0, Math.round(parseInt(clean.slice(0, 2), 16) * factor)));
-  const g = Math.min(255, Math.max(0, Math.round(parseInt(clean.slice(2, 4), 16) * factor)));
-  const b = Math.min(255, Math.max(0, Math.round(parseInt(clean.slice(4, 6), 16) * factor)));
-  return `rgb(${r}, ${g}, ${b})`;
-}
-
-function getThermalHexColor(weight: number, dtsh: number): string {
-  const norm = Math.min(1, Math.max(0, weight * (0.35 + Math.min(dtsh / 60, 0.65))));
-  if (norm < 0.5) {
-    const t = norm * 2;
-    const r = Math.round(219 + t * (253 - 219));
-    const g = Math.round(234 + t * (230 - 234));
-    const b = Math.round(254 + t * (138 - 254));
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-  const t = (norm - 0.5) * 2;
-  const r = Math.round(253 + t * (225 - 253));
-  const g = Math.round(230 + t * (29 - 230));
-  const b = Math.round(138 + t * (72 - 138));
-  return `rgb(${r}, ${g}, ${b})`;
-}
+const SCALE_UM_TO_3D = 10.0; // 1 um = 10 Three.js world units
 
 export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewProps> = ({
   parameters,
+  elements,
   opResult,
   selectedParamId,
   selectedElementId,
   onSelectParamInLab,
   onSelectElementInLab,
 }) => {
-  const [viewportTab, setViewportTab] = useState<ViewportTab>('interactive_3d');
-  const [yawDeg, setYawDeg] = useState<number>(-28);
-  const [pitchDeg, setPitchDeg] = useState<number>(22);
-  const [zoom, setZoom] = useState<number>(1.38);
-  const [explodeFactor, setExplodeFactor] = useState<number>(0.08);
-  const [cutawayMode, setCutawayMode] = useState<CutawayMode>('step_cutaway');
-  const [overlayMode, setOverlayMode] = useState<OverlayMode>('doping');
-  const [spatialFilter] = useState<'all' | SpatialNature>('all');
-  const [selectedRegionId, setSelectedRegionId] = useState<string>('intrinsic_sige_base');
+  // Primary Workspace State
+  const [viewModePreset, setViewModePreset] = useState<ViewModePreset>('cross_section');
+  const [interactionTool, setInteractionTool] = useState<InteractionTool>('orbit');
+  const [activeCameraPreset, setActiveCameraPreset] = useState<CameraPresetId | null>('front');
+  const [explodePct, setExplodePct] = useState<number>(0); // 0 to 100
+  const [cutawayAxis, setCutawayAxis] = useState<CutawayAxis>('z_cross');
+  const [cutawayPos, setCutawayPos] = useState<number>(0.02); // in um
+  const [globalOpacity, setGlobalOpacity] = useState<number>(0.94);
 
-  const dragRef = useRef<{ active: boolean; startX: number; startY: number; startYaw: number; startPitch: number }>({
-    active: false,
-    startX: 0,
-    startY: 0,
-    startYaw: -28,
-    startPitch: 22,
+  // Visibility & Hover Toggles
+  const [hoverLabelsEnabled, setHoverLabelsEnabled] = useState<boolean>(true);
+  const [showMaterials, setShowMaterials] = useState<boolean>(true);
+  const [showContacts, setShowContacts] = useState<boolean>(true);
+  const [showOxide, setShowOxide] = useState<boolean>(true);
+  const [showHicumOverlay, setShowHicumOverlay] = useState<boolean>(true);
+  const [showComponentLabels, setShowComponentLabels] = useState<boolean>(true);
+  const [showComponentWires, setShowComponentWires] = useState<boolean>(true);
+  const [enabledCategories, setEnabledCategories] = useState<Record<EmbeddedComponentCategory, boolean>>({
+    resistances: true,
+    capacitances: true,
+    currents: true,
+    charges: true,
   });
 
-  const activeRegion = useMemo(() => {
+  // Per-Region Selection, Isolation, Hide, and Opacity
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('intrinsic_sige_base');
+  const [isolatedRegionId, setIsolatedRegionId] = useState<string | null>(null);
+  const [hiddenRegionIds, setHiddenRegionIds] = useState<Record<string, boolean>>({});
+  const [regionOpacityMap, setRegionOpacityMap] = useState<Record<string, number>>({});
+
+  // Hover state (for 3D semiconductor regions and embedded HICUM components)
+  const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
+  const [hoveredComponentId, setHoveredComponentId] = useState<string | null>(null);
+  const [mouseScreenPos, setMouseScreenPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Parameter Search inside 3D Workspace
+  const [paramSearchQuery, setParamSearchQuery] = useState<string>('');
+  const [paramSearchOpen, setParamSearchOpen] = useState<boolean>(false);
+
+  // UI Panels & Popovers
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [bottomCardsExpanded, setBottomCardsExpanded] = useState<boolean>(true);
+  const [showCategoryMenu, setShowCategoryMenu] = useState<boolean>(false);
+  const [showRegionManager, setShowRegionManager] = useState<boolean>(false);
+  const [screenshotTransparent, setScreenshotTransparent] = useState<boolean>(false);
+  const [glbLoadedStatus, setGlbLoadedStatus] = useState<boolean>(false);
+
+  // Camera angles synced to OrientationCube3D
+  const [camAngles, setCamAngles] = useState<{ theta: number; phi: number }>({
+    theta: 0.14,
+    phi: Math.PI / 2 - 0.12,
+  });
+
+  // Projected 2D coordinates for the SVG HICUM schematic overlay
+  const [overlayProj, setOverlayProj] = useState<ProjectedOverlayState>({
+    nodes: {},
+    components: {},
+  });
+
+  // Refs for Three.js lifecycle & smooth animation
+  const artboardContainerRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const svgOverlayRef = useRef<SVGSVGElement | null>(null);
+
+  const cameraStateRef = useRef({
+    theta: 0.14,
+    phi: Math.PI / 2 - 0.12,
+    radius: 25.5,
+    targetTheta: 0.14,
+    targetPhi: Math.PI / 2 - 0.12,
+    targetRadius: 25.5,
+    panX: 0.0,
+    panY: -1.1,
+    panZ: 0.0,
+    targetPanX: 0.0,
+    targetPanY: -1.1,
+    targetPanZ: 0.0,
+    currentExplode: 0.0,
+    targetExplode: 0.0,
+  });
+
+  const pointerRef = useRef<{
+    isDown: boolean;
+    button: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
+  }>({
+    isDown: false,
+    button: 0,
+    startX: 0,
+    startY: 0,
+    moved: false,
+  });
+
+  const sceneObjectsRef = useRef<{
+    scene: THREE.Scene | null;
+    camera: THREE.PerspectiveCamera | null;
+    renderer: THREE.WebGLRenderer | null;
+    clippingPlane: THREE.Plane;
+    meshEntries: {
+      regionId: string;
+      side: 'left' | 'right' | 'center';
+      group: THREE.Group;
+      mesh: THREE.Mesh;
+      edges: THREE.LineSegments;
+      material: THREE.MeshStandardMaterial;
+      edgeMaterial: THREE.LineBasicMaterial;
+    }[];
+  }>({
+    scene: null,
+    camera: null,
+    renderer: null,
+    clippingPlane: new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.2),
+    meshEntries: [],
+  });
+
+  // Keep latest state in a ref for the Three.js animation & raycast loop
+  const liveStateRef = useRef({
+    selectedRegionId,
+    hoveredRegionId,
+    isolatedRegionId,
+    hiddenRegionIds,
+    regionOpacityMap,
+    globalOpacity,
+    showMaterials,
+    showContacts,
+    showOxide,
+    cutawayAxis,
+    cutawayPos,
+    selectedParamId,
+    selectedElementId,
+    interactionTool,
+  });
+
+  useEffect(() => {
+    liveStateRef.current = {
+      selectedRegionId,
+      hoveredRegionId,
+      isolatedRegionId,
+      hiddenRegionIds,
+      regionOpacityMap,
+      globalOpacity,
+      showMaterials,
+      showContacts,
+      showOxide,
+      cutawayAxis,
+      cutawayPos,
+      selectedParamId,
+      selectedElementId,
+      interactionTool,
+    };
+  }, [
+    selectedRegionId,
+    hoveredRegionId,
+    isolatedRegionId,
+    hiddenRegionIds,
+    regionOpacityMap,
+    globalOpacity,
+    showMaterials,
+    showContacts,
+    showOxide,
+    cutawayAxis,
+    cutawayPos,
+    selectedParamId,
+    selectedElementId,
+    interactionTool,
+  ]);
+
+  useEffect(() => {
+    cameraStateRef.current.targetExplode = explodePct / 100;
+  }, [explodePct]);
+
+  // Verify Blender GLB asset availability via GLTFLoader
+  useEffect(() => {
+    const loader = new GLTFLoader();
+    loader.load(
+      './models/sige_hbt_sentaurus.glb',
+      () => {
+        setGlbLoadedStatus(true);
+      },
+      undefined,
+      () => {
+        setGlbLoadedStatus(false);
+      }
+    );
+  }, []);
+
+  // Active Region & Active Embedded Component resolution
+  const activeRegion: Sentaurus3DRegionSpec = useMemo(() => {
+    return (
+      SENTAURUS_3D_REGIONS.find((r) => r.id === selectedRegionId) ||
+      SENTAURUS_3D_REGIONS[6]
+    );
+  }, [selectedRegionId]);
+
+  const activeEmbeddedComponent: Embedded3DComponentSpec = useMemo(() => {
     if (selectedElementId) {
-      const match = HBT_3D_REGIONS.find((r) => r.circuitElements.includes(selectedElementId));
-      if (match && match.id === selectedRegionId) return match;
+      const found = EMBEDDED_3D_COMPONENTS.find((c) => c.id === selectedElementId);
+      if (found) return found;
     }
-    return HBT_3D_REGIONS.find((r) => r.id === selectedRegionId) || HBT_3D_REGIONS[5];
-  }, [selectedRegionId, selectedElementId]);
+    const regionComp = EMBEDDED_3D_COMPONENTS.find(
+      (c) => c.hostRegionId === activeRegion.id
+    );
+    return regionComp || EMBEDDED_3D_COMPONENTS[11]; // default 'it'
+  }, [selectedElementId, activeRegion.id]);
 
-  const project3D = (xUm: number, yUm: number, zUm: number) => {
-    const x = xUm * UM_TO_VIEW;
-    const y = yUm * UM_TO_VIEW;
-    const z = (zUm + 0.14) * UM_TO_VIEW;
+  const activeCircuitElement: CircuitElement | undefined = useMemo(
+    () => elements.find((e) => e.id === activeEmbeddedComponent.id),
+    [elements, activeEmbeddedComponent.id]
+  );
 
-    const yaw = (yawDeg * Math.PI) / 180;
-    const pitch = (pitchDeg * Math.PI) / 180;
+  const activeEquation = useMemo(() => {
+    const eqId = activeEmbeddedComponent.primaryEquationId;
+    return (
+      HICUM_EQUATIONS.find((eq) => eq.id === eqId) ||
+      HICUM_EQUATIONS.find((eq) =>
+        activeCircuitElement?.governingEquations.includes(eq.id)
+      ) ||
+      HICUM_EQUATIONS[0]
+    );
+  }, [activeEmbeddedComponent, activeCircuitElement]);
 
-    const x1 = x * Math.cos(yaw) - y * Math.sin(yaw);
-    const y1 = x * Math.sin(yaw) + y * Math.cos(yaw);
-    const z1 = z;
+  // Regions highlighted by the currently selected parameter
+  const paramHighlightedRegionIds = useMemo(() => {
+    if (!selectedParamId) return new Set<string>();
+    return new Set(
+      SENTAURUS_3D_REGIONS.filter((r) =>
+        r.keyParameters.includes(selectedParamId)
+      ).map((r) => r.id)
+    );
+  }, [selectedParamId]);
 
-    const x2 = x1;
-    const y2 = y1 * Math.sin(pitch) - z1 * Math.cos(pitch);
-    const z2 = y1 * Math.cos(pitch) + z1 * Math.sin(pitch);
+  const paramHighlightedComponentIds = useMemo(() => {
+    if (!selectedParamId) return new Set<string>();
+    const matchingElementIds = new Set(
+      elements
+        .filter((el) => el.parameters.includes(selectedParamId))
+        .map((el) => el.id)
+    );
+    return matchingElementIds;
+  }, [selectedParamId, elements]);
 
-    const fov = 680;
-    const persp = fov / Math.max(fov - z2 * 0.55, 220);
-    const cx = 370;
-    const cy = 248;
+  // Camera Preset Handler
+  const handleSelectCameraPreset = useCallback((preset: CameraPresetId) => {
+    setActiveCameraPreset(preset);
+    const cam = cameraStateRef.current;
+    switch (preset) {
+      case 'front':
+        cam.targetTheta = 0.0;
+        cam.targetPhi = Math.PI / 2 - 0.04;
+        break;
+      case 'back':
+        cam.targetTheta = Math.PI;
+        cam.targetPhi = Math.PI / 2 - 0.04;
+        break;
+      case 'left':
+        cam.targetTheta = -Math.PI / 2;
+        cam.targetPhi = Math.PI / 2 - 0.04;
+        break;
+      case 'right':
+        cam.targetTheta = Math.PI / 2;
+        cam.targetPhi = Math.PI / 2 - 0.04;
+        break;
+      case 'top':
+        cam.targetTheta = 0.0;
+        cam.targetPhi = 0.08;
+        break;
+      case 'bottom':
+        cam.targetTheta = 0.0;
+        cam.targetPhi = Math.PI - 0.08;
+        break;
+      case 'iso':
+        cam.targetTheta = 0.52;
+        cam.targetPhi = Math.PI / 2 - 0.36;
+        break;
+    }
+  }, []);
 
-    return {
-      x: cx + x2 * zoom * persp,
-      y: cy + y2 * zoom * persp,
-      depth: z2,
+  // Fit to Screen Handler
+  const handleFitToScreen = useCallback(() => {
+    const cam = cameraStateRef.current;
+    cam.targetPanX = 0.0;
+    cam.targetPanY = -1.1;
+    cam.targetPanZ = 0.0;
+    cam.targetRadius = 25.5 + cam.targetExplode * 5.5;
+  }, []);
+
+  // Focus Camera on Specific Region (Double-click or Focus button)
+  const handleFocusOnRegion = useCallback((region: Sentaurus3DRegionSpec) => {
+    const cam = cameraStateRef.current;
+    const [fx, fy, fz] = region.focusCenterUm;
+    const [, ey, ez] = region.explodeVectorUm;
+    const exp = cam.targetExplode;
+    cam.targetPanX = fx * SCALE_UM_TO_3D;
+    cam.targetPanY = (fy + ey * exp) * SCALE_UM_TO_3D;
+    cam.targetPanZ = (fz + ez * exp) * SCALE_UM_TO_3D;
+    cam.targetRadius = 15.5;
+    setSelectedRegionId(region.id);
+  }, []);
+
+  // Complete Reset Handler
+  const handleResetAll = useCallback(() => {
+    setViewModePreset('cross_section');
+    setExplodePct(0);
+    setCutawayAxis('z_cross');
+    setCutawayPos(0.02);
+    setGlobalOpacity(0.94);
+    setIsolatedRegionId(null);
+    setHiddenRegionIds({});
+    setRegionOpacityMap({});
+    setShowMaterials(true);
+    setShowContacts(true);
+    setShowOxide(true);
+    setShowHicumOverlay(true);
+    setActiveCameraPreset('front');
+    const cam = cameraStateRef.current;
+    cam.targetTheta = 0.14;
+    cam.targetPhi = Math.PI / 2 - 0.12;
+    cam.targetRadius = 25.5;
+    cam.targetPanX = 0.0;
+    cam.targetPanY = -1.1;
+    cam.targetPanZ = 0.0;
+    cam.targetExplode = 0.0;
+  }, []);
+
+  // Quick View Mode Switcher (Cross-Section vs Assembled 3D vs Exploded 3D)
+  const handleSelectViewModePreset = useCallback((mode: ViewModePreset) => {
+    setViewModePreset(mode);
+    const cam = cameraStateRef.current;
+    if (mode === 'cross_section') {
+      setExplodePct(0);
+      setCutawayAxis('z_cross');
+      setCutawayPos(0.02);
+      setActiveCameraPreset('front');
+      cam.targetTheta = 0.12;
+      cam.targetPhi = Math.PI / 2 - 0.10;
+      cam.targetRadius = 25.5;
+      cam.targetPanX = 0.0;
+      cam.targetPanY = -1.1;
+      cam.targetPanZ = 0.0;
+    } else if (mode === 'assembled_3d') {
+      setExplodePct(0);
+      setCutawayAxis('none');
+      setActiveCameraPreset('iso');
+      cam.targetTheta = 0.52;
+      cam.targetPhi = Math.PI / 2 - 0.34;
+      cam.targetRadius = 27.5;
+      cam.targetPanX = 0.0;
+      cam.targetPanY = -1.1;
+      cam.targetPanZ = 0.0;
+    } else if (mode === 'exploded_3d') {
+      setExplodePct(68);
+      setCutawayAxis('z_cross');
+      setCutawayPos(0.18);
+      setActiveCameraPreset('iso');
+      cam.targetTheta = 0.44;
+      cam.targetPhi = Math.PI / 2 - 0.28;
+      cam.targetRadius = 31.0;
+      cam.targetPanX = 0.0;
+      cam.targetPanY = -0.8;
+      cam.targetPanZ = 0.0;
+    }
+  }, []);
+
+  // Initialize Three.js Scene, Meshes from Sentaurus TCAD Geometry, Lighting & Animation Loop
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = artboardContainerRef.current;
+    if (!canvas || !container) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(34, 1.6, 0.5, 250);
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      preserveDrawingBuffer: true,
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.localClippingEnabled = true;
+
+    // Soft, publication-grade studio illumination (no harsh specular glare)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xfffcf7, 1.15);
+    keyLight.position.set(18, 28, 26);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xeef4fa, 0.65);
+    fillLight.position.set(-22, 12, 18);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xf5f5f0, 0.45);
+    rimLight.position.set(0, -18, -20);
+    scene.add(rimLight);
+
+    const clippingPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.2);
+    const meshEntries: typeof sceneObjectsRef.current.meshEntries = [];
+
+    // Helper to build a single extruded 3D prism mesh + edge lines
+    const buildExtrudedHalfMesh = (
+      reg: Sentaurus3DRegionSpec,
+      side: 'left' | 'right' | 'center'
+    ) => {
+      const group = new THREE.Group();
+      const z0 = reg.extrudeZUm[0] * SCALE_UM_TO_3D;
+      const z1 = reg.extrudeZUm[1] * SCALE_UM_TO_3D;
+      const depth = z1 - z0;
+
+      const material = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(reg.colorHex),
+        roughness: reg.category === 'contacts' ? 0.35 : 0.62,
+        metalness: reg.category === 'contacts' ? 0.25 : 0.04,
+        transparent: true,
+        opacity: reg.defaultOpacity,
+        side: THREE.DoubleSide,
+        clippingPlanes: [clippingPlane],
+        clipShadows: true,
+        polygonOffset: true,
+        polygonOffsetFactor: 1,
+        polygonOffsetUnits: 1,
+      });
+
+      const edgeMaterial = new THREE.LineBasicMaterial({
+        color: new THREE.Color(reg.edgeHex),
+        transparent: true,
+        opacity: 0.72,
+        clippingPlanes: [clippingPlane],
+      });
+
+      for (const prism of reg.prisms) {
+        const shape = new THREE.Shape();
+        const pts =
+          side === 'left'
+            ? [...prism.xzPointsUm].reverse().map(([x, y]) => [-x * SCALE_UM_TO_3D, y * SCALE_UM_TO_3D])
+            : prism.xzPointsUm.map(([x, y]) => [x * SCALE_UM_TO_3D, y * SCALE_UM_TO_3D]);
+
+        pts.forEach(([px, py], idx) => {
+          if (idx === 0) shape.moveTo(px, py);
+          else shape.lineTo(px, py);
+        });
+        shape.closePath();
+
+        const geom = new THREE.ExtrudeGeometry(shape, {
+          depth,
+          bevelEnabled: false,
+        });
+        geom.translate(0, 0, z0);
+
+        const mesh = new THREE.Mesh(geom, material);
+        mesh.userData = { regionId: reg.id, side };
+        group.add(mesh);
+
+        const edgesGeom = new THREE.EdgesGeometry(geom, 18);
+        const edges = new THREE.LineSegments(edgesGeom, edgeMaterial);
+        group.add(edges);
+
+        meshEntries.push({
+          regionId: reg.id,
+          side,
+          group,
+          mesh,
+          edges,
+          material,
+          edgeMaterial,
+        });
+      }
+
+      scene.add(group);
+    };
+
+    // Build all Sentaurus 3D regions (symmetric left and right halves)
+    for (const reg of SENTAURUS_3D_REGIONS) {
+      const touchesCenter = reg.prisms.some((p) =>
+        p.xzPointsUm.some(([x]) => Math.abs(x) < 1e-4)
+      );
+      const isPurelyLateral = !touchesCenter;
+      if (isPurelyLateral) {
+        buildExtrudedHalfMesh(reg, 'right');
+        buildExtrudedHalfMesh(reg, 'left');
+      } else {
+        // Regions touching X=0 are built as both right and left symmetric halves moving together along center Y
+        buildExtrudedHalfMesh(reg, 'right');
+        buildExtrudedHalfMesh(reg, 'left');
+      }
+    }
+
+    sceneObjectsRef.current = {
+      scene,
+      camera,
+      renderer,
+      clippingPlane,
+      meshEntries,
+    };
+
+    // Resize observer for responsive layout
+    const updateSize = () => {
+      if (!container || !renderer || !camera) return;
+      const w = container.clientWidth || 900;
+      const h = container.clientHeight || 540;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    updateSize();
+    const resizeObserver = new ResizeObserver(updateSize);
+    resizeObserver.observe(container);
+
+    // Wheel zoom listener with passive: false
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const cam = cameraStateRef.current;
+      const delta = e.deltaY * 0.018;
+      cam.targetRadius = Math.max(9.0, Math.min(52.0, cam.targetRadius + delta));
+    };
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+
+    // Animation loop
+    let animFrameId = 0;
+    let frameCounter = 0;
+    const tempVec = new THREE.Vector3();
+
+    const animate = () => {
+      animFrameId = requestAnimationFrame(animate);
+      const cam = cameraStateRef.current;
+      const st = liveStateRef.current;
+
+      // Smoothly damp camera spherical coordinates, pan target, and explode factor
+      const damp = 0.16;
+      cam.theta += (cam.targetTheta - cam.theta) * damp;
+      cam.phi += (cam.targetPhi - cam.phi) * damp;
+      cam.radius += (cam.targetRadius - cam.radius) * damp;
+      cam.panX += (cam.targetPanX - cam.panX) * damp;
+      cam.panY += (cam.targetPanY - cam.panY) * damp;
+      cam.panZ += (cam.targetPanZ - cam.panZ) * damp;
+      cam.currentExplode += (cam.targetExplode - cam.currentExplode) * damp;
+
+      // Update camera position from spherical coordinates
+      const sinPhi = Math.sin(cam.phi);
+      const cosPhi = Math.cos(cam.phi);
+      const sinTheta = Math.sin(cam.theta);
+      const cosTheta = Math.cos(cam.theta);
+
+      camera.position.set(
+        cam.panX + cam.radius * sinPhi * sinTheta,
+        cam.panY + cam.radius * cosPhi,
+        cam.panZ + cam.radius * sinPhi * cosTheta
+      );
+      camera.lookAt(cam.panX, cam.panY, cam.panZ);
+      camera.updateMatrixWorld();
+
+      // Update clipping plane
+      if (st.cutawayAxis === 'none') {
+        clippingPlane.constant = 999;
+      } else if (st.cutawayAxis === 'z_cross') {
+        clippingPlane.normal.set(0, 0, -1);
+        clippingPlane.constant = st.cutawayPos * SCALE_UM_TO_3D;
+      } else if (st.cutawayAxis === 'x_half') {
+        clippingPlane.normal.set(-1, 0, 0);
+        clippingPlane.constant = st.cutawayPos * SCALE_UM_TO_3D;
+      } else if (st.cutawayAxis === 'y_depth') {
+        clippingPlane.normal.set(0, -1, 0);
+        clippingPlane.constant = st.cutawayPos * SCALE_UM_TO_3D;
+      }
+
+      // Update each mesh's exploded position, visibility, highlight, and opacity
+      for (const entry of meshEntries) {
+        const reg = SENTAURUS_3D_REGIONS.find((r) => r.id === entry.regionId);
+        if (!reg) continue;
+
+        const [ex, ey, ez] = reg.explodeVectorUm;
+        const sideSign =
+          Math.abs(ex) > 1e-4
+            ? entry.side === 'left'
+              ? -1
+              : 1
+            : 0;
+
+        entry.group.position.set(
+          ex * sideSign * cam.currentExplode * SCALE_UM_TO_3D,
+          ey * cam.currentExplode * SCALE_UM_TO_3D,
+          ez * cam.currentExplode * SCALE_UM_TO_3D
+        );
+
+        // Visibility check
+        const catVisible =
+          (reg.category === 'materials' && st.showMaterials) ||
+          (reg.category === 'contacts' && st.showContacts) ||
+          (reg.category === 'oxide' && st.showOxide);
+        const isHidden = Boolean(st.hiddenRegionIds[reg.id]);
+        const isIsolatedOut =
+          st.isolatedRegionId !== null && st.isolatedRegionId !== reg.id;
+
+        entry.group.visible = catVisible && !isHidden && !isIsolatedOut;
+
+        // Material color & highlight state
+        const isSelected = st.selectedRegionId === reg.id;
+        const isHovered = st.hoveredRegionId === reg.id;
+        const isParamMatch =
+          st.selectedParamId !== null &&
+          reg.keyParameters.includes(st.selectedParamId);
+
+        const baseColor = new THREE.Color(reg.colorHex);
+        if (isHovered) {
+          baseColor.offsetHSL(0, 0.05, 0.06);
+        } else if (isSelected || isParamMatch) {
+          baseColor.offsetHSL(0, 0.04, 0.03);
+        }
+        entry.material.color.copy(baseColor);
+
+        const customOpacity = st.regionOpacityMap[reg.id] ?? reg.defaultOpacity;
+        const finalOpacity = Math.min(1, customOpacity * st.globalOpacity);
+        entry.material.opacity = finalOpacity;
+        entry.material.depthWrite = finalOpacity > 0.78;
+
+        entry.edgeMaterial.color.set(
+          isSelected || isHovered || isParamMatch ? '#1E3A8A' : reg.edgeHex
+        );
+        entry.edgeMaterial.opacity = isSelected || isHovered ? 0.98 : 0.65;
+      }
+
+      renderer.render(scene, camera);
+
+      // Update React overlay projection & orientation cube at ~30fps or when moving
+      frameCounter++;
+      if (frameCounter % 2 === 0) {
+        const w = container.clientWidth || 900;
+        const h = container.clientHeight || 540;
+
+        const zFrontPlaneUm =
+          st.cutawayAxis === 'z_cross'
+            ? Math.min(0.55, st.cutawayPos + 0.01)
+            : 0.56;
+
+        const projectUmPoint = (ptUm: [number, number, number]) => {
+          tempVec.set(
+            ptUm[0] * SCALE_UM_TO_3D,
+            ptUm[1] * SCALE_UM_TO_3D,
+            ptUm[2] * SCALE_UM_TO_3D
+          );
+          tempVec.project(camera);
+          return {
+            x: (tempVec.x * 0.5 + 0.5) * w,
+            y: (-tempVec.y * 0.5 + 0.5) * h,
+            visible: tempVec.z >= -1 && tempVec.z <= 1,
+          };
+        };
+
+        const nodesProj: ProjectedOverlayState['nodes'] = {};
+        const explodedNodeCoordsUm: Record<string, [number, number, number]> = {};
+
+        for (const pin of EMBEDDED_3D_NODE_PINS) {
+          const baseUm: [number, number, number] = [
+            pin.posUm[0],
+            pin.posUm[1],
+            zFrontPlaneUm,
+          ];
+          const expUm = getExplodedPointUm(
+            baseUm,
+            pin.hostRegionId,
+            pin.hostSide,
+            cam.currentExplode
+          );
+          explodedNodeCoordsUm[pin.id] = expUm;
+          nodesProj[pin.id] = projectUmPoint(expUm);
+        }
+
+        const compsProj: ProjectedOverlayState['components'] = {};
+        for (const comp of EMBEDDED_3D_COMPONENTS) {
+          const baseSymUm: [number, number, number] = [
+            comp.symbolPosUm[0],
+            comp.symbolPosUm[1],
+            zFrontPlaneUm,
+          ];
+          const expSymUm = getExplodedPointUm(
+            baseSymUm,
+            comp.hostRegionId,
+            comp.hostSide,
+            cam.currentExplode
+          );
+          const sym2D = projectUmPoint(expSymUm);
+
+          const fromUm = explodedNodeCoordsUm[comp.fromNodePinId];
+          const toUm = explodedNodeCoordsUm[comp.toNodePinId];
+          const wirePts: { x: number; y: number }[] = [];
+
+          if (fromUm && toUm) {
+            wirePts.push(projectUmPoint(fromUm));
+            if (comp.wireWaypoints && comp.wireWaypoints.length > 0) {
+              for (const wp of comp.wireWaypoints) {
+                const wpUm = getExplodedPointUm(
+                  [wp.posUm[0], wp.posUm[1], zFrontPlaneUm],
+                  wp.hostRegionId,
+                  wp.hostSide,
+                  cam.currentExplode
+                );
+                wirePts.push(projectUmPoint(wpUm));
+              }
+            }
+            wirePts.push(sym2D);
+            wirePts.push(projectUmPoint(toUm));
+          }
+
+          compsProj[comp.id] = {
+            x: sym2D.x,
+            y: sym2D.y,
+            visible: sym2D.visible,
+            wirePoints: wirePts,
+          };
+        }
+
+        setOverlayProj({ nodes: nodesProj, components: compsProj });
+        setCamAngles({ theta: cam.theta, phi: cam.phi });
+      }
+    };
+
+    animFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animFrameId);
+      resizeObserver.disconnect();
+      canvas.removeEventListener('wheel', handleWheel);
+      renderer.dispose();
+    };
+  }, []);
+
+  // Raycast helper to pick 3D semiconductor region under cursor
+  const raycastRegionAtEvent = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>): string | null => {
+      const container = artboardContainerRef.current;
+      const { camera, meshEntries, clippingPlane } = sceneObjectsRef.current;
+      if (!container || !camera) return null;
+
+      const rect = container.getBoundingClientRect();
+      const ndcX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ndcY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+
+      const visibleMeshes = meshEntries
+        .filter((entry) => entry.group.visible)
+        .map((entry) => entry.mesh);
+
+      const hits = raycaster.intersectObjects(visibleMeshes, false);
+      for (const hit of hits) {
+        // Respect active clipping plane
+        if (
+          liveStateRef.current.cutawayAxis !== 'none' &&
+          clippingPlane.distanceToPoint(hit.point) < -1e-3
+        ) {
+          continue;
+        }
+        const regId = hit.object.userData?.regionId;
+        if (regId) return regId;
+      }
+      return null;
+    },
+    []
+  );
+
+  // Mouse handlers on the 3D Artboard
+  const handlePointerDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    pointerRef.current = {
+      isDown: true,
+      button: e.button,
+      startX: e.clientX,
+      startY: e.clientY,
+      moved: false,
     };
   };
 
-  // Build Painter's Algorithm Depth-Sorted 3D Polygonal Prism Faces from exact Sentaurus coordinates
-  const sortedFaces = useMemo(() => {
-    const faces: ProjectedFace[] = [];
-
-    const addExtrudedPolygon = (
-      regId: string,
-      ptsXZ: [number, number][],
-      y0Um: number,
-      y1Um: number,
-      zOffsetUm: number,
-      baseFill: string,
-      strokeColor: string,
-      opacity: number,
-      isSelected: boolean
-    ) => {
-      const n = ptsXZ.length;
-      if (n < 3 || y1Um <= y0Um) return;
-
-      const frontVerts = ptsXZ.map(([x, z]) => project3D(x, y1Um, z + zOffsetUm));
-      const backVerts = ptsXZ.map(([x, z]) => project3D(x, y0Um, z + zOffsetUm));
-
-      // Front face (at y1Um — cutaway plane facing viewer)
-      faces.push({
-        regionId: regId,
-        points: frontVerts.map((v) => ({ x: v.x, y: v.y })),
-        depth: frontVerts.reduce((acc, v) => acc + v.depth, 0) / n,
-        fill: shadeHexColor(baseFill, isSelected ? 1.06 : 1.0),
-        stroke: strokeColor,
-        opacity,
+  const handlePointerMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const container = artboardContainerRef.current;
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      setMouseScreenPos({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
       });
+    }
 
-      // Back face (at y0Um)
-      faces.push({
-        regionId: regId,
-        points: backVerts.map((v) => ({ x: v.x, y: v.y })),
-        depth: backVerts.reduce((acc, v) => acc + v.depth, 0) / n,
-        fill: shadeHexColor(baseFill, 0.82),
-        stroke: strokeColor,
-        opacity,
-      });
-
-      // Side quads around the 2D polygon perimeter
-      for (let i = 0; i < n; i++) {
-        const j = (i + 1) % n;
-        const dx = ptsXZ[j][0] - ptsXZ[i][0];
-        const dz = ptsXZ[j][1] - ptsXZ[i][1];
-        // Shade top edges brighter than bottom/side edges
-        const isTopLike = Math.abs(dx) > Math.abs(dz) && ptsXZ[i][1] >= 0;
-        const shade = isTopLike ? 1.08 : Math.abs(dx) > Math.abs(dz) ? 0.78 : 0.91;
-        const quad = [backVerts[i], backVerts[j], frontVerts[j], frontVerts[i]];
-        faces.push({
-          regionId: regId,
-          points: quad.map((v) => ({ x: v.x, y: v.y })),
-          depth: quad.reduce((acc, v) => acc + v.depth, 0) / 4,
-          fill: shadeHexColor(baseFill, isSelected ? shade * 1.04 : shade),
-          stroke: strokeColor,
-          opacity,
-        });
+    if (pointerRef.current.isDown) {
+      const dx = e.clientX - pointerRef.current.startX;
+      const dy = e.clientY - pointerRef.current.startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        pointerRef.current.moved = true;
       }
-    };
+      pointerRef.current.startX = e.clientX;
+      pointerRef.current.startY = e.clientY;
 
-    for (const reg of HBT_3D_REGIONS) {
-      const zOffsetUm = (reg.layerGroup - 2.5) * explodeFactor * 0.16;
-      const isSelected = reg.id === activeRegion.id;
-      const isParamLinked = selectedParamId !== null && reg.keyParameters.includes(selectedParamId);
-      const isElementLinked = selectedElementId !== null && reg.circuitElements.includes(selectedElementId);
+      const cam = cameraStateRef.current;
+      const isPanGesture =
+        interactionTool === 'pan' || e.button === 2 || e.shiftKey;
 
-      let baseOpacity = reg.defaultOpacity ?? 0.92;
-      if (overlayMode === 'circuit_overlay') {
-        baseOpacity = isSelected ? 0.58 : 0.24;
-      } else if (overlayMode === 'carrier_kirk') {
-        baseOpacity =
-          reg.id === 'intrinsic_sige_base' ||
-          reg.id === 'intrinsic_collector_sic' ||
-          reg.id === 'emitter_poly_mono'
-            ? 0.68
-            : 0.25;
-      } else if (spatialFilter !== 'all' && reg.spatialNature !== spatialFilter) {
-        baseOpacity = 0.22;
-      }
-
-      const baseFill =
-        overlayMode === 'thermal'
-          ? getThermalHexColor(reg.thermalWeight, opResult.Dtsh)
-          : reg.colorFill;
-
-      const strokeColor =
-        isSelected || isParamLinked || isElementLinked ? '#1E3A8A' : reg.colorStroke;
-
-      for (const prism of reg.prisms) {
-        // Right half-cell (Exact Sentaurus SDE coordinates X >= 0)
-        const yRight: [number, number] =
-          cutawayMode === 'step_cutaway'
-            ? [-0.55, 0.20]
-            : cutawayMode === 'sde_half_cell'
-            ? [-0.45, 0.45]
-            : [-0.55, 0.55];
-
-        addExtrudedPolygon(
-          reg.id,
-          prism.xzPointsUm,
-          yRight[0],
-          yRight[1],
-          zOffsetUm,
-          baseFill,
-          strokeColor,
-          baseOpacity,
-          isSelected
+      if (isPanGesture) {
+        const panScale = cam.radius * 0.0014;
+        const cosT = Math.cos(cam.theta);
+        const sinT = Math.sin(cam.theta);
+        cam.targetPanX -= dx * cosT * panScale;
+        cam.targetPanZ += dx * sinT * panScale;
+        cam.targetPanY += dy * panScale;
+      } else {
+        setActiveCameraPreset(null);
+        cam.targetTheta -= dx * 0.0075;
+        cam.targetPhi = Math.max(
+          0.08,
+          Math.min(Math.PI - 0.08, cam.targetPhi - dy * 0.0065)
         );
+      }
+      return;
+    }
 
-        // Left mirrored symmetric half-cell (X <= 0), omitted in pure SDE half-cell mode
-        if (cutawayMode !== 'sde_half_cell') {
-          const yLeft: [number, number] =
-            cutawayMode === 'step_cutaway' ? [-0.55, -0.12] : [-0.55, 0.55];
-          const mirroredXZ: [number, number][] = [...prism.xzPointsUm]
-            .reverse()
-            .map(([x, z]) => [-x, z]);
+    // Hover identification via Raycaster when not dragging
+    const hitRegionId = raycastRegionAtEvent(e);
+    setHoveredRegionId(hitRegionId);
+  };
 
-          addExtrudedPolygon(
-            reg.id,
-            mirroredXZ,
-            yLeft[0],
-            yLeft[1],
-            zOffsetUm,
-            baseFill,
-            strokeColor,
-            baseOpacity,
-            isSelected
-          );
+  const handlePointerUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    const wasClick = pointerRef.current.isDown && !pointerRef.current.moved;
+    pointerRef.current.isDown = false;
+
+    if (wasClick && e.button === 0) {
+      const hitRegionId = raycastRegionAtEvent(e);
+      if (hitRegionId) {
+        setSelectedRegionId(hitRegionId);
+        const reg = SENTAURUS_3D_REGIONS.find((r) => r.id === hitRegionId);
+        if (reg && reg.circuitElements.length > 0) {
+          onSelectElementInLab(reg.circuitElements[0]);
         }
       }
     }
+  };
 
-    faces.sort((a, b) => a.depth - b.depth);
-    return faces;
-  }, [
-    yawDeg,
-    pitchDeg,
-    zoom,
-    explodeFactor,
-    cutawayMode,
-    overlayMode,
-    spatialFilter,
-    activeRegion.id,
-    selectedParamId,
-    selectedElementId,
-    opResult.Dtsh,
-  ]);
+  const handleDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const hitRegionId = raycastRegionAtEvent(e);
+    if (hitRegionId) {
+      const reg = SENTAURUS_3D_REGIONS.find((r) => r.id === hitRegionId);
+      if (reg) {
+        handleFocusOnRegion(reg);
+      }
+    }
+  };
 
-  const kirkRatio = useMemo(() => {
-    if (opResult.Ick <= 0) return 0;
-    return Math.min(2.5, Math.max(0, opResult.Ic / opResult.Ick));
-  }, [opResult.Ic, opResult.Ick]);
+  // Screenshot Export Handler (WebGL Canvas + Optional SVG Circuit & Labels + Optional Transparent Background)
+  const handleExportScreenshot = useCallback(() => {
+    const canvas = canvasRef.current;
+    const svg = svgOverlayRef.current;
+    if (!canvas) return;
 
-  const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
-    dragRef.current = {
-      active: true,
-      startX: e.clientX,
-      startY: e.clientY,
-      startYaw: yawDeg,
-      startPitch: pitchDeg,
+    const w = canvas.width;
+    const h = canvas.height;
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = w;
+    outCanvas.height = h;
+    const ctx = outCanvas.getContext('2d');
+    if (!ctx) return;
+
+    if (!screenshotTransparent) {
+      ctx.fillStyle = '#F7F6F2';
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    ctx.drawImage(canvas, 0, 0, w, h);
+
+    const triggerDownload = () => {
+      const link = document.createElement('a');
+      link.download = `HICUM_3D_SiGe_HBT_${viewModePreset}.png`;
+      link.href = outCanvas.toDataURL('image/png');
+      link.click();
     };
-  };
 
-  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!dragRef.current.active) return;
-    const dx = e.clientX - dragRef.current.startX;
-    const dy = e.clientY - dragRef.current.startY;
-    setYawDeg(dragRef.current.startYaw + dx * 0.45);
-    setPitchDeg(Math.max(-5, Math.min(78, dragRef.current.startPitch + dy * 0.35)));
-  };
+    if (showHicumOverlay && svg) {
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svg);
+      const svgBlob = new Blob([svgString], {
+        type: 'image/svg+xml;charset=utf-8',
+      });
+      const url = URL.createObjectURL(svgBlob);
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        triggerDownload();
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        triggerDownload();
+      };
+      img.src = url;
+    } else {
+      triggerDownload();
+    }
+  }, [screenshotTransparent, showHicumOverlay, viewModePreset]);
 
-  const handleMouseUp = () => {
-    dragRef.current.active = false;
-  };
+  // Filtered parameters for the 3D Workspace Parameter Locator Search
+  const matchingSearchParams = useMemo(() => {
+    const q = paramSearchQuery.trim().toLowerCase();
+    if (!q) return [];
+    return parameters
+      .filter(
+        (p) =>
+          p.id.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          p.physicalRegion.toLowerCase().includes(q)
+      )
+      .slice(0, 8);
+  }, [paramSearchQuery, parameters]);
 
+  // Hovered entity for the floating tooltip
+  const hoveredRegionSpec = useMemo(
+    () =>
+      hoveredRegionId
+        ? SENTAURUS_3D_REGIONS.find((r) => r.id === hoveredRegionId) || null
+        : null,
+    [hoveredRegionId]
+  );
+
+  const hoveredComponentSpec = useMemo(
+    () =>
+      hoveredComponentId
+        ? EMBEDDED_3D_COMPONENTS.find((c) => c.id === hoveredComponentId) || null
+        : null,
+    [hoveredComponentId]
+  );
+
+  // Conceptual / Non-localized parameters
   const conceptualParams = useMemo(
-    () => parameters.filter((p) => p.spatialNature === 'conceptual' || p.spatialNature === 'flag'),
+    () =>
+      parameters.filter(
+        (p) => p.spatialNature === 'conceptual' || p.spatialNature === 'flag'
+      ),
     [parameters]
   );
 
-  const baseUrl = './';
-
   return (
-    <div className="space-y-5">
-      {/* Top Control & Mode Bar */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 text-xs font-mono font-semibold">
-                <Box className="w-3.5 h-3.5" />
-                Sentaurus TCAD → Blender 3D SiGe HBT Reconstruction
-              </span>
-              <span className="px-2.5 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200 text-xs font-mono font-medium">
-                Exact SDE & sprocess Geometry (X ∈ [0, 1.20] μm, Y ∈ [−0.30, +0.60] μm) · 16 Blender Meshes
-              </span>
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 mt-1 font-scientific">
-              Sentaurus 3D SiGe HBT Architecture, Blender Reconstruction & HICUM/L2 Mapping
-            </h2>
-          </div>
-
-          {/* Primary Sub-View Switcher: Interactive 3D vs Blender Renders vs Sentaurus Spec */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <button
-              onClick={() => setViewportTab('interactive_3d')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
-                viewportTab === 'interactive_3d'
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'
-              }`}
-            >
-              <Box className="w-3.5 h-3.5" />
-              <span>Interactive 3D Sentaurus Model</span>
-            </button>
-            <button
-              onClick={() => setViewportTab('blender_renders')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
-                viewportTab === 'blender_renders'
-                  ? 'bg-blue-800 text-white border-blue-800 shadow-2xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300'
-              }`}
-            >
-              <ImageIcon className="w-3.5 h-3.5" />
-              <span>Blender 5.2 Renders & GLB</span>
-            </button>
-            <button
-              onClick={() => setViewportTab('sentaurus_table')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
-                viewportTab === 'sentaurus_table'
-                  ? 'bg-teal-800 text-white border-teal-800 shadow-2xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-teal-300'
-              }`}
-            >
-              <Code2 className="w-3.5 h-3.5" />
-              <span>Sentaurus SDE / sprocess Spec</span>
-            </button>
-            <a
-              href={`${baseUrl}models/sige_hbt_sentaurus.glb`}
-              download="sige_hbt_sentaurus.glb"
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 transition-all"
-              title="Download the 16-mesh Blender 3D GLB model reconstructed from Sentaurus TCAD"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download Blender .GLB</span>
-            </a>
-          </div>
-        </div>
-
-        {/* 4 Physics Overlay Mode Buttons + Camera & Cutaway Controls */}
-        {viewportTab === 'interactive_3d' && (
-          <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <button
-                onClick={() => setOverlayMode('doping')}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1 border transition-all ${
-                  overlayMode === 'doping'
-                    ? 'bg-blue-800 text-white border-blue-800'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Sentaurus Regions & Doping</span>
-              </button>
-
-              <button
-                onClick={() => setOverlayMode('circuit_overlay')}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1 border transition-all ${
-                  overlayMode === 'circuit_overlay'
-                    ? 'bg-teal-800 text-white border-teal-800'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-teal-300'
-                }`}
-              >
-                <Cpu className="w-3.5 h-3.5" />
-                <span>3D HICUM Circuit Overlay</span>
-              </button>
-
-              <button
-                onClick={() => setOverlayMode('carrier_kirk')}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1 border transition-all ${
-                  overlayMode === 'carrier_kirk'
-                    ? 'bg-indigo-800 text-white border-indigo-800'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300'
-                }`}
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>Electron Flux & Kirk Push-Out</span>
-              </button>
-
-              <button
-                onClick={() => setOverlayMode('thermal')}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1 border transition-all ${
-                  overlayMode === 'thermal'
-                    ? 'bg-rose-800 text-white border-rose-800'
-                    : 'bg-white text-slate-700 border-slate-200 hover:border-rose-300'
-                }`}
-              >
-                <Flame className="w-3.5 h-3.5" />
-                <span>3D Self-Heating (ΔTj)</span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2.5 flex-wrap">
-              {/* Cutaway Selector */}
-              <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
-                <button
-                  onClick={() => setCutawayMode('step_cutaway')}
-                  className={`px-2 py-1 rounded-md text-[11px] font-medium ${
-                    cutawayMode === 'step_cutaway' ? 'bg-white text-blue-800 shadow-2xs' : 'text-slate-600'
-                  }`}
-                >
-                  Blender Step-Cutaway
-                </button>
-                <button
-                  onClick={() => setCutawayMode('sde_half_cell')}
-                  className={`px-2 py-1 rounded-md text-[11px] font-medium ${
-                    cutawayMode === 'sde_half_cell' ? 'bg-white text-blue-800 shadow-2xs' : 'text-slate-600'
-                  }`}
-                >
-                  SDE Half-Cell (X ≥ 0)
-                </button>
-                <button
-                  onClick={() => setCutawayMode('full_3d')}
-                  className={`px-2 py-1 rounded-md text-[11px] font-medium ${
-                    cutawayMode === 'full_3d' ? 'bg-white text-blue-800 shadow-2xs' : 'text-slate-600'
-                  }`}
-                >
-                  Full Symmetric 3D
-                </button>
-              </div>
-
-              {/* Camera Presets */}
-              <button
-                onClick={() => {
-                  setYawDeg(0);
-                  setPitchDeg(3);
-                  setZoom(1.48);
-                }}
-                className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px]"
-              >
-                2D Cross-Section
-              </button>
-
-              {/* Exploded Stack Slider */}
-              <div className="flex items-center gap-2 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
-                <span className="font-medium text-slate-600">Explode Z:</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.02}
-                  value={explodeFactor}
-                  onChange={(e) => setExplodeFactor(parseFloat(e.target.value))}
-                  className="w-16 accent-blue-800 cursor-pointer"
-                />
-                <span className="font-mono text-[11px] w-7 text-right font-semibold">
-                  {Math.round(explodeFactor * 100)}%
-                </span>
-              </div>
-
-              {/* Zoom Controls */}
-              <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden">
-                <button
-                  onClick={() => setZoom((z) => Math.max(0.85, +(z - 0.15).toFixed(2)))}
-                  className="p-1.5 text-slate-600 hover:bg-slate-100"
-                  title="Zoom Out"
-                >
-                  <ZoomOut className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => {
-                    setYawDeg(-28);
-                    setPitchDeg(22);
-                    setZoom(1.38);
-                    setExplodeFactor(0.08);
-                  }}
-                  className="px-2 text-[11px] font-mono text-slate-600 hover:bg-slate-100"
-                >
-                  Reset
-                </button>
-                <button
-                  onClick={() => setZoom((z) => Math.min(2.2, +(z + 0.15).toFixed(2)))}
-                  className="p-1.5 text-slate-600 hover:bg-slate-100"
-                  title="Zoom In"
-                >
-                  <ZoomIn className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Main 12-Column Interactive 3D Viewport + Sentaurus & HICUM Region Inspector */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-        {/* Left 7 Columns: Active Viewport Tab */}
-        <div className="xl:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-          {viewportTab === 'interactive_3d' && (
-            <>
-              <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
-                <span className="font-medium text-slate-600">
-                  Drag to rotate ({Math.round(yawDeg)}° yaw, {Math.round(pitchDeg)}° pitch) · Exact Sentaurus Trapezoidal Mesas (dWc = 0.10 μm)
-                </span>
-                <span className="font-mono text-[11px] text-blue-800 font-semibold">
-                  Selected: {activeRegion.shortLabel}
-                </span>
-              </div>
-
-              <div className="relative bg-gradient-to-b from-[#F8FAFC] to-[#EFF6FF] select-none">
-                <svg
-                  viewBox="0 0 740 490"
-                  className="w-full h-auto max-h-[510px] cursor-grab active:cursor-grabbing"
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
-                >
-                  {/* 3D Coordinate Axes Triad in Bottom-Left Corner */}
-                  {(() => {
-                    const orig = { x: 64, y: 438 };
-                    const axX = project3D(0.28, 0, 0);
-                    const axY = project3D(0, 0.28, 0);
-                    const axZ = project3D(0, 0, 0.28);
-                    const c0 = project3D(0, 0, 0);
-                    return (
-                      <g>
-                        <line
-                          x1={orig.x}
-                          y1={orig.y}
-                          x2={orig.x + (axX.x - c0.x)}
-                          y2={orig.y + (axX.y - c0.y)}
-                          stroke="#1E40AF"
-                          strokeWidth={2}
-                        />
-                        <text
-                          x={orig.x + (axX.x - c0.x) + 4}
-                          y={orig.y + (axX.y - c0.y)}
-                          className="fill-blue-900 font-mono text-[10px] font-bold"
-                        >
-                          X_sde (0→1.2 μm)
-                        </text>
-                        <line
-                          x1={orig.x}
-                          y1={orig.y}
-                          x2={orig.x + (axY.x - c0.x)}
-                          y2={orig.y + (axY.y - c0.y)}
-                          stroke="#0F766E"
-                          strokeWidth={2}
-                        />
-                        <text
-                          x={orig.x + (axY.x - c0.x) + 4}
-                          y={orig.y + (axY.y - c0.y)}
-                          className="fill-teal-900 font-mono text-[10px] font-bold"
-                        >
-                          Z_extrude (l_E)
-                        </text>
-                        <line
-                          x1={orig.x}
-                          y1={orig.y}
-                          x2={orig.x + (axZ.x - c0.x)}
-                          y2={orig.y + (axZ.y - c0.y)}
-                          stroke="#9F1239"
-                          strokeWidth={2}
-                        />
-                        <text
-                          x={orig.x + (axZ.x - c0.x) - 14}
-                          y={orig.y + (axZ.y - c0.y) - 6}
-                          className="fill-rose-900 font-mono text-[10px] font-bold"
-                        >
-                          −Y_sde (Depth)
-                        </text>
-                      </g>
-                    );
-                  })()}
-
-                  {/* Depth-Sorted 3D Polygonal Prism Faces */}
-                  {sortedFaces.map((f, idx) => {
-                    const ptsStr = f.points
-                      .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-                      .join(' ');
-                    const isSelected = f.regionId === activeRegion.id;
-                    return (
-                      <polygon
-                        key={idx}
-                        points={ptsStr}
-                        fill={f.fill}
-                        fillOpacity={f.opacity}
-                        stroke={f.stroke}
-                        strokeWidth={isSelected ? 1.65 : 0.8}
-                        strokeLinejoin="round"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedRegionId(f.regionId);
-                        }}
-                        className="cursor-pointer transition-opacity"
-                      />
-                    );
-                  })}
-
-                  {/* Carrier Flux & Kirk Effect Base Push-Out Overlay */}
-                  {overlayMode === 'carrier_kirk' &&
-                    (() => {
-                      const zOffBase = (3 - 2.5) * explodeFactor * 0.16;
-                      const zOffColl = (2 - 2.5) * explodeFactor * 0.16;
-                      const zOffBuried = (1 - 2.5) * explodeFactor * 0.16;
-                      const zOffEmit = (6 - 2.5) * explodeFactor * 0.16;
-
-                      const pushDepthUm = Math.min(0.24, 0.04 + kirkRatio * 0.11);
-                      const kTopLeft = project3D(-0.15, 0.2, 0.0 + zOffColl);
-                      const kTopRight = project3D(0.15, 0.2, 0.0 + zOffColl);
-                      const kBotRight = project3D(0.15 + kirkRatio * 0.05, 0.2, -pushDepthUm + zOffColl);
-                      const kBotLeft = project3D(-0.15 - kirkRatio * 0.05, 0.2, -pushDepthUm + zOffColl);
-
-                      // Electron flow stream in Sentaurus coordinates: E' (X=0) -> B' -> SubCol (Y=0.30) -> Sinker (X=0.90) -> C
-                      const pE = project3D(0.0, 0.2, 0.28 + zOffEmit);
-                      const pB = project3D(0.0, 0.2, 0.035 + zOffBase);
-                      const pCprime = project3D(0.0, 0.2, -0.35 + zOffBuried);
-                      const pSinkerBot = project3D(0.90, 0.2, -0.35 + zOffBuried);
-                      const pC = project3D(0.90, 0.2, 0.26 + zOffColl);
-
-                      // Lateral hole injection path: R.BaseContR (X=0.34) -> R.Baseright (X=0.18) -> R.SiGeBase (X=0)
-                      const pBaseExt = project3D(0.34, 0.2, 0.22 + zOffBase);
-                      const pBasePerim = project3D(0.18, 0.2, 0.06 + zOffBase);
-
-                      return (
-                        <g className="pointer-events-none">
-                          <polygon
-                            points={`${kTopLeft.x},${kTopLeft.y} ${kTopRight.x},${kTopRight.y} ${kBotRight.x},${kBotRight.y} ${kBotLeft.x},${kBotLeft.y}`}
-                            fill="#F43F5E"
-                            fillOpacity={0.44}
-                            stroke="#9F1239"
-                            strokeWidth={2}
-                            strokeDasharray="4 2"
-                          />
-                          <text
-                            x={(kTopLeft.x + kBotRight.x) / 2}
-                            y={(kTopLeft.y + kBotRight.y) / 2 + 4}
-                            textAnchor="middle"
-                            className="fill-rose-950 font-mono font-bold text-[10px]"
-                          >
-                            Kirk Push-Out into SIC (I_C/I_CK = {kirkRatio.toFixed(2)})
-                          </text>
-
-                          <path
-                            d={`M ${pE.x} ${pE.y} L ${pB.x} ${pB.y} L ${pCprime.x} ${pCprime.y} L ${pSinkerBot.x} ${pSinkerBot.y} L ${pC.x} ${pC.y}`}
-                            fill="none"
-                            stroke="#1E40AF"
-                            strokeWidth={3.5}
-                            strokeDasharray="6 4"
-                          />
-
-                          <path
-                            d={`M ${pBaseExt.x} ${pBaseExt.y} L ${pBasePerim.x} ${pBasePerim.y} L ${pB.x} ${pB.y}`}
-                            fill="none"
-                            stroke="#0F766E"
-                            strokeWidth={2.8}
-                          />
-                        </g>
-                      );
-                    })()}
-
-                  {/* 3D Equivalent-Circuit Overlay (Nodes & Branches Mapped in Sentaurus 3D Space) */}
-                  {(overlayMode === 'circuit_overlay' || overlayMode === 'doping') &&
-                    (() => {
-                      const pinScreenMap: Record<string, { x: number; y: number }> = {};
-                      for (const pin of NODE_3D_PINS) {
-                        const zOffUm = (pin.layerGroup - 2.5) * explodeFactor * 0.16;
-                        const pt = project3D(pin.xUm, pin.yUm, pin.zUm + zOffUm);
-                        pinScreenMap[pin.id] = { x: pt.x, y: pt.y };
-                      }
-
-                      return (
-                        <g>
-                          {overlayMode === 'circuit_overlay' &&
-                            BRANCH_3D_LINKS.map((br) => {
-                              const p1 = pinScreenMap[br.fromNode];
-                              const p2 = pinScreenMap[br.toNode];
-                              if (!p1 || !p2) return null;
-                              const mx = (p1.x + p2.x) / 2;
-                              const my = (p1.y + p2.y) / 2;
-                              return (
-                                <g
-                                  key={br.elementId}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onSelectElementInLab(br.elementId);
-                                  }}
-                                  className="cursor-pointer"
-                                >
-                                  <line
-                                    x1={p1.x}
-                                    y1={p1.y}
-                                    x2={p2.x}
-                                    y2={p2.y}
-                                    stroke={br.color}
-                                    strokeWidth={2.4}
-                                  />
-                                  <rect
-                                    x={mx - 36}
-                                    y={my - 9}
-                                    width={72}
-                                    height={16}
-                                    rx={4}
-                                    fill="#FFFFFF"
-                                    fillOpacity={0.94}
-                                    stroke={br.color}
-                                    strokeWidth={1.2}
-                                  />
-                                  <text
-                                    x={mx}
-                                    y={my + 3}
-                                    textAnchor="middle"
-                                    className="fill-slate-900 font-mono font-bold text-[8.5px]"
-                                  >
-                                    {br.label}
-                                  </text>
-                                </g>
-                              );
-                            })}
-
-                          {NODE_3D_PINS.map((pin) => {
-                            const pt = pinScreenMap[pin.id];
-                            if (!pt) return null;
-                            return (
-                              <g key={pin.id} className="pointer-events-none">
-                                <circle
-                                  cx={pt.x}
-                                  cy={pt.y}
-                                  r={pin.ext ? 6.5 : 5}
-                                  fill={pin.ext ? '#0F172A' : '#FFFFFF'}
-                                  stroke="#1E40AF"
-                                  strokeWidth={2}
-                                />
-                                <text
-                                  x={pt.x + 8}
-                                  y={pt.y + 3}
-                                  className="fill-slate-900 font-mono font-bold text-[10px]"
-                                  style={{
-                                    paintOrder: 'stroke',
-                                    stroke: '#FFFFFF',
-                                    strokeWidth: 3,
-                                  }}
-                                >
-                                  {pin.id}
-                                </text>
-                              </g>
-                            );
-                          })}
-                        </g>
-                      );
-                    })()}
-                </svg>
-
-                {/* Floating Live Physics Status Pill */}
-                <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-xs border border-slate-200 rounded-lg px-3 py-2 shadow-xs text-[11px] font-mono space-y-0.5">
-                  <div className="text-slate-500 font-sans font-semibold text-[10px] uppercase">
-                    Sentaurus SiGe HBT · Live Bias State
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-blue-900 font-semibold">
-                      I_C = {(opResult.Ic * 1e3).toFixed(2)} mA
-                    </span>
-                    <span className="text-rose-900 font-semibold">
-                      I_C/I_CK = {kirkRatio.toFixed(2)}
-                    </span>
-                    <span className="text-amber-900 font-semibold">
-                      ΔT_j = +{opResult.Dtsh.toFixed(1)} K
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {viewportTab === 'blender_renders' && (
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Blender 5.2 LTS Reconstruction from Sentaurus TCAD (`sige_hbt_sentaurus.blend`)
-                  </h3>
-                  <p className="text-xs text-slate-600">
-                    Generated directly in Blender via MCP from the 16 exact Sentaurus `sde` & `sprocess` regions (`S = 10 BU/μm`).
-                  </p>
-                </div>
-                <a
-                  href={`${baseUrl}models/sige_hbt_sentaurus.glb`}
-                  download="sige_hbt_sentaurus.glb"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-800 text-white text-xs font-semibold hover:bg-blue-900"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download 3D Model (.glb)</span>
-                </a>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
-                  <div className="px-3 py-2 bg-white border-b border-slate-200 flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-800">
-                      1. Blender 3D Isometric Step-Cutaway Render (Sentaurus SDE Half-Cell + Symmetric Full HBT)
-                    </span>
-                    <span className="font-mono text-[11px] text-slate-500">1600×1000 Workbench Studio Cavity</span>
-                  </div>
-                  <img
-                    src={`${baseUrl}models/sige_hbt_sentaurus_preview.png`}
-                    alt="Blender 3D Isometric Render of Sentaurus SiGe HBT"
-                    className="w-full h-auto object-contain max-h-[380px]"
-                  />
-                </div>
-
-                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
-                  <div className="px-3 py-2 bg-white border-b border-slate-200 flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-800">
-                      2. Blender Front Orthographic Cross-Section (Exact Sentaurus Trapezoidal Mesas & STI Oxide)
-                    </span>
-                    <span className="font-mono text-[11px] text-slate-500">X ∈ [−1.20, +1.20] μm, Y_sde ∈ [−0.30, +0.60] μm</span>
-                  </div>
-                  <img
-                    src={`${baseUrl}models/sige_hbt_sentaurus_front.png`}
-                    alt="Blender Front Orthographic Cross-Section of Sentaurus SiGe HBT"
-                    className="w-full h-auto object-contain max-h-[380px]"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {viewportTab === 'sentaurus_table' && (
-            <div className="p-4 space-y-3">
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">
-                  Extracted Sentaurus TCAD (`sde` + `sprocess`) Geometry & Doping Specification
-                </h3>
-                <p className="text-xs text-slate-600">
-                  Every coordinate and doping concentration extracted from the Sentaurus command file used to generate the Blender 3D meshes.
-                </p>
-              </div>
-              <div className="overflow-x-auto border border-slate-200 rounded-lg">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
-                      <th className="py-2 px-3 font-semibold">Sentaurus Variable / Profile</th>
-                      <th className="py-2 px-3 font-semibold">Extracted Value</th>
-                      <th className="py-2 px-3 font-semibold">Physical & 3D Geometric Role</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {SENTAURUS_SDE_SPEC_ROWS.map((row) => (
-                      <tr key={row.param} className="hover:bg-slate-50/80">
-                        <td className="py-2 px-3 font-mono font-semibold text-blue-900 whitespace-nowrap">
-                          {row.param}
-                        </td>
-                        <td className="py-2 px-3 font-mono text-teal-900 whitespace-nowrap">
-                          {row.value}
-                        </td>
-                        <td className="py-2 px-3 text-slate-600">{row.role}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* 3D Region Quick-Select Strip */}
-          <div className="p-3 bg-white border-t border-slate-200 flex items-center flex-wrap gap-1.5">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">
-              Sentaurus 3D Regions:
+    <div
+      className={
+        isFullscreen
+          ? 'fixed inset-0 z-50 bg-[#F7F6F2] overflow-y-auto p-4 sm:p-6 space-y-4'
+          : 'space-y-5'
+      }
+    >
+      {/* Publication Header & Compact Contextual Controls */}
+      <div className="bg-white rounded-xl border border-slate-200/90 px-4 py-3 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-mono uppercase tracking-wider font-semibold text-[#3B5978] bg-[#EEF3F8] px-2.5 py-0.5 rounded border border-[#D5E1EE]">
+              Sentaurus TCAD → 3D SiGe HBT Workspace
             </span>
-            {HBT_3D_REGIONS.map((r) => {
-              const active = r.id === activeRegion.id;
-              return (
-                <button
-                  key={r.id}
-                  onClick={() => setSelectedRegionId(r.id)}
-                  className={`px-2 py-1 rounded text-[11px] font-medium border transition-all flex items-center gap-1.5 ${
-                    active
-                      ? 'bg-blue-800 text-white border-blue-800 shadow-2xs'
-                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-300'
-                  }`}
-                >
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: r.colorStroke }}
-                  />
-                  <span>{r.shortLabel}</span>
-                </button>
-              );
-            })}
+            {glbLoadedStatus && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#2C6E63] bg-[#EDF6F4] px-2 py-0.5 rounded border border-[#CBE4DF]">
+                <CheckCircle2 className="w-3 h-3" />
+                Blender 5.2 GLB Verified
+              </span>
+            )}
           </div>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-scientific mt-0.5">
+            Physical Mapping of the HICUM/L2 Compact Model to a 3D SiGe HBT
+          </h2>
         </div>
 
-        {/* Right 5 Columns: Synchronized Sentaurus TCAD + Blender + HICUM Inspector */}
-        <div className="xl:col-span-5 space-y-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 font-mono text-xs font-semibold">
-                {activeRegion.dopingTag}
-              </span>
-              <span
-                className={`px-2.5 py-0.5 rounded text-xs font-semibold border ${
-                  activeRegion.spatialNature === 'localized'
-                    ? 'bg-teal-50 text-teal-800 border-teal-200'
-                    : 'bg-blue-50 text-blue-800 border-blue-200'
-                }`}
-              >
-                {activeRegion.spatialNature === 'localized'
-                  ? 'Physically Localized 3D Volume'
-                  : 'Distributed 2D/3D Physical Region'}
-              </span>
+        {/* Right Contextual Toolbar: Parameter Locator Search, View Mode Presets & Export */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Parameter Search & 3D Region Locator */}
+          <div className="relative">
+            <div className="flex items-center bg-[#F8F7F4] border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs focus-within:border-[#3B5978] focus-within:bg-white transition-all">
+              <Search className="w-3.5 h-3.5 text-slate-400 mr-1.5 shrink-0" />
+              <input
+                type="text"
+                value={paramSearchQuery}
+                onFocus={() => setParamSearchOpen(true)}
+                onBlur={() => setTimeout(() => setParamSearchOpen(false), 180)}
+                onChange={(e) => {
+                  setParamSearchQuery(e.target.value);
+                  setParamSearchOpen(true);
+                }}
+                placeholder="Locate parameter in 3D (e.g. rbi0, cjci0, rcx)..."
+                className="bg-transparent outline-none w-48 sm:w-56 text-slate-800 placeholder:text-slate-400"
+              />
             </div>
 
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 font-scientific">
-                {activeRegion.name}
-              </h3>
-              <p className="text-xs font-mono text-slate-500 mt-0.5">
-                HICUM/L2 Manual: {activeRegion.manualSection} · Blender Mesh: <span className="text-slate-800 font-semibold">{activeRegion.blenderMeshName}</span>
-              </p>
-            </div>
-
-            {/* Sentaurus TCAD Exact Coordinates & Command Snippet */}
-            <div className="p-3 rounded-lg bg-slate-900 text-slate-100 font-mono text-[11px] space-y-1.5">
-              <div className="flex items-center justify-between text-teal-300 font-semibold">
-                <span>Sentaurus SDE: {activeRegion.sentaurusId}</span>
-                <span>{activeRegion.sentaurusCoordsUm}</span>
-              </div>
-              <pre className="text-[10.5px] text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed pt-1 border-t border-slate-800">
-                {activeRegion.sentaurusSdeSnippet}
-              </pre>
-            </div>
-
-            <p className="text-xs text-slate-700 leading-relaxed">
-              {activeRegion.description}
-            </p>
-
-            {/* Localized vs Distributed Physical Distinction Box */}
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/90">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800 mb-1">
-                <Compass className="w-3.5 h-3.5 text-teal-700 shrink-0" />
-                <span>Physical Localization vs. Distributed Modeling Note</span>
-              </div>
-              <p className="text-[11px] text-slate-600 leading-relaxed">
-                {activeRegion.localizedVsDistributedNote}
-              </p>
-            </div>
-
-            {/* Equivalent-Circuit Nodes & Branches inside this 3D Region */}
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
-                HICUM/L2 Circuit Nodes & Branches in This Sentaurus Region
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {activeRegion.nodesInRegion.map((nId) => (
-                  <span
-                    key={nId}
-                    className="px-2 py-1 rounded bg-slate-900 text-white font-mono text-xs font-bold"
-                  >
-                    Node {nId}
-                  </span>
-                ))}
-                {activeRegion.circuitElements.map((elId) => (
-                  <button
-                    key={elId}
-                    onClick={() => onSelectElementInLab(elId)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 text-teal-900 border border-teal-200 hover:bg-teal-100 font-mono text-xs font-semibold transition-colors"
-                  >
-                    <Cpu className="w-3 h-3" />
-                    <span>{elId}</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Associated HICUM Parameters */}
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
-                Mapped HICUM/L2 Parameters (Click to Inspect & Adjust in Lab)
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {activeRegion.keyParameters.map((pId) => {
-                  const isCurrent = pId === selectedParamId;
+            {paramSearchOpen && matchingSearchParams.length > 0 && (
+              <div className="absolute right-0 mt-1 w-80 bg-white rounded-xl border border-slate-200 shadow-lg p-2 z-50 space-y-1 text-xs">
+                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+                  Click Parameter to Highlight 3D Region & Element
+                </div>
+                {matchingSearchParams.map((p) => {
+                  const mappedReg = SENTAURUS_3D_REGIONS.find((r) =>
+                    r.keyParameters.includes(p.id)
+                  );
                   return (
                     <button
-                      key={pId}
-                      onClick={() => onSelectParamInLab(pId)}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded font-mono text-xs font-medium border transition-colors ${
-                        isCurrent
-                          ? 'bg-blue-800 text-white border-blue-800'
-                          : 'bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100'
-                      }`}
+                      key={p.id}
+                      onMouseDown={() => {
+                        onSelectParamInLab(p.id);
+                        if (mappedReg) {
+                          handleFocusOnRegion(mappedReg);
+                        }
+                        setParamSearchQuery('');
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2"
                     >
-                      <span>{pId}</span>
-                      <ArrowUpRight className="w-3 h-3" />
+                      <div>
+                        <span className="font-mono font-bold text-[#3B5978]">
+                          {p.id}
+                        </span>
+                        <span className="text-slate-500 ml-1.5 text-[11px] truncate">
+                          {p.description}
+                        </span>
+                      </div>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[9.5px] font-mono shrink-0 ${
+                          p.spatialNature === 'localized'
+                            ? 'bg-[#EDF6F4] text-[#2C6E63]'
+                            : p.spatialNature === 'distributed'
+                            ? 'bg-[#EEF3F8] text-[#3B5978]'
+                            : 'bg-amber-50 text-amber-800'
+                        }`}
+                      >
+                        {mappedReg ? mappedReg.shortLabel : p.spatialNature}
+                      </span>
                     </button>
                   );
                 })}
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Non-Localized / Conceptual / Global Thermal Parameters Card */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
-                <Info className="w-4 h-4 text-amber-700 shrink-0" />
-                <span>Non-Localized, Smoothing & Global Parameters ({conceptualParams.length})</span>
-              </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-50 text-amber-900 border border-amber-200">
-                Conceptual / Global
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600 leading-relaxed mb-2.5">
-              Unlike localized Sentaurus regions or junction capacitances, mathematical smoothing constants (<code>ajei</code>, <code>aick</code>, <code>ahc</code>, <code>acbar</code>), global temperature exponents (<code>zetact</code>, <code>zetabet</code>, <code>f1vg</code>, <code>f2vg</code>), and simulator control flags (<code>flnqs</code>, <code>flcono</code>, <code>flsh</code>, <code>type</code>) act across equations or the entire die rather than a single 3D coordinate:
-            </p>
-            <div className="flex flex-wrap gap-1 max-h-28 overflow-y-auto pr-1">
-              {conceptualParams.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => onSelectParamInLab(p.id)}
-                  className="px-2 py-0.5 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-950 border border-amber-200 font-mono text-[11px]"
-                  title={p.description}
-                >
-                  {p.id}
-                </button>
-              ))}
-            </div>
+          {/* 3 View Mode Presets: Cross-Section / Assembled 3D / Exploded */}
+          <div className="flex items-center bg-[#F3F2EE] p-0.5 rounded-lg border border-slate-200/80 text-xs">
+            <button
+              onClick={() => handleSelectViewModePreset('cross_section')}
+              className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+                viewModePreset === 'cross_section'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              3D Cross-Section
+            </button>
+            <button
+              onClick={() => handleSelectViewModePreset('assembled_3d')}
+              className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+                viewModePreset === 'assembled_3d'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Assembled 3D
+            </button>
+            <button
+              onClick={() => handleSelectViewModePreset('exploded_3d')}
+              className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
+                viewModePreset === 'exploded_3d'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Exploded View
+            </button>
+          </div>
+
+          {/* Screenshot & GLB Export */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleExportScreenshot}
+              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium inline-flex items-center gap-1.5"
+              title="Export PNG Screenshot of 3D Artboard"
+            >
+              <Camera className="w-3.5 h-3.5 text-[#3B5978]" />
+              <span className="hidden sm:inline">Screenshot</span>
+            </button>
+            <label className="hidden xl:inline-flex items-center gap-1 text-[11px] text-slate-600 px-1.5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={screenshotTransparent}
+                onChange={(e) => setScreenshotTransparent(e.target.checked)}
+                className="accent-[#3B5978] rounded"
+              />
+              <span>Transp. BG</span>
+            </label>
+            <a
+              href="./models/sige_hbt_sentaurus.glb"
+              download="sige_hbt_sentaurus.glb"
+              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium inline-flex items-center gap-1"
+              title="Download Blender 5.2 Sentaurus 3D Model (.glb)"
+            >
+              <Download className="w-3.5 h-3.5 text-[#2C6E63]" />
+              <span className="hidden md:inline">.GLB</span>
+            </a>
+            <button
+              onClick={() => setIsFullscreen((f) => !f)}
+              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+              title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen 3D Artboard'}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="w-3.5 h-3.5" />
+              ) : (
+                <Maximize2 className="w-3.5 h-3.5" />
+              )}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* DOMINANT 3D SCIENTIFIC ARTBOARD */}
+      <div className="bg-[#FAF9F5] rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col">
+        {/* Top Artboard Contextual Visibility Bar */}
+        <div className="px-4 py-2 bg-white/80 border-b border-slate-200/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+          {/* Layer & Component Visibility Pills */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">
+              Layers:
+            </span>
+            <button
+              onClick={() => setShowMaterials((v) => !v)}
+              className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
+                showMaterials
+                  ? 'bg-[#EEF3F8] text-[#3B5978] border-[#C5D6E8]'
+                  : 'bg-white text-slate-400 border-slate-200'
+              }`}
+            >
+              {showMaterials ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+              <span>Semiconductors</span>
+            </button>
+
+            <button
+              onClick={() => setShowContacts((v) => !v)}
+              className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
+                showContacts
+                  ? 'bg-slate-100 text-slate-800 border-slate-300'
+                  : 'bg-white text-slate-400 border-slate-200'
+              }`}
+            >
+              {showContacts ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+              <span>Contacts (E, B, C, S)</span>
+            </button>
+
+            <button
+              onClick={() => setShowOxide((v) => !v)}
+              className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
+                showOxide
+                  ? 'bg-slate-100 text-slate-700 border-slate-300'
+                  : 'bg-white text-slate-400 border-slate-200'
+              }`}
+            >
+              {showOxide ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+              <span>STI & Spacers</span>
+            </button>
+
+            <div className="h-4 w-px bg-slate-200 mx-1" />
+
+            {/* Embedded HICUM Circuit Overlay Toggle & Category Filter */}
+            <button
+              onClick={() => setShowHicumOverlay((v) => !v)}
+              className={`px-2.5 py-1 rounded-md font-semibold border transition-colors inline-flex items-center gap-1.5 ${
+                showHicumOverlay
+                  ? 'bg-[#2C6E63] text-white border-[#2C6E63]'
+                  : 'bg-white text-slate-600 border-slate-200'
+              }`}
+            >
+              <Cpu className="w-3.5 h-3.5" />
+              <span>Embedded HICUM Elements</span>
+            </button>
+
+            {showHicumOverlay && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowCategoryMenu((m) => !m)}
+                  className="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium inline-flex items-center gap-1"
+                >
+                  <Sliders className="w-3 h-3 text-[#2C6E63]" />
+                  <span>Filter Symbols</span>
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+
+                {showCategoryMenu && (
+                  <div className="absolute left-0 mt-1 w-60 bg-white rounded-xl border border-slate-200 shadow-lg p-3 z-40 space-y-2 text-xs">
+                    <div className="font-semibold text-slate-800 border-b border-slate-100 pb-1">
+                      HICUM Component Categories
+                    </div>
+                    {(
+                      [
+                        { id: 'resistances', label: 'Resistances (R_E, R_Bx, R_bi*, R_Cx, R_su)' },
+                        { id: 'capacitances', label: 'Capacitances (Q_jEi, Q_jCi, Q_BCx, Q_jS)' },
+                        { id: 'currents', label: 'Currents & Diodes (i_T, i_jBE, i_AVL, i_TS)' },
+                        { id: 'charges', label: 'Charges & Thermal (Q_f, R_th || C_th)' },
+                      ] as { id: EmbeddedComponentCategory; label: string }[]
+                    ).map((cat) => (
+                      <label
+                        key={cat.id}
+                        className="flex items-center gap-2 cursor-pointer text-slate-700 hover:text-slate-900"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={enabledCategories[cat.id]}
+                          onChange={(e) =>
+                            setEnabledCategories((prev) => ({
+                              ...prev,
+                              [cat.id]: e.target.checked,
+                            }))
+                          }
+                          className="accent-[#2C6E63] rounded"
+                        />
+                        <span className="text-[11px]">{cat.label}</span>
+                      </label>
+                    ))}
+                    <div className="border-t border-slate-100 pt-2 space-y-1.5">
+                      <label className="flex items-center gap-2 cursor-pointer text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={showComponentLabels}
+                          onChange={(e) => setShowComponentLabels(e.target.checked)}
+                          className="accent-[#3B5978] rounded"
+                        />
+                        <span className="text-[11px]">Show Component Labels</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={showComponentWires}
+                          onChange={(e) => setShowComponentWires(e.target.checked)}
+                          className="accent-[#3B5978] rounded"
+                        />
+                        <span className="text-[11px]">Show 3D Routing Wires</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Right Toggles: Hover Identification ON/OFF & Region Visibility Manager */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHoverLabelsEnabled((h) => !h)}
+              className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
+                hoverLabelsEnabled
+                  ? 'bg-[#EEF3F8] text-[#3B5978] border-[#C5D6E8]'
+                  : 'bg-white text-slate-500 border-slate-200'
+              }`}
+              title="Toggle Hover Identification Labels ON/OFF"
+            >
+              <Tag className="w-3 h-3" />
+              <span>Hover Labels: {hoverLabelsEnabled ? 'ON' : 'OFF'}</span>
+            </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setShowRegionManager((r) => !r)}
+                className="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium inline-flex items-center gap-1"
+              >
+                <Layers className="w-3 h-3 text-[#3B5978]" />
+                <span>Regions (13)</span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+
+              {showRegionManager && (
+                <div className="absolute right-0 mt-1 w-72 bg-white rounded-xl border border-slate-200 shadow-lg p-3 z-40 space-y-1.5 text-xs max-h-80 overflow-y-auto">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                    <span className="font-semibold text-slate-800">
+                      Show / Hide / Isolate Regions
+                    </span>
+                    <button
+                      onClick={() => {
+                        setIsolatedRegionId(null);
+                        setHiddenRegionIds({});
+                      }}
+                      className="text-[10px] text-[#3B5978] hover:underline font-medium"
+                    >
+                      Show All
+                    </button>
+                  </div>
+                  {SENTAURUS_3D_REGIONS.map((reg) => {
+                    const isHidden = Boolean(hiddenRegionIds[reg.id]);
+                    const isIsolated = isolatedRegionId === reg.id;
+                    return (
+                      <div
+                        key={reg.id}
+                        className="flex items-center justify-between gap-2 py-1 px-1.5 rounded hover:bg-slate-50"
+                      >
+                        <button
+                          onClick={() => setSelectedRegionId(reg.id)}
+                          className="flex items-center gap-2 text-left truncate flex-1"
+                        >
+                          <span
+                            className="w-2.5 h-2.5 rounded-xs shrink-0 border border-slate-400"
+                            style={{ backgroundColor: reg.colorHex }}
+                          />
+                          <span className="truncate text-[11px] font-medium text-slate-700">
+                            {reg.shortLabel}
+                          </span>
+                        </button>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() =>
+                              setIsolatedRegionId((prev) =>
+                                prev === reg.id ? null : reg.id
+                              )
+                            }
+                            className={`px-1.5 py-0.5 rounded text-[9.5px] font-mono border ${
+                              isIsolated
+                                ? 'bg-[#3B5978] text-white border-[#3B5978]'
+                                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            Iso
+                          </button>
+                          <button
+                            onClick={() =>
+                              setHiddenRegionIds((prev) => ({
+                                ...prev,
+                                [reg.id]: !prev[reg.id],
+                              }))
+                            }
+                            className="p-1 text-slate-500 hover:text-slate-900"
+                            title={isHidden ? 'Show Region' : 'Hide Region'}
+                          >
+                            {isHidden ? (
+                              <EyeOff className="w-3 h-3 text-rose-600" />
+                            ) : (
+                              <Eye className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* MAIN 3D VIEWPORT CANVAS + EMBEDDED HICUM SVG OVERLAY */}
+        <div
+          ref={artboardContainerRef}
+          onMouseDown={handlePointerDown}
+          onMouseMove={handlePointerMove}
+          onMouseUp={handlePointerUp}
+          onDoubleClick={handleDoubleClick}
+          onContextMenu={(e) => e.preventDefault()}
+          className={`relative w-full ${
+            isFullscreen ? 'h-[68vh]' : 'h-[520px] sm:h-[560px]'
+          } select-none overflow-hidden ${
+            interactionTool === 'pan'
+              ? 'cursor-move'
+              : 'cursor-grab active:cursor-grabbing'
+          }`}
+        >
+          {/* Three.js WebGL Canvas */}
+          <canvas ref={canvasRef} className="w-full h-full block" />
+
+          {/* Synchronized 3D-Projected Embedded HICUM Circuit Overlay */}
+          {showHicumOverlay && (
+            <svg
+              ref={svgOverlayRef}
+              className="absolute inset-0 w-full h-full pointer-events-none"
+            >
+              {/* Terminal Lead Stems for External Nodes B, E, C, S */}
+              {(['B', 'E', 'C', 'S'] as const).map((termId) => {
+                const pt = overlayProj.nodes[termId];
+                if (!pt || !pt.visible) return null;
+                const isBottom = termId === 'S';
+                const stemY = isBottom ? pt.y + 26 : pt.y - 32;
+                return (
+                  <g key={`term-${termId}`}>
+                    <line
+                      x1={pt.x}
+                      y1={pt.y}
+                      x2={pt.x}
+                      y2={stemY}
+                      stroke="#0F172A"
+                      strokeWidth={2}
+                    />
+                    <circle
+                      cx={pt.x}
+                      cy={stemY}
+                      r={4.5}
+                      fill="#FFFFFF"
+                      stroke="#0F172A"
+                      strokeWidth={2}
+                    />
+                    <text
+                      x={pt.x}
+                      y={isBottom ? stemY + 16 : stemY - 9}
+                      textAnchor="middle"
+                      className="fill-slate-900 font-scientific font-bold text-sm"
+                    >
+                      {termId}
+                    </text>
+                  </g>
+                );
+              })}
+
+              {/* 3D Routing Wires Connecting Embedded HICUM Components */}
+              {showComponentWires &&
+                EMBEDDED_3D_COMPONENTS.map((comp) => {
+                  if (!enabledCategories[comp.category]) return null;
+                  const proj = overlayProj.components[comp.id];
+                  if (!proj || !proj.visible || proj.wirePoints.length < 2)
+                    return null;
+                  const isSel =
+                    selectedElementId === comp.id ||
+                    hoveredComponentId === comp.id ||
+                    paramHighlightedComponentIds.has(comp.id);
+                  const d = proj.wirePoints
+                    .map(
+                      (p, i) =>
+                        `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`
+                    )
+                    .join(' ');
+                  return (
+                    <path
+                      key={`wire-${comp.id}`}
+                      d={d}
+                      fill="none"
+                      stroke={isSel ? '#B85D43' : '#1E293B'}
+                      strokeWidth={isSel ? 2.1 : 1.25}
+                      strokeOpacity={isSel ? 0.95 : 0.72}
+                    />
+                  );
+                })}
+
+              {/* Internal & External HICUM Node Dots (E', B*, B', C', S', T) */}
+              {EMBEDDED_3D_NODE_PINS.map((pin) => {
+                if (!pin.label) return null;
+                const pt = overlayProj.nodes[pin.id];
+                if (!pt || !pt.visible) return null;
+                return (
+                  <g key={`pin-${pin.id}`}>
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r={pin.isExternalTerminal ? 4 : 3.2}
+                      fill="#0F172A"
+                      stroke="#FFFFFF"
+                      strokeWidth={1.2}
+                    />
+                    {!pin.isExternalTerminal && showComponentLabels && (
+                      <text
+                        x={pt.x + 6}
+                        y={pt.y - 4}
+                        className="fill-slate-900 font-mono font-bold text-[10.5px]"
+                        style={{
+                          paintOrder: 'stroke',
+                          stroke: '#FAF9F5',
+                          strokeWidth: 3,
+                        }}
+                      >
+                        {pin.label}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+
+              {/* Selectable Embedded HICUM Circuit Symbols */}
+              <g className="pointer-events-auto">
+                {EMBEDDED_3D_COMPONENTS.map((comp) => {
+                  if (!enabledCategories[comp.category]) return null;
+                  const proj = overlayProj.components[comp.id];
+                  if (!proj || !proj.visible) return null;
+                  return (
+                    <CircuitSymbolGlyph
+                      key={comp.id}
+                      cx={proj.x}
+                      cy={proj.y}
+                      symbolType={comp.symbolType}
+                      orientation={comp.orientation}
+                      label={comp.symbolLabel}
+                      showLabel={showComponentLabels}
+                      isSelected={activeEmbeddedComponent.id === comp.id}
+                      isHovered={hoveredComponentId === comp.id}
+                      isHighlighted={paramHighlightedComponentIds.has(comp.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectElementInLab(comp.id);
+                        setSelectedRegionId(comp.hostRegionId);
+                      }}
+                      onMouseEnter={() => setHoveredComponentId(comp.id)}
+                      onMouseLeave={() => setHoveredComponentId(null)}
+                    />
+                  );
+                })}
+              </g>
+            </svg>
+          )}
+
+          {/* LEFT FLOATING ORIENTATION CUBE */}
+          <div
+            className="absolute top-3 left-3 z-20"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <OrientationCube3D
+              theta={camAngles.theta}
+              phi={camAngles.phi}
+              activePreset={activeCameraPreset}
+              onSelectPreset={handleSelectCameraPreset}
+            />
+          </div>
+
+          {/* RIGHT FLOATING NAVIGATION & CAMERA TOOLBAR */}
+          <div
+            className="absolute top-3 right-3 z-20 flex flex-col gap-1.5 bg-white/92 backdrop-blur-xs border border-slate-200/90 rounded-xl p-1.5 shadow-xs"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setInteractionTool('orbit')}
+              className={`p-2 rounded-lg transition-colors ${
+                interactionTool === 'orbit'
+                  ? 'bg-[#3B5978] text-white'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              title="360° Orbit Tool (Left-Drag)"
+            >
+              <Orbit className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setInteractionTool('pan')}
+              className={`p-2 rounded-lg transition-colors ${
+                interactionTool === 'pan'
+                  ? 'bg-[#3B5978] text-white'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+              title="Pan / Grab Tool (Drag to Reposition)"
+            >
+              <Hand className="w-4 h-4" />
+            </button>
+            <div className="h-px bg-slate-200 my-0.5" />
+            <button
+              onClick={() => {
+                cameraStateRef.current.targetRadius = Math.max(
+                  9.0,
+                  cameraStateRef.current.targetRadius - 3.2
+                );
+              }}
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                cameraStateRef.current.targetRadius = Math.min(
+                  52.0,
+                  cameraStateRef.current.targetRadius + 3.2
+                );
+              }}
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleFitToScreen}
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              title="Fit Complete Device to Screen"
+            >
+              <Focus className="w-4 h-4" />
+            </button>
+            <div className="h-px bg-slate-200 my-0.5" />
+            <button
+              onClick={handleResetAll}
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              title="Reset Assembly, Camera & Visibility"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* SELECTED REGION CONTEXTUAL BAR (TOP-CENTER) */}
+          <div
+            className="absolute top-3 left-1/2 -translate-x-1/2 z-20 hidden md:flex items-center gap-2 bg-white/92 backdrop-blur-xs border border-slate-200/90 rounded-xl px-3 py-1.5 shadow-xs text-xs"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <span
+              className="w-3 h-3 rounded-xs border border-slate-400 shrink-0"
+              style={{ backgroundColor: activeRegion.colorHex }}
+            />
+            <span className="font-semibold text-slate-800">
+              {activeRegion.shortLabel}
+            </span>
+            <span
+              className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                activeRegion.spatialNature === 'localized'
+                  ? 'bg-[#EDF6F4] text-[#2C6E63]'
+                  : 'bg-[#EEF3F8] text-[#3B5978]'
+              }`}
+            >
+              {activeRegion.spatialNature === 'localized'
+                ? 'Localized'
+                : 'Distributed'}
+            </span>
+            <div className="h-3.5 w-px bg-slate-200 mx-0.5" />
+            <button
+              onClick={() => handleFocusOnRegion(activeRegion)}
+              className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px]"
+              title="Focus Camera on This Region (or Double-Click Region)"
+            >
+              Focus
+            </button>
+            <button
+              onClick={() =>
+                setIsolatedRegionId((prev) =>
+                  prev === activeRegion.id ? null : activeRegion.id
+                )
+              }
+              className={`px-2 py-0.5 rounded font-medium text-[11px] ${
+                isolatedRegionId === activeRegion.id
+                  ? 'bg-[#3B5978] text-white'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+              }`}
+            >
+              {isolatedRegionId === activeRegion.id ? 'Un-Isolate' : 'Isolate'}
+            </button>
+            <div className="flex items-center gap-1 text-[11px] text-slate-500">
+              <span>α:</span>
+              <input
+                type="range"
+                min={0.15}
+                max={1}
+                step={0.05}
+                value={
+                  regionOpacityMap[activeRegion.id] ??
+                  activeRegion.defaultOpacity
+                }
+                onChange={(e) =>
+                  setRegionOpacityMap((prev) => ({
+                    ...prev,
+                    [activeRegion.id]: parseFloat(e.target.value),
+                  }))
+                }
+                className="w-14 accent-[#3B5978] cursor-pointer"
+                title="Adjust Selected Region Opacity"
+              />
+            </div>
+          </div>
+
+          {/* HOVER IDENTIFICATION TOOLTIP */}
+          {hoverLabelsEnabled && (hoveredComponentSpec || hoveredRegionSpec) && (
+            <div
+              style={{
+                left: Math.min(mouseScreenPos.x + 16, 620),
+                top: Math.max(mouseScreenPos.y - 16, 12),
+              }}
+              className="absolute z-30 pointer-events-none bg-white/96 backdrop-blur-xs border border-slate-300 rounded-xl px-3 py-2 shadow-md max-w-xs text-xs space-y-0.5"
+            >
+              {hoveredComponentSpec ? (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-[#B85D43]">
+                      {hoveredComponentSpec.symbolLabel}
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                      {hoveredComponentSpec.spatialNature}
+                    </span>
+                  </div>
+                  <div className="font-semibold text-slate-900">
+                    {hoveredComponentSpec.name}
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-snug">
+                    {hoveredComponentSpec.physicalOriginNote}
+                  </p>
+                </>
+              ) : (
+                hoveredRegionSpec && (
+                  <>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-slate-900">
+                        {hoveredRegionSpec.shortLabel}
+                      </span>
+                      <span className="text-[10px] font-mono text-[#3B5978]">
+                        {hoveredRegionSpec.materialName}
+                      </span>
+                    </div>
+                    <div className="text-[10.5px] font-mono text-slate-500">
+                      {hoveredRegionSpec.dopingSummary} ·{' '}
+                      {hoveredRegionSpec.sentaurusCoordsUm}
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-snug">
+                      {hoveredRegionSpec.physicalFunction}
+                    </p>
+                  </>
+                )
+              )}
+            </div>
+          )}
+
+          {/* BOTTOM FLOATING ARTBOARD CONTROLS: EXPLODED VIEW, CUTAWAY PLANE & OPACITY */}
+          <div
+            className="absolute bottom-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-3 bg-white/92 backdrop-blur-xs border border-slate-200/90 rounded-xl px-3.5 py-2 shadow-xs text-xs"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {/* Exploded View Slider (0-100%) */}
+            <div className="flex items-center gap-2">
+              <Box className="w-3.5 h-3.5 text-[#3B5978]" />
+              <span className="font-semibold text-slate-700">
+                Exploded View:
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={explodePct}
+                onChange={(e) => setExplodePct(parseInt(e.target.value, 10))}
+                className="w-28 sm:w-36 accent-[#3B5978] cursor-pointer"
+              />
+              <span className="font-mono font-semibold text-slate-800 w-9 text-right">
+                {explodePct}%
+              </span>
+            </div>
+
+            {/* Cutaway Clipping Plane Control */}
+            <div className="flex items-center gap-2">
+              <Scissors className="w-3.5 h-3.5 text-[#2C6E63]" />
+              <span className="font-semibold text-slate-700">Cutaway:</span>
+              <select
+                value={cutawayAxis}
+                onChange={(e) => {
+                  const axis = e.target.value as CutawayAxis;
+                  setCutawayAxis(axis);
+                  if (axis === 'z_cross') setCutawayPos(0.02);
+                  else if (axis === 'x_half') setCutawayPos(0.0);
+                  else if (axis === 'y_depth') setCutawayPos(0.05);
+                }}
+                className="bg-slate-50 border border-slate-200 rounded-md px-2 py-0.5 text-xs font-medium text-slate-700 outline-none cursor-pointer"
+              >
+                <option value="z_cross">Z Cross-Section</option>
+                <option value="x_half">X Symmetry Slice</option>
+                <option value="y_depth">Y Horizontal Slice</option>
+                <option value="none">Full Uncut 3D</option>
+              </select>
+              {cutawayAxis !== 'none' && (
+                <input
+                  type="range"
+                  min={-0.55}
+                  max={0.55}
+                  step={0.02}
+                  value={cutawayPos}
+                  onChange={(e) => setCutawayPos(parseFloat(e.target.value))}
+                  className="w-20 accent-[#2C6E63] cursor-pointer"
+                  title="Adjust Clipping Plane Position"
+                />
+              )}
+            </div>
+
+            {/* Global Model Opacity Slider */}
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-slate-700">Opacity:</span>
+              <input
+                type="range"
+                min={0.2}
+                max={1.0}
+                step={0.04}
+                value={globalOpacity}
+                onChange={(e) => setGlobalOpacity(parseFloat(e.target.value))}
+                className="w-20 accent-[#3B5978] cursor-pointer"
+              />
+              <span className="font-mono text-[11px] text-slate-600 w-9 text-right">
+                {Math.round(globalOpacity * 100)}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* MATERIAL & EMBEDDED SYMBOL LEGEND BAR BELOW ARTBOARD */}
+        <div className="px-4 py-2.5 bg-white border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="font-semibold text-slate-500">
+              Material (SiGe HBT):
+            </span>
+            {[
+              {
+                id: 'emitter_poly_pedestal',
+                label: 'N⁺ (Emitter)',
+                color: '#7FA3C7',
+              },
+              {
+                id: 'intrinsic_sige_base',
+                label: 'P (Base, SiGe)',
+                color: '#DFAEA6',
+              },
+              {
+                id: 'extrinsic_base_poly',
+                label: 'P⁺ (Poly-Base)',
+                color: '#C68B82',
+              },
+              {
+                id: 'intrinsic_collector_sic',
+                label: 'N (SIC Collector)',
+                color: '#6E94B8',
+              },
+              {
+                id: 'buried_subcollector',
+                label: 'N⁺ (Buried & Sinker)',
+                color: '#E5C48A',
+              },
+              {
+                id: 'p_substrate_bulk',
+                label: 'P⁻ (Substrate)',
+                color: '#BDD2C5',
+              },
+              {
+                id: 'contact_emitter',
+                label: 'Contact / Metal',
+                color: '#78808A',
+              },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  const reg = SENTAURUS_3D_REGIONS.find((r) => r.id === item.id);
+                  if (reg) {
+                    setSelectedRegionId(reg.id);
+                  }
+                }}
+                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded transition-colors ${
+                  selectedRegionId === item.id
+                    ? 'bg-slate-100 font-semibold text-slate-900 ring-1 ring-slate-300'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <span
+                  className="w-3.5 h-2.5 rounded-xs border border-slate-400/80"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowHicumOverlay((v) => !v)}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200 bg-[#F8F7F4] hover:bg-slate-100 text-slate-700 font-medium text-[11px]"
+            >
+              <span className="font-mono font-bold">o—o</span>
+              <span>HICUM element (embedded)</span>
+            </button>
+            <button
+              onClick={() => setBottomCardsExpanded((b) => !b)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-medium text-[11px]"
+            >
+              <span>{bottomCardsExpanded ? 'Collapse Details' : 'Expand Details'}</span>
+              {bottomCardsExpanded ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* COLLAPSIBLE 3-COLUMN SCIENTIFIC PUBLICATION CARDS BELOW ARTBOARD */}
+      {bottomCardsExpanded && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+          {/* Card 1 (Left 4 Cols): Synchronized HICUM Equivalent Circuit */}
+          <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+                <h3 className="text-sm font-bold text-slate-900 font-scientific">
+                  Synchronized HICUM Circuit
+                </h3>
+                <span className="text-[10.5px] font-mono text-[#3B5978] bg-[#EEF3F8] px-2 py-0.5 rounded">
+                  Active: {activeEmbeddedComponent.symbolLabel}
+                </span>
+              </div>
+
+              {/* Clean Interactive Compact HICUM Schematic SVG */}
+              <svg
+                viewBox="0 0 380 235"
+                className="w-full h-auto bg-[#FAF9F5] rounded-lg border border-slate-200/70 p-1 select-none"
+              >
+                {/* Dashed Intrinsic Transistor Box */}
+                <rect
+                  x={122}
+                  y={42}
+                  width={162}
+                  height={138}
+                  rx={6}
+                  fill="none"
+                  stroke="#64748B"
+                  strokeWidth={1.1}
+                  strokeDasharray="4 3"
+                />
+                <text
+                  x={203}
+                  y={36}
+                  textAnchor="middle"
+                  className="fill-slate-500 font-mono text-[8px] font-semibold"
+                >
+                  eff. internal transistor (B&apos;, E&apos;, C&apos;)
+                </text>
+
+                {/* Main Schematic Wires */}
+                <g stroke="#334155" strokeWidth={1.3} fill="none">
+                  {/* Collector C' top rail -> R_Cx -> C */}
+                  <line x1={80} y1={56} x2={348} y2={56} />
+                  {/* Base B -> R_Bx -> B* -> R_bi* -> B' */}
+                  <line x1={26} y1={122} x2={185} y2={122} />
+                  {/* Emitter E' bottom rail -> R_E -> E */}
+                  <line x1={128} y1={168} x2={265} y2={168} />
+                  <line x1={215} y1={168} x2={215} y2={218} />
+                  {/* Substrate S' rail -> R_su || C_su -> S */}
+                  <line x1={48} y1={18} x2={348} y2={18} />
+                  {/* Vertical branches */}
+                  <line x1={48} y1={18} x2={48} y2={56} />
+                  <line x1={96} y1={18} x2={96} y2={122} />
+                  <line x1={52} y1={56} x2={52} y2={122} />
+                  <line x1={80} y1={56} x2={80} y2={122} />
+                  <line x1={108} y1={56} x2={108} y2={168} />
+                  <line x1={185} y1={56} x2={185} y2={168} />
+                  <line x1={225} y1={56} x2={225} y2={168} />
+                  <line x1={265} y1={56} x2={265} y2={168} />
+                  {/* B-E par */}
+                  <line x1={38} y1={122} x2={38} y2={205} />
+                  <line x1={38} y1={205} x2={215} y2={205} />
+                </g>
+
+                {/* Clickable Schematic Elements synced with 3D Artboard */}
+                {(
+                  [
+                    { id: 'cjs', label: 'Q_jS', x: 48, y: 37 },
+                    { id: 'its', label: 'i_TS', x: 96, y: 37 },
+                    { id: 'rsu', label: 'R_su||C_su', x: 210, y: 18 },
+                    { id: 'cjcx1', label: 'Q_BCx1', x: 52, y: 88 },
+                    { id: 'cjcx2', label: 'Q_BCx2', x: 80, y: 88 },
+                    { id: 'rbx', label: 'R_Bx', x: 64, y: 122 },
+                    { id: 'rbi', label: 'R_bi*||C_rBi', x: 146, y: 122 },
+                    { id: 'cjep', label: 'Q_jEp', x: 108, y: 148 },
+                    { id: 'cbepar1', label: 'C_BEpar', x: 112, y: 205 },
+                    { id: 'cjci', label: 'Q_jCi', x: 185, y: 88 },
+                    { id: 'iavl', label: 'i_AVL', x: 225, y: 88 },
+                    { id: 'cjei', label: 'Q_jEi', x: 185, y: 146 },
+                    { id: 'qf', label: 'Q_f', x: 225, y: 146 },
+                    { id: 'it', label: 'i_T', x: 265, y: 112 },
+                    { id: 'rcx', label: 'R_Cx', x: 312, y: 56 },
+                    { id: 're', label: 'R_E', x: 215, y: 192 },
+                  ] as { id: string; label: string; x: number; y: number }[]
+                ).map((item) => {
+                  const isSel = activeEmbeddedComponent.id === item.id;
+                  const isParamMatch = paramHighlightedComponentIds.has(item.id);
+                  return (
+                    <g
+                      key={item.id}
+                      onClick={() => {
+                        onSelectElementInLab(item.id);
+                        const comp = EMBEDDED_3D_COMPONENTS.find(
+                          (c) => c.id === item.id
+                        );
+                        if (comp) setSelectedRegionId(comp.hostRegionId);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <rect
+                        x={item.x - 20}
+                        y={item.y - 8}
+                        width={40}
+                        height={16}
+                        rx={3.5}
+                        fill={
+                          isSel
+                            ? '#B85D43'
+                            : isParamMatch
+                            ? '#2C6E63'
+                            : '#FFFFFF'
+                        }
+                        stroke={
+                          isSel
+                            ? '#B85D43'
+                            : isParamMatch
+                            ? '#2C6E63'
+                            : '#64748B'
+                        }
+                        strokeWidth={isSel ? 1.6 : 1}
+                      />
+                      <text
+                        x={item.x}
+                        y={item.y + 3}
+                        textAnchor="middle"
+                        className={`font-mono font-bold text-[7.5px] ${
+                          isSel || isParamMatch ? 'fill-white' : 'fill-slate-800'
+                        }`}
+                      >
+                        {item.label}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* Terminal Labels */}
+                <text x={14} y={125} className="fill-slate-900 font-bold text-[10px]">
+                  B
+                </text>
+                <text x={100} y={116} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                  B*
+                </text>
+                <text x={175} y={116} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                  B&apos;
+                </text>
+                <text x={174} y={51} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                  C&apos;
+                </text>
+                <text x={174} y={180} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                  E&apos;
+                </text>
+                <text x={115} y={13} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                  S&apos;
+                </text>
+                <text x={355} y={22} className="fill-slate-900 font-bold text-[10px]">
+                  S
+                </text>
+                <text x={355} y={60} className="fill-slate-900 font-bold text-[10px]">
+                  C
+                </text>
+                <text x={224} y={224} className="fill-slate-900 font-bold text-[10px]">
+                  E
+                </text>
+              </svg>
+            </div>
+
+            <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span>Click any branch in 2D or 3D to synchronize</span>
+              <span className="font-mono text-slate-700 font-semibold">
+                I_C = {(opResult.Ic * 1e3).toFixed(2)} mA · f_T = {(opResult.Ft / 1e9).toFixed(1)} GHz
+              </span>
+            </div>
+          </div>
+
+          {/* Card 2 (Center 4 Cols): Documented Key Equation & Parameters */}
+          <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between space-y-3">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 font-scientific">
+                    Key Documented Equation
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-mono">
+                    {activeEquation.eqNumber} · {activeEquation.section}
+                  </p>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#EDF6F4] text-[#2C6E63] border border-[#CBE4DF]">
+                  {activeEmbeddedComponent.symbolLabel}
+                </span>
+              </div>
+
+              {/* LaTeX Equation Box */}
+              <div className="bg-[#FAF9F5] border border-slate-200/80 rounded-xl p-3 overflow-x-auto">
+                <FormulaView latex={activeEquation.latex} displayMode={true} />
+              </div>
+
+              {/* Equation Title & Physical Meaning */}
+              <div>
+                <div className="text-xs font-bold text-slate-800">
+                  {activeEquation.title}
+                </div>
+                <p className="text-[11.5px] text-slate-600 leading-relaxed mt-0.5">
+                  {activeEquation.summary}
+                </p>
+              </div>
+
+              {/* Related HICUM Parameters for Selected Component / Region */}
+              <div>
+                <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                  Associated HICUM/L2 Parameters (Click to Inspect)
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {(activeCircuitElement?.parameters.length
+                    ? activeCircuitElement.parameters
+                    : activeRegion.keyParameters
+                  )
+                    .slice(0, 12)
+                    .map((pId) => {
+                      const isSel = selectedParamId === pId;
+                      return (
+                        <button
+                          key={pId}
+                          onClick={() => onSelectParamInLab(pId)}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[11px] font-medium border transition-colors ${
+                            isSel
+                              ? 'bg-[#3B5978] text-white border-[#3B5978]'
+                              : 'bg-[#F8F7F4] text-slate-800 border-slate-200 hover:border-[#3B5978]'
+                          }`}
+                        >
+                          <span>{pId}</span>
+                          <ArrowUpRight className="w-2.5 h-2.5" />
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+              <span>HICUM/L2 v2.4.0 Manual Reference</span>
+              <span className="font-mono text-slate-700">
+                {activeRegion.manualSection}
+              </span>
+            </div>
+          </div>
+
+          {/* Card 3 (Right 4 Cols): Physical Mapping, Sentaurus TCAD Spec & Localization */}
+          <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between space-y-3">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <h3 className="text-sm font-bold text-slate-900 font-scientific">
+                  Physical Mapping & Sentaurus Spec
+                </h3>
+                <span
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold border ${
+                    activeRegion.spatialNature === 'localized'
+                      ? 'bg-[#EDF6F4] text-[#2C6E63] border-[#CBE4DF]'
+                      : 'bg-[#EEF3F8] text-[#3B5978] border-[#D5E1EE]'
+                  }`}
+                >
+                  {activeRegion.spatialNature === 'localized'
+                    ? 'Localized 3D Volume'
+                    : 'Distributed 2D/3D Region'}
+                </span>
+              </div>
+
+              {/* Selected Region & Embedded Component Explanation */}
+              <div className="space-y-1.5">
+                <div className="text-xs font-bold text-slate-900">
+                  {activeRegion.name}
+                </div>
+                <p className="text-[11.5px] text-slate-600 leading-relaxed">
+                  {activeRegion.description}
+                </p>
+              </div>
+
+              {/* Localized vs Distributed Distinction */}
+              <div className="p-2.5 rounded-lg bg-[#FAF9F5] border border-slate-200/80 space-y-1">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-800">
+                  <Compass className="w-3.5 h-3.5 text-[#2C6E63] shrink-0" />
+                  <span>Localized vs. Distributed Physical Origin</span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-snug">
+                  {activeRegion.localizedVsDistributedNote}
+                </p>
+              </div>
+
+              {/* Authoritative Sentaurus TCAD Coordinates & Code */}
+              <div className="p-2.5 rounded-lg bg-slate-900 text-slate-100 font-mono text-[10.5px] space-y-1">
+                <div className="flex items-center justify-between text-[#88C0D0] font-semibold">
+                  <span>{activeRegion.sentaurusId}</span>
+                  <span>{activeRegion.dopingSummary}</span>
+                </div>
+                <div className="text-slate-400 text-[10px]">
+                  Coords: {activeRegion.sentaurusCoordsUm}
+                </div>
+                <pre className="text-[9.5px] text-slate-300 overflow-x-auto whitespace-pre-wrap pt-1 border-t border-slate-800">
+                  {activeRegion.sentaurusSdeSnippet}
+                </pre>
+              </div>
+
+              {/* Non-Localized / Conceptual Parameter Distinction */}
+              <div className="p-2.5 rounded-lg bg-amber-50/60 border border-amber-200/80">
+                <div className="flex items-center justify-between text-[11px] font-semibold text-amber-900 mb-1">
+                  <span className="inline-flex items-center gap-1">
+                    <Info className="w-3 h-3 text-amber-700" />
+                    Conceptual / Global Parameters ({conceptualParams.length})
+                  </span>
+                  <span className="font-mono text-[9.5px]">No 3D Point Invented</span>
+                </div>
+                <div className="flex flex-wrap gap-1 max-h-14 overflow-y-auto">
+                  {conceptualParams.slice(0, 14).map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => onSelectParamInLab(p.id)}
+                      className="px-1.5 py-0.5 rounded bg-white hover:bg-amber-100 text-amber-950 border border-amber-200 font-mono text-[10px]"
+                      title={`${p.id}: ${p.description} (Conceptual/global parameter)`}
+                    >
+                      {p.id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

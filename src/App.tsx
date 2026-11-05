@@ -45,7 +45,7 @@ import {
 type MainTabId = 'lab' | 'parameters' | 'equations' | 'cross_section' | 'veriloga';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<MainTabId>('lab');
+  const [activeTab, setActiveTab] = useState<MainTabId>('cross_section');
   const [activePresetId, setActivePresetId] = useState<string>('manual_test');
 
   const baselineParams = useMemo(() => {
@@ -416,63 +416,63 @@ export const App: React.FC = () => {
             {/* Main Navigation Tabs */}
             <nav className="flex items-center gap-1 overflow-x-auto py-0.5">
               <button
+                onClick={() => setActiveTab('cross_section')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                  activeTab === 'cross_section'
+                    ? 'bg-[#3B5978] text-white shadow-2xs'
+                    : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                }`}
+              >
+                <Box className="w-3.5 h-3.5" />
+                <span>1. 3D HICUM ↔ SiGe HBT Workspace</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('lab')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                   activeTab === 'lab'
-                    ? 'bg-blue-800 text-white shadow-2xs'
+                    ? 'bg-[#3B5978] text-white shadow-2xs'
                     : 'text-slate-600 hover:bg-white hover:text-slate-900'
                 }`}
               >
                 <Cpu className="w-3.5 h-3.5" />
-                <span>1. Interactive Circuit & Physics Lab</span>
+                <span>2. Circuit & Simulation Lab</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('parameters')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                   activeTab === 'parameters'
-                    ? 'bg-blue-800 text-white shadow-2xs'
+                    ? 'bg-[#3B5978] text-white shadow-2xs'
                     : 'text-slate-600 hover:bg-white hover:text-slate-900'
                 }`}
               >
                 <Database className="w-3.5 h-3.5" />
-                <span>2. Parameter Database (136)</span>
+                <span>3. Parameters (136)</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('equations')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                   activeTab === 'equations'
-                    ? 'bg-blue-800 text-white shadow-2xs'
+                    ? 'bg-[#3B5978] text-white shadow-2xs'
                     : 'text-slate-600 hover:bg-white hover:text-slate-900'
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>3. Equations & Mechanisms (Ch. 2 & 4)</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('cross_section')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap ${
-                  activeTab === 'cross_section'
-                    ? 'bg-blue-800 text-white shadow-2xs'
-                    : 'text-slate-600 hover:bg-white hover:text-slate-900'
-                }`}
-              >
-                <Box className="w-3.5 h-3.5" />
-                <span>4. 3D SiGe HBT & Cross-Sections</span>
+                <span>4. Equations & Physics (Ch. 2 & 4)</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('veriloga')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                   activeTab === 'veriloga'
-                    ? 'bg-blue-800 text-white shadow-2xs'
+                    ? 'bg-[#3B5978] text-white shadow-2xs'
                     : 'text-slate-600 hover:bg-white hover:text-slate-900'
                 }`}
               >
                 <Code2 className="w-3.5 h-3.5" />
-                <span>5. Verilog-A Implementation (`hic2_full`)</span>
+                <span>5. Verilog-A (`hic2_full`)</span>
               </button>
             </nav>
 
@@ -684,8 +684,8 @@ export const App: React.FC = () => {
               opResult={opResult}
               selectedParamId={selectedParamId}
               selectedElementId={selectedElementId}
-              onSelectParamInLab={(paramId) => handleSelectParam(paramId, true)}
-              onSelectElementInLab={(elId) => handleSelectElement(elId, true)}
+              onSelectParamInLab={(paramId) => handleSelectParam(paramId, false)}
+              onSelectElementInLab={(elId) => handleSelectElement(elId, false)}
             />
 
             <CrossSectionDiagrams
