@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HICUM Explorer">
+  <title>HICUM Explorer</title>
+  <!-- Matte slate tile -->
+  <rect width="64" height="64" rx="14" fill="#1D2530"/>
+  <!-- N+ buried layer / collector -->
+  <rect x="9" y="42" width="46" height="11" rx="2" fill="#4F8F86"/>
+  <!-- P SiGe base -->
+  <rect x="15" y="32" width="34" height="7.5" rx="1.5" fill="#C98A5E"/>
+  <!-- N+ emitter -->
+  <rect x="24.5" y="18" width="15" height="11.5" rx="1.5" fill="#8FB0CC"/>
+  <!-- Contacts: emitter (top) and two base contacts -->
+  <rect x="27" y="12" width="10" height="3.5" rx="1" fill="#E8E6DF"/>
+  <rect x="15" y="26" width="6.5" height="3.5" rx="1" fill="#E8E6DF"/>
+  <rect x="42.5" y="26" width="6.5" height="3.5" rx="1" fill="#E8E6DF"/>
+</svg>
