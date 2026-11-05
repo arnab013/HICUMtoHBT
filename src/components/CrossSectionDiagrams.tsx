@@ -901,43 +901,53 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
         </defs>
 
         {/* ---------------------------------------------------- 1. Semiconductor Layers & Regions */}
-        {/* P- Substrate Background Bulk */}
-        <rect x={40} y={370} width={860} height={135} fill="#E2EEEA" stroke="#ADC7C0" strokeWidth={1.2} />
+        {/* P- Substrate Background Bulk (#173F5F) */}
+        <rect x={40} y={370} width={860} height={135} fill="#173F5F" fillOpacity={0.16} stroke="#173F5F" strokeWidth={1.4} />
 
-        {/* P+ Isolation Wells on Left & Right */}
-        <path d="M 40 145 C 75 160 85 300 85 410 L 40 410 Z" fill="#9FB4EB" fillOpacity={0.65} stroke="#8299D6" strokeWidth={1} />
-        <path d="M 690 145 C 690 280 750 410 750 410 L 795 410 C 795 280 750 145 750 145 Z" fill="#9FB4EB" fillOpacity={0.65} stroke="#8299D6" strokeWidth={1} />
-        <path d="M 810 145 C 810 280 870 410 870 410 L 900 410 L 900 145 Z" fill="#9FB4EB" fillOpacity={0.65} stroke="#8299D6" strokeWidth={1} />
+        {/* P+ Isolation Wells on Left & Right (#173F5F) */}
+        <path d="M 40 145 C 75 160 85 300 85 410 L 40 410 Z" fill="#173F5F" fillOpacity={0.35} stroke="#173F5F" strokeWidth={1.2} />
+        <path d="M 690 145 C 690 280 750 410 750 410 L 795 410 C 795 280 750 145 750 145 Z" fill="#173F5F" fillOpacity={0.35} stroke="#173F5F" strokeWidth={1.2} />
+        <path d="M 810 145 C 810 280 870 410 870 410 L 900 410 L 900 145 Z" fill="#173F5F" fillOpacity={0.35} stroke="#173F5F" strokeWidth={1.2} />
 
-        {/* N+ Buried Layer & Sinker */}
+        {/* N+ Buried Layer & Sinker (#F6D55C) */}
         <path
           d="M 125 315 L 690 315 L 690 285 L 650 285 L 650 145 L 690 145 L 690 370 L 125 370 Z"
-          fill="#FDE6B0"
-          stroke="#E5B962"
+          fill="#F6D55C"
+          fillOpacity={0.75}
+          stroke="#D4A72C"
+          strokeWidth={1.3}
+        />
+
+        {/* N- Epitaxy Layer (#20639B) */}
+        <rect x={125} y={265} width={525} height={50} fill="#20639B" fillOpacity={0.22} stroke="#20639B" strokeWidth={1.1} />
+
+        {/* P Base Layer (SiGe Extrinsic) (#3CAEA3) */}
+        <path
+          d="M 125 145 L 610 145 C 610 190 590 265 520 265 L 125 265 Z"
+          fill="#3CAEA3"
+          fillOpacity={0.45}
+          stroke="#2A8B82"
           strokeWidth={1.2}
         />
 
-        {/* N- Epitaxy Layer */}
-        <rect x={125} y={265} width={525} height={50} fill="#C0D7F5" fillOpacity={0.7} stroke="#99BAE5" strokeWidth={1} />
-
-        {/* P Base Layer */}
+        {/* Intrinsic Active Transistor Core (#ED553B) */}
         <path
-          d="M 125 145 L 610 145 C 610 190 590 265 520 265 L 125 265 Z"
-          fill="#FCA5A5"
-          fillOpacity={0.55}
-          stroke="#EF4444"
-          strokeWidth={1.1}
+          d="M 235 175 C 235 175 240 260 270 265 L 590 265 C 610 260 610 190 600 175 Z"
+          fill="#ED553B"
+          fillOpacity={0.45}
+          stroke="#D0422B"
+          strokeWidth={1.2}
         />
 
-        {/* N+ Emitter Layer */}
-        <rect x={245} y={145} width={345} height={42} rx={6} fill="#60A5FA" fillOpacity={0.85} stroke="#2563EB" strokeWidth={1.3} />
+        {/* N+ Emitter Layer (#20639B) */}
+        <rect x={245} y={145} width={345} height={42} rx={6} fill="#20639B" fillOpacity={0.88} stroke="#154A78" strokeWidth={1.3} />
 
         {/* Metal Contact Electrodes (Surface Metallization) */}
-        <rect x={50} y={135} width={150} height={12} fill="#64748B" rx={1} />
-        <rect x={235} y={135} width={365} height={12} fill="#64748B" rx={1} />
-        <rect x={630} y={135} width={50} height={12} fill="#64748B" rx={1} />
-        <rect x={730} y={135} width={50} height={12} fill="#64748B" rx={1} />
-        <rect x={830} y={135} width={70} height={12} fill="#64748B" rx={1} />
+        <rect x={50} y={135} width={150} height={12} fill="#78808A" rx={1} stroke="#525861" strokeWidth={0.8} />
+        <rect x={235} y={135} width={365} height={12} fill="#78808A" rx={1} stroke="#525861" strokeWidth={0.8} />
+        <rect x={630} y={135} width={50} height={12} fill="#78808A" rx={1} stroke="#525861" strokeWidth={0.8} />
+        <rect x={730} y={135} width={50} height={12} fill="#78808A" rx={1} stroke="#525861" strokeWidth={0.8} />
+        <rect x={830} y={135} width={70} height={12} fill="#78808A" rx={1} stroke="#525861" strokeWidth={0.8} />
 
         {/* Region Labels with Badges */}
         <g className="font-sans font-medium text-[11px] select-none pointer-events-none">
@@ -1249,25 +1259,29 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             Material (SiGe HBT)
           </text>
 
-          {/* N+ Emitter Swatch */}
-          <rect x={180} y={537} width={18} height={13} rx={2} fill="#60A5FA" stroke="#2563EB" strokeWidth={1} />
-          <text x={204} y={548} className="fill-slate-700 font-medium">N⁺ (Emitter)</text>
+          {/* N+ Emitter Swatch (#20639B) */}
+          <rect x={160} y={537} width={18} height={13} rx={2} fill="#20639B" stroke="#154A78" strokeWidth={1} />
+          <text x={184} y={548} className="fill-slate-700 font-medium">N⁺ (Emitter)</text>
 
-          {/* P Base Swatch */}
-          <rect x={290} y={537} width={18} height={13} rx={2} fill="#FCA5A5" stroke="#EF4444" strokeWidth={1} />
-          <text x={314} y={548} className="fill-slate-700 font-medium">P (Base, SiGe)</text>
+          {/* P Base Extrinsic Swatch (#3CAEA3) */}
+          <rect x={268} y={537} width={18} height={13} rx={2} fill="#3CAEA3" stroke="#2B857D" strokeWidth={1} />
+          <text x={292} y={548} className="fill-slate-700 font-medium">P (Base Extr.)</text>
 
-          {/* N+ Buried Layer Swatch */}
-          <rect x={422} y={537} width={18} height={13} rx={2} fill="#FDE6B0" stroke="#E5B962" strokeWidth={1} />
-          <text x={446} y={548} className="fill-slate-700 font-medium">N⁺ (Buried Layer)</text>
+          {/* Active Core Swatch (#ED553B) */}
+          <rect x={388} y={537} width={18} height={13} rx={2} fill="#ED553B" stroke="#B83822" strokeWidth={1} />
+          <text x={412} y={548} className="fill-slate-700 font-medium">Active Core</text>
 
-          {/* P- Substrate Swatch */}
-          <rect x={565} y={537} width={18} height={13} rx={2} fill="#E2EEEA" stroke="#ADC7C0" strokeWidth={1} />
-          <text x={589} y={548} className="fill-slate-700 font-medium">P⁻ (Substrate)</text>
+          {/* N+ Buried Layer Swatch (#F6D55C) */}
+          <rect x={495} y={537} width={18} height={13} rx={2} fill="#F6D55C" stroke="#D4A72C" strokeWidth={1} />
+          <text x={519} y={548} className="fill-slate-700 font-medium">N⁺ (Buried Layer)</text>
 
-          {/* Contact / Metal Swatch */}
-          <rect x={692} y={537} width={18} height={13} rx={1} fill="#64748B" />
-          <text x={716} y={548} className="fill-slate-700 font-medium">Contact / Metal</text>
+          {/* P- Substrate Swatch (#173F5F) */}
+          <rect x={638} y={537} width={18} height={13} rx={2} fill="#173F5F" stroke="#0F2A40" strokeWidth={1} />
+          <text x={662} y={548} className="fill-slate-700 font-medium">P⁻ (Substrate / Well)</text>
+
+          {/* Contact / Metal Swatch (#78808A) */}
+          <rect x={788} y={537} width={18} height={13} rx={1} fill="#78808A" stroke="#525861" strokeWidth={0.8} />
+          <text x={812} y={548} className="fill-slate-700 font-medium">Metal</text>
 
           {/* Embedded Element Pill Badge */}
           <rect x={815} y={533} width={85} height={22} rx={11} fill="#FFFFFF" stroke="#CBD5E1" strokeWidth={1} />

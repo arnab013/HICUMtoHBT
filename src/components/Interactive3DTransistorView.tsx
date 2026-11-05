@@ -118,7 +118,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
   });
 
   // Per-Region Selection, Isolation, Hide, and Opacity
-  const [selectedRegionId, setSelectedRegionId] = useState<string>('intrinsic_sige_base');
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('intrinsic_active_transistor_core');
   const [isolatedRegionId, setIsolatedRegionId] = useState<string | null>(null);
   const [hiddenRegionIds, setHiddenRegionIds] = useState<Record<string, boolean>>({});
   const [regionOpacityMap, setRegionOpacityMap] = useState<Record<string, number>>({});
@@ -495,10 +495,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
     const meshEntries: typeof sceneObjectsRef.current.meshEntries = [];
 
     // Helper to build a single extruded 3D prism mesh + edge lines
-    const buildExtrudedHalfMesh = (
-      reg: Sentaurus3DRegionSpec,
-      side: 'left' | 'right' | 'center'
-    ) => {
+    const buildExtrudedMesh = (reg: Sentaurus3DRegionSpec) => {
       const group = new THREE.Group();
       const z0 = reg.extrudeZUm[0] * SCALE_UM_TO_3D;
       const z1 = reg.extrudeZUm[1] * SCALE_UM_TO_3D;
@@ -506,8 +503,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
       const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(reg.colorHex),
-        roughness: reg.category === 'contacts' ? 0.35 : 0.62,
-        metalness: reg.category === 'contacts' ? 0.25 : 0.04,
+        roughness: reg.category === 'contacts' ? 0.30 : 0.45,
+        metalness: reg.category === 'contacts' ? 0.70 : 0.05,
         transparent: true,
         opacity: reg.defaultOpacity,
         side: THREE.DoubleSide,
@@ -521,16 +518,13 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
       const edgeMaterial = new THREE.LineBasicMaterial({
         color: new THREE.Color(reg.edgeHex),
         transparent: true,
-        opacity: 0.72,
+        opacity: 0.85,
         clippingPlanes: [clippingPlane],
       });
 
       for (const prism of reg.prisms) {
         const shape = new THREE.Shape();
-        const pts =
-          side === 'left'
-            ? [...prism.xzPointsUm].reverse().map(([x, y]) => [-x * SCALE_UM_TO_3D, y * SCALE_UM_TO_3D])
-            : prism.xzPointsUm.map(([x, y]) => [x * SCALE_UM_TO_3D, y * SCALE_UM_TO_3D]);
+        const pts = prism.xzPointsUm.map(([x, y]) => [x * SCALE_UM_TO_3D, y * SCALE_UM_TO_3D]);
 
         pts.forEach(([px, py], idx) => {
           if (idx === 0) shape.moveTo(px, py);
@@ -545,16 +539,16 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
         geom.translate(0, 0, z0);
 
         const mesh = new THREE.Mesh(geom, material);
-        mesh.userData = { regionId: reg.id, side };
+        mesh.userData = { regionId: reg.id };
         group.add(mesh);
 
-        const edgesGeom = new THREE.EdgesGeometry(geom, 18);
+        const edgesGeom = new THREE.EdgesGeometry(geom, 22);
         const edges = new THREE.LineSegments(edgesGeom, edgeMaterial);
         group.add(edges);
 
         meshEntries.push({
           regionId: reg.id,
-          side,
+          side: 'center',
           group,
           mesh,
           edges,
@@ -566,20 +560,9 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
       scene.add(group);
     };
 
-    // Build all Sentaurus 3D regions (symmetric left and right halves)
+    // Build all Sentaurus 3D regions
     for (const reg of SENTAURUS_3D_REGIONS) {
-      const touchesCenter = reg.prisms.some((p) =>
-        p.xzPointsUm.some(([x]) => Math.abs(x) < 1e-4)
-      );
-      const isPurelyLateral = !touchesCenter;
-      if (isPurelyLateral) {
-        buildExtrudedHalfMesh(reg, 'right');
-        buildExtrudedHalfMesh(reg, 'left');
-      } else {
-        // Regions touching X=0 are built as both right and left symmetric halves moving together along center Y
-        buildExtrudedHalfMesh(reg, 'right');
-        buildExtrudedHalfMesh(reg, 'left');
-      }
+      buildExtrudedMesh(reg);
     }
 
     sceneObjectsRef.current = {
@@ -666,15 +649,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
         if (!reg) continue;
 
         const [ex, ey, ez] = reg.explodeVectorUm;
-        const sideSign =
-          Math.abs(ex) > 1e-4
-            ? entry.side === 'left'
-              ? -1
-              : 1
-            : 0;
-
         entry.group.position.set(
-          ex * sideSign * cam.currentExplode * SCALE_UM_TO_3D,
+          ex * cam.currentExplode * SCALE_UM_TO_3D,
           ey * cam.currentExplode * SCALE_UM_TO_3D,
           ez * cam.currentExplode * SCALE_UM_TO_3D
         );
@@ -1874,38 +1850,33 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
             </span>
             {[
               {
-                id: 'emitter_poly_pedestal',
+                id: 'n_plus_emitter',
                 label: 'N⁺ (Emitter)',
-                color: '#7FA3C7',
+                color: '#20639B',
               },
               {
-                id: 'intrinsic_sige_base',
+                id: 'p_base_sige_extrinsic',
                 label: 'P (Base, SiGe)',
-                color: '#DFAEA6',
+                color: '#3CAEA3',
               },
               {
-                id: 'extrinsic_base_poly',
-                label: 'P⁺ (Poly-Base)',
-                color: '#C68B82',
+                id: 'intrinsic_active_transistor_core',
+                label: 'Intrinsic Core',
+                color: '#ED553B',
               },
               {
-                id: 'intrinsic_collector_sic',
-                label: 'N (SIC Collector)',
-                color: '#6E94B8',
-              },
-              {
-                id: 'buried_subcollector',
+                id: 'n_plus_buried_layer',
                 label: 'N⁺ (Buried & Sinker)',
-                color: '#E5C48A',
+                color: '#F6D55C',
               },
               {
                 id: 'p_substrate_bulk',
-                label: 'P⁻ (Substrate)',
-                color: '#BDD2C5',
+                label: 'P⁻ (Substrate & Wells)',
+                color: '#173F5F',
               },
               {
-                id: 'contact_emitter',
-                label: 'Contact / Metal',
+                id: 'contact_metal_terminals',
+                label: 'Contacts (B, E, C, S)',
                 color: '#78808A',
               },
             ].map((item) => (
