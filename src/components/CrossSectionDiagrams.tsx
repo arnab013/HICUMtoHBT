@@ -403,71 +403,71 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2] text-xs font-mono font-semibold">
+              <span className="px-2.5 py-0.5 rounded bg-[#E7EEF4] dark:bg-slate-800 text-[#2B4C65] dark:text-[#7FA3C7] border border-[#C5D4E2] dark:border-slate-700 text-xs font-mono font-semibold">
                 2D Physical Structure & Component Mapping
               </span>
-              <span className="px-2.5 py-0.5 rounded bg-[#E6F0EE] text-[#2A645E] border border-[#C0D8D4] text-xs font-mono font-medium">
+              <span className="px-2.5 py-0.5 rounded bg-[#E6F0EE] dark:bg-emerald-950/40 text-[#2A645E] dark:text-emerald-300 border border-[#C0D8D4] dark:border-emerald-800/50 text-xs font-mono font-medium">
                 Authoritative Reference · M. Schröter &amp; A. Pawlak
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1.5 font-scientific">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1.5 tracking-tight">
               Physical Embedding of HICUM/L2 Elements into a 2D SiGe HBT
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-3xl leading-relaxed">
               Every resistance, capacitance, current source, and charge storage element mapped directly into its corresponding semiconductor layer, junction, and contact path—from the N⁺ emitter window down to the P⁻ substrate and self-heating network.
             </p>
           </div>
 
           {/* View Mode Selector */}
-          <div className="flex items-center gap-1.5 bg-[#F3F2EE] p-1 rounded-lg border border-slate-200 text-xs shrink-0">
+          <div className="flex items-center gap-1.5 bg-[#F3F2EE] dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 text-xs shrink-0">
             <button
               onClick={() => setViewMode('vector')}
               className={`px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
                 viewMode === 'vector'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <Cpu className="w-3.5 h-3.5 text-[#2B4C65]" />
+              <Cpu className="w-3.5 h-3.5 text-[#2B4C65] dark:text-[#7FA3C7]" />
               <span>Interactive Vector</span>
             </button>
             <button
               onClick={() => setViewMode('reference')}
               className={`px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
                 viewMode === 'reference'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <ImageIcon className="w-3.5 h-3.5 text-[#2A645E]" />
+              <ImageIcon className="w-3.5 h-3.5 text-[#2A645E] dark:text-[#52B788]" />
               <span>2D Reference</span>
             </button>
             <button
               onClick={() => setViewMode('comparison')}
               className={`px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
                 viewMode === 'comparison'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
-              <Columns className="w-3.5 h-3.5 text-[#9A5833]" />
+              <Columns className="w-3.5 h-3.5 text-[#9A5833] dark:text-amber-400" />
               <span>Split View</span>
             </button>
           </div>
         </div>
 
         {/* Sub-figure navigation pills */}
-        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100 flex-wrap">
+        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex-wrap">
           <button
             onClick={() => setActiveFigureTab('cross_section')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeFigureTab === 'cross_section'
                 ? 'bg-[#2B4C65] text-white shadow-2xs'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             1. Embedded HICUM Circuit Cross-Section (2D Reference)
@@ -477,7 +477,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeFigureTab === 'bandgap_grading'
                 ? 'bg-[#2B4C65] text-white shadow-2xs'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             2. Bandgap Grading &amp; Doping Profile (Manual Fig. 2.2.0/2)
@@ -487,7 +487,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeFigureTab === 'resistance_isolation'
                 ? 'bg-[#2B4C65] text-white shadow-2xs'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             3. Resistances &amp; Trench Isolation (Figs. 2.7.0/1, 2.8.1–3, 2.11.0/1)
@@ -500,15 +500,15 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
           {/* Main Display Area (Left 8 Columns) */}
           <div className="lg:col-span-8 space-y-4">
             {/* Top Toolbar: Instructions & Quick Selection Pills */}
-            <div className="bg-white rounded-xl border border-slate-200 px-4 py-2.5 shadow-2xs flex flex-wrap items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2 text-slate-600">
-                <span className="font-semibold text-slate-800">Selected Component:</span>
-                <span className="font-mono font-bold text-[#2B4C65] px-2 py-0.5 rounded bg-[#E7EEF4] border border-[#C5D4E2]">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2.5 shadow-2xs flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">Selected Component:</span>
+                <span className="font-mono font-bold text-[#2B4C65] dark:text-[#7FA3C7] px-2 py-0.5 rounded bg-[#E7EEF4] dark:bg-slate-800 border border-[#C5D4E2] dark:border-slate-700">
                   {activeAnnotation.symbol} ({activeAnnotation.name})
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-slate-500">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">
                   Click any element or callout below to inspect
                 </span>
               </div>
@@ -518,15 +518,15 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             {viewMode === 'comparison' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Left: Original Reference Image */}
-                <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-2xs space-y-2">
-                  <div className="flex items-center justify-between text-xs font-semibold text-slate-800 border-b border-slate-100 pb-2">
-                    <span className="flex items-center gap-1.5 text-[#2A645E]">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3 shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <span className="flex items-center gap-1.5 text-[#2A645E] dark:text-[#52B788]">
                       <ImageIcon className="w-3.5 h-3.5" />
                       <span>Original 2D Reference Image</span>
                     </span>
-                    <span className="text-[10.5px] font-mono text-slate-500">Authoritative Layout</span>
+                    <span className="text-[10.5px] font-mono text-slate-500 dark:text-slate-400">Authoritative Layout</span>
                   </div>
-                  <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                  <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-white">
                     <img
                       src="./docs/hicum_2d_reference.png"
                       alt="Original 2D Reference: Physical Mapping of the HICUM Model to a 3D SiGe HBT"
@@ -536,23 +536,23 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                 </div>
 
                 {/* Right: Interactive Vector Schematic */}
-                <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-2xs space-y-2">
-                  <div className="flex items-center justify-between text-xs font-semibold text-slate-800 border-b border-slate-100 pb-2">
-                    <span className="flex items-center gap-1.5 text-[#2B4C65]">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3 shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <span className="flex items-center gap-1.5 text-[#2B4C65] dark:text-[#7FA3C7]">
                       <Cpu className="w-3.5 h-3.5" />
                       <span>Interactive Vector Overlay</span>
                     </span>
-                    <span className="text-[10.5px] font-mono text-slate-500">Click to Select</span>
+                    <span className="text-[10.5px] font-mono text-slate-500 dark:text-slate-400">Click to Select</span>
                   </div>
-                  <div className="overflow-hidden rounded-lg border border-slate-200 bg-[#F7F6F2]">
+                  <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-[#F7F6F2] dark:bg-slate-950">
                     {renderInteractiveVectorSvg()}
                   </div>
                 </div>
               </div>
             ) : viewMode === 'reference' ? (
-              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs space-y-3">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-800 border-b border-slate-100 pb-2">
-                  <span className="flex items-center gap-1.5 text-[#2A645E]">
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-2xs space-y-3">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="flex items-center gap-1.5 text-[#2A645E] dark:text-[#52B788]">
                     <ImageIcon className="w-4 h-4" />
                     <span>Original 2D Physical Mapping Reference Image</span>
                   </span>
@@ -560,13 +560,13 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     href="./docs/hicum_2d_reference.png"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-mono text-[#2B4C65] hover:underline"
+                    className="inline-flex items-center gap-1 text-[11px] font-mono text-[#2B4C65] dark:text-[#7FA3C7] hover:underline"
                   >
                     <span>Open Full Image</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
-                <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-inner flex justify-center p-2">
+                <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-white shadow-inner flex justify-center p-2">
                   <img
                     src="./docs/hicum_2d_reference.png"
                     alt="Original 2D Reference of the HICUM Model physical mapping to a SiGe HBT"
@@ -576,25 +576,25 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
               </div>
             ) : (
               /* Vector Mode: dominant interactive SVG */
-              <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs space-y-3">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-800 border-b border-slate-100 pb-2">
-                  <span className="flex items-center gap-1.5 text-[#2B4C65]">
+              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-2xs space-y-3">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="flex items-center gap-1.5 text-[#2B4C65] dark:text-[#7FA3C7]">
                     <Cpu className="w-4 h-4" />
                     <span>Interactive 2D SiGe HBT Cross-Section with Embedded HICUM Circuit</span>
                   </span>
-                  <span className="text-[11px] font-mono text-slate-500">
+                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                     Exact Layout &amp; Callouts Matching 2D Reference
                   </span>
                 </div>
-                <div className="overflow-hidden rounded-lg border border-slate-200 bg-[#F7F6F2]">
+                <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-[#F7F6F2] dark:bg-slate-950">
                   {renderInteractiveVectorSvg()}
                 </div>
               </div>
             )}
 
             {/* Quick Component Selection Strip */}
-            <div className="bg-white rounded-xl border border-slate-200 p-3 shadow-2xs space-y-2">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-3 shadow-2xs space-y-2">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
                 Quick Element Selector (Click to Highlight &amp; Inspect):
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -608,7 +608,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                       className={`px-2 py-0.5 rounded text-[11px] font-mono border transition-all ${
                         isSel
                           ? 'bg-[#2B4C65] text-white border-[#2B4C65] font-bold shadow-2xs'
-                          : 'bg-[#F7F6F2] text-slate-700 border-slate-200 hover:bg-[#EAE8E1]'
+                          : 'bg-[#F7F6F2] dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-[#EAE8E1] dark:hover:bg-slate-700'
                       }`}
                     >
                       {item.symbol}
@@ -620,25 +620,25 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
           </div>
 
           {/* Right Inspector Column (Left 4 Columns) */}
-          <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200 p-4 shadow-2xs space-y-4">
+          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-2xs space-y-4">
             {/* Component Header */}
             <div>
-              <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-                <span className="px-2 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2] font-mono text-xs font-semibold">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <span className="px-2 py-0.5 rounded bg-[#E7EEF4] dark:bg-slate-800 text-[#2B4C65] dark:text-[#7FA3C7] border border-[#C5D4E2] dark:border-slate-700 font-mono text-xs font-semibold">
                   {activeAnnotation.category.toUpperCase()} BRANCH
                 </span>
                 {activeAnnotation.calloutTitle && (
-                  <span className="px-2 py-0.5 rounded bg-[#F4EAE3] text-[#824726] border border-[#DFC8B8] font-mono text-[10.5px] font-semibold">
+                  <span className="px-2 py-0.5 rounded bg-[#F4EAE3] dark:bg-amber-950/40 text-[#824726] dark:text-amber-300 border border-[#DFC8B8] dark:border-amber-900/50 font-mono text-[10.5px] font-semibold">
                     {activeAnnotation.calloutTitle}
                   </span>
                 )}
               </div>
 
               <div className="mt-2.5 flex items-center gap-2.5">
-                <span className="text-2xl font-mono font-bold text-[#2B4C65]">
+                <span className="text-2xl font-mono font-bold text-[#2B4C65] dark:text-[#7FA3C7]">
                   <FormulaView latex={activeAnnotation.symbol} inline />
                 </span>
-                <span className="text-sm font-bold text-slate-900 font-scientific">
+                <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   {activeAnnotation.name}
                 </span>
               </div>
@@ -646,7 +646,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
 
             {/* Authoritative Citations */}
             <div className="space-y-1">
-              <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+              <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">
                 Official Documented Citations:
               </div>
               <CitationBadges
@@ -656,11 +656,11 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             </div>
 
             {/* Physical Mechanism & Description */}
-            <div className="p-3 rounded-lg bg-[#F7F6F2] border border-slate-200 space-y-1.5">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-[#2A645E] font-bold">
+            <div className="p-3 rounded-lg bg-[#F7F6F2] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1.5">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-[#2A645E] dark:text-[#52B788] font-bold">
                 Physical Mechanism &amp; Origin
               </div>
-              <p className="text-xs text-slate-700 leading-relaxed">
+              <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                 {activeAnnotation.description}
               </p>
             </div>
@@ -704,27 +704,27 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
       )}
 
       {activeFigureTab === 'bandgap_grading' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-7">
-            <h3 className="text-base font-bold text-slate-900 font-scientific mb-1">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1">
               Bandgap Grading &amp; Doping Profile in the Internal Base-Emitter-Collector Region (Manual Fig. 2.2.0/2, p. 16)
             </h3>
-            <p className="text-xs text-slate-600 mb-3">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
               Spatial variation of doping concentration <FormulaView latex="N_E(x), N_B(x), N_C(x)" inline /> and effective bandgap voltage <FormulaView latex="V_{Ge}(x)" inline /> across the 1D intrinsic SiGe HBT coordinate <FormulaView latex="x" inline />.
             </p>
-            <svg viewBox="0 0 680 340" className="w-full h-auto bg-[#F7F6F2] rounded-lg border border-slate-200 p-2">
+            <svg viewBox="0 0 680 340" className="w-full h-auto bg-[#F7F6F2] dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-2">
               <line x1={80} y1={30} x2={80} y2={295} stroke="#334155" strokeWidth={1.5} />
               <line x1={80} y1={295} x2={640} y2={295} stroke="#334155" strokeWidth={1.5} />
               <line x1={230} y1={30} x2={230} y2={295} stroke="#94A3B8" strokeDasharray="4 4" />
               <line x1={430} y1={30} x2={430} y2={295} stroke="#94A3B8" strokeDasharray="4 4" />
 
-              <text x={155} y={48} textAnchor="middle" className="fill-[#23435C] font-bold text-[12px]">
+              <text x={155} y={48} textAnchor="middle" className="fill-[#23435C] dark:fill-[#7FA3C7] font-bold text-[12px]">
                 n⁺ Emitter (N_E)
               </text>
-              <text x={330} y={48} textAnchor="middle" className="fill-[#1C4642] font-bold text-[12px]">
+              <text x={330} y={48} textAnchor="middle" className="fill-[#1C4642] dark:fill-[#52B788] font-bold text-[12px]">
                 p-SiGe Graded Base (N_B)
               </text>
-              <text x={535} y={48} textAnchor="middle" className="fill-[#6E3B1F] font-bold text-[12px]">
+              <text x={535} y={48} textAnchor="middle" className="fill-[#6E3B1F] dark:fill-amber-400 font-bold text-[12px]">
                 n⁻ Epi Collector (N_C)
               </text>
 
@@ -734,7 +734,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                 stroke="#2B4C65"
                 strokeWidth={2.5}
               />
-              <text x={135} y={68} className="fill-[#23435C] font-mono font-semibold text-[11px]">
+              <text x={135} y={68} className="fill-[#23435C] dark:fill-[#7FA3C7] font-mono font-semibold text-[11px]">
                 log N(x) Doping
               </text>
 
@@ -744,30 +744,30 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                 stroke="#8A3B33"
                 strokeWidth={2.5}
               />
-              <text x={325} y={245} textAnchor="middle" className="fill-[#74312A] font-mono font-bold text-[11px]">
+              <text x={325} y={245} textAnchor="middle" className="fill-[#74312A] dark:fill-rose-400 font-mono font-bold text-[11px]">
                 Graded Bandgap V_Ge(x) (Ge Mole Fraction)
               </text>
-              <text x={455} y={185} className="fill-[#74312A] font-mono text-[10px]">
+              <text x={455} y={185} className="fill-[#74312A] dark:fill-rose-300 font-mono text-[10px]">
                 BC Barrier (vcbar, icbar)
               </text>
 
-              <text x={230} y={315} textAnchor="middle" className="fill-slate-700 font-mono text-[11px]">
+              <text x={230} y={315} textAnchor="middle" className="fill-slate-700 dark:fill-slate-300 font-mono text-[11px]">
                 x_jE (BE Junction)
               </text>
-              <text x={430} y={315} textAnchor="middle" className="fill-slate-700 font-mono text-[11px]">
+              <text x={430} y={315} textAnchor="middle" className="fill-slate-700 dark:fill-slate-300 font-mono text-[11px]">
                 x_jC (BC Junction)
               </text>
             </svg>
           </div>
 
           <div className="lg:col-span-5 space-y-3">
-            <h4 className="text-sm font-bold text-slate-900 font-scientific">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
               How HICUM/L2 Captures Heterojunction Bandgap Grading
             </h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               In a SiGe HBT, the bandgap varies spatially across the base-emitter and base-collector regions, causing the intrinsic carrier density <FormulaView latex="n_i^2(x) \propto \exp(-qV_{Ge}(x)/k_BT)" inline /> to vary with position. HICUM/L2 incorporates this directly into the Generalized Integral Charge-Control Relation (GICCR) via physically derived charge weighting factors:
             </p>
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+            <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
               <FormulaView
                 latex="Q_{p,T} = Q_{p0} + h_{jEi}(v_{B'E'})Q_{jEi} + h_{jCi}Q_{jCi} + h_{f0}Q_{f0} + h_{fE}\Delta Q_{Ef} + h_{fC}\Delta Q_{Cf} + Q_{Bf}"
                 displayMode
@@ -778,7 +778,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                 <button
                   key={p}
                   onClick={() => onSelectParamInLab(p)}
-                  className="px-2.5 py-1 rounded bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] text-xs font-mono hover:bg-[#DCE6EF]"
+                  className="px-2.5 py-1 rounded bg-[#E7EEF4] dark:bg-slate-800 text-[#23435C] dark:text-[#7FA3C7] border border-[#C5D4E2] dark:border-slate-700 text-xs font-mono hover:bg-[#DCE6EF] dark:hover:bg-slate-700"
                 >
                   {p} ↗
                 </button>
@@ -790,84 +790,84 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
 
       {activeFigureTab === 'resistance_isolation' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs">
-            <h3 className="text-sm font-bold text-slate-900 font-scientific">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-2xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
               1. External Base Resistance Breakdown (Manual Fig. 2.7.0/1, p. 48)
             </h3>
-            <div className="my-2 p-2.5 bg-slate-50 rounded border border-slate-100">
+            <div className="my-2 p-2.5 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-800">
               <FormulaView latex="R_{Bx} = r_{KB} + r_{po} + r_{pm} + r_{sp}" displayMode={false} />
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Decomposes the extrinsic base path between terminal <code>B</code> and perimeter node <code>B*</code> into contact resistance (<FormulaView latex="r_{KB}" inline />), poly-on-oxide sheet resistance (<FormulaView latex="r_{po}" inline />), poly-to-monosilicon transition (<FormulaView latex="r_{pm}" inline />), and link-base under the spacer (<FormulaView latex="r_{sp}" inline />).
             </p>
             <div className="mt-3 flex gap-1.5">
               <button
                 onClick={() => onSelectElementInLab('rbx')}
-                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] dark:bg-emerald-950/40 text-[#1C4642] dark:text-emerald-300 border border-[#C0D8D4] dark:border-emerald-800/50 text-xs font-mono"
               >
                 Element: rbx ↗
               </button>
               <button
                 onClick={() => onSelectParamInLab('rbx')}
-                className="px-2.5 py-1 rounded bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E7EEF4] dark:bg-slate-800 text-[#23435C] dark:text-[#7FA3C7] border border-[#C5D4E2] dark:border-slate-700 text-xs font-mono"
               >
                 Param: rbx ↗
               </button>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs">
-            <h3 className="text-sm font-bold text-slate-900 font-scientific">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-2xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
               2. Collector Buried Layer &amp; Sinker Path (Manual Fig. 2.8.2/1, p. 53)
             </h3>
-            <div className="my-2 p-2.5 bg-slate-50 rounded border border-slate-100">
+            <div className="my-2 p-2.5 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-800">
               <FormulaView latex="R_{Cx} = r_{bl} + r_{sink} + r_{KC}" displayMode={false} />
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Models the ohmic series path from the bottom of the active epitaxial collector (internal node <code>C&apos;</code>) laterally through the <FormulaView latex="n^+" inline /> buried layer (<FormulaView latex="r_{bl}" inline />), vertically up the collector sinker (<FormulaView latex="r_{sink}" inline />), and through the collector contact (<FormulaView latex="r_{KC}" inline />) to terminal <code>C</code>.
             </p>
             <div className="mt-3 flex gap-1.5">
               <button
                 onClick={() => onSelectElementInLab('rcx')}
-                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] dark:bg-emerald-950/40 text-[#1C4642] dark:text-emerald-300 border border-[#C0D8D4] dark:border-emerald-800/50 text-xs font-mono"
               >
                 Element: rcx ↗
               </button>
               <button
                 onClick={() => onSelectParamInLab('rcx')}
-                className="px-2.5 py-1 rounded bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E7EEF4] dark:bg-slate-800 text-[#23435C] dark:text-[#7FA3C7] border border-[#C5D4E2] dark:border-slate-700 text-xs font-mono"
               >
                 Param: rcx ↗
               </button>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs">
-            <h3 className="text-sm font-bold text-slate-900 font-scientific">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-2xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
               3. Collector-Substrate Trench Variants (Manual Fig. 2.11.0/1, p. 61)
             </h3>
-            <div className="my-2 p-2.5 bg-slate-50 rounded border border-slate-100">
+            <div className="my-2 p-2.5 bg-slate-50 dark:bg-slate-950 rounded border border-slate-100 dark:border-slate-800">
               <FormulaView latex="C_{CS} = C_{jS}(v_{S'C'}) + C_{SCp}(v_{SC})" displayMode={false} />
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Compares junction isolation, Shallow Trench Isolation (STI), and Deep Trench Isolation (DTI). Bottom subcollector-to-substrate capacitance <FormulaView latex="C_{jS}" inline /> connects to internal substrate node <code>S&apos;</code>, while perimeter sidewall capacitance <FormulaView latex="C_{SCp}" inline /> connects between <code>S</code> and <code>C</code>.
             </p>
             <div className="mt-3 flex gap-1.5 flex-wrap">
               <button
                 onClick={() => onSelectElementInLab('cjs')}
-                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] dark:bg-emerald-950/40 text-[#1C4642] dark:text-emerald-300 border border-[#C0D8D4] dark:border-emerald-800/50 text-xs font-mono"
               >
                 Element: cjs ↗
               </button>
               <button
                 onClick={() => onSelectElementInLab('cscp')}
-                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] dark:bg-emerald-950/40 text-[#1C4642] dark:text-emerald-300 border border-[#C0D8D4] dark:border-emerald-800/50 text-xs font-mono"
               >
                 Element: cscp ↗
               </button>
               <button
                 onClick={() => onSelectElementInLab('rsu')}
-                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] dark:bg-emerald-950/40 text-[#1C4642] dark:text-emerald-300 border border-[#C0D8D4] dark:border-emerald-800/50 text-xs font-mono"
               >
                 Element: rsu ↗
               </button>

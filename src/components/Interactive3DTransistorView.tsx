@@ -1043,13 +1043,13 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               Sentaurus TCAD → 3D SiGe HBT Workspace
             </span>
             {glbLoadedStatus && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#2C6E63] bg-[#EDF6F4] px-2 py-0.5 rounded border border-[#CBE4DF]">
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#2C6E63] dark:text-[#52B788] bg-[#EDF6F4] dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-[#CBE4DF] dark:border-emerald-800/50">
                 <CheckCircle2 className="w-3 h-3" />
                 Blender 5.2 GLB Verified
               </span>
             )}
           </div>
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-scientific mt-0.5">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5">
             Physical Mapping of the HICUM/L2 Compact Model to a 3D SiGe HBT
           </h2>
         </div>
@@ -1058,7 +1058,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
         <div className="flex items-center gap-2 flex-wrap">
           {/* Parameter Search & 3D Region Locator */}
           <div className="relative">
-            <div className="flex items-center bg-[#F8F7F4] border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs focus-within:border-[#3B5978] focus-within:bg-white transition-all">
+            <div className="flex items-center bg-[#F8F7F4] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus-within:border-[#3B5978] dark:focus-within:border-[#7FA3C7] focus-within:bg-white dark:focus-within:bg-slate-900 transition-all">
               <Search className="w-3.5 h-3.5 text-slate-400 mr-1.5 shrink-0" />
               <input
                 type="text"
@@ -1070,12 +1070,12 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                   setParamSearchOpen(true);
                 }}
                 placeholder="Locate parameter in 3D (e.g. rbi0, cjci0, rcx)..."
-                className="bg-transparent outline-none w-48 sm:w-56 text-slate-800 placeholder:text-slate-400"
+                className="bg-transparent outline-none w-48 sm:w-56 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             {paramSearchOpen && matchingSearchParams.length > 0 && (
-              <div className="absolute right-0 mt-1 w-80 bg-white rounded-xl border border-slate-200 shadow-lg p-2 z-50 space-y-1 text-xs">
+              <div className="absolute right-0 mt-1 w-80 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg p-2 z-50 space-y-1 text-xs">
                 <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
                   Click Parameter to Highlight 3D Region & Element
                 </div>
@@ -1093,23 +1093,23 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                         }
                         setParamSearchQuery('');
                       }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2"
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between gap-2"
                     >
                       <div>
-                        <span className="font-mono font-bold text-[#3B5978]">
+                        <span className="font-mono font-bold text-[#3B5978] dark:text-[#7FA3C7]">
                           {p.id}
                         </span>
-                        <span className="text-slate-500 ml-1.5 text-[11px] truncate">
+                        <span className="text-slate-500 dark:text-slate-400 ml-1.5 text-[11px] truncate">
                           {p.description}
                         </span>
                       </div>
                       <span
                         className={`px-1.5 py-0.5 rounded text-[9.5px] font-mono shrink-0 ${
                           p.spatialNature === 'localized'
-                            ? 'bg-[#EDF6F4] text-[#2C6E63]'
+                            ? 'bg-[#EDF6F4] text-[#2C6E63] dark:bg-emerald-950/40 dark:text-emerald-300'
                             : p.spatialNature === 'distributed'
-                            ? 'bg-[#EEF3F8] text-[#3B5978]'
-                            : 'bg-[#F4EAE3] text-[#824726]'
+                            ? 'bg-[#EEF3F8] text-[#3B5978] dark:bg-slate-800 dark:text-sky-300'
+                            : 'bg-[#F4EAE3] text-[#824726] dark:bg-amber-950/40 dark:text-amber-300'
                         }`}
                       >
                         {mappedReg ? mappedReg.shortLabel : p.spatialNature}
@@ -1122,13 +1122,13 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
           </div>
 
           {/* 3 View Mode Presets: Cross-Section / Assembled 3D / Exploded */}
-          <div className="flex items-center bg-[#F3F2EE] p-0.5 rounded-lg border border-slate-200/80 text-xs">
+          <div className="flex items-center bg-[#F3F2EE] dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200/80 dark:border-slate-700 text-xs">
             <button
               onClick={() => handleSelectViewModePreset('cross_section')}
               className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
                 viewModePreset === 'cross_section'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               3D Cross-Section
@@ -1137,8 +1137,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               onClick={() => handleSelectViewModePreset('assembled_3d')}
               className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
                 viewModePreset === 'assembled_3d'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Assembled 3D
@@ -1147,8 +1147,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               onClick={() => handleSelectViewModePreset('exploded_3d')}
               className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
                 viewModePreset === 'exploded_3d'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Exploded View
@@ -1159,13 +1159,13 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
           <div className="flex items-center gap-1">
             <button
               onClick={handleExportScreenshot}
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium inline-flex items-center gap-1.5"
+              className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium inline-flex items-center gap-1.5"
               title="Export PNG Screenshot of 3D Artboard"
             >
-              <Camera className="w-3.5 h-3.5 text-[#3B5978]" />
+              <Camera className="w-3.5 h-3.5 text-[#3B5978] dark:text-[#7FA3C7]" />
               <span className="hidden sm:inline">Screenshot</span>
             </button>
-            <label className="hidden xl:inline-flex items-center gap-1 text-[11px] text-slate-600 px-1.5 cursor-pointer select-none">
+            <label className="hidden xl:inline-flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 px-1.5 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={screenshotTransparent}
@@ -1177,15 +1177,15 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
             <a
               href="./models/sige_hbt_sentaurus.glb"
               download="sige_hbt_sentaurus.glb"
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium inline-flex items-center gap-1"
+              className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium inline-flex items-center gap-1"
               title="Download Blender 5.2 Sentaurus 3D Model (.glb)"
             >
-              <Download className="w-3.5 h-3.5 text-[#2C6E63]" />
+              <Download className="w-3.5 h-3.5 text-[#2C6E63] dark:text-[#52B788]" />
               <span className="hidden md:inline">.GLB</span>
             </a>
             <button
               onClick={() => setIsFullscreen((f) => !f)}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"
               title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen 3D Artboard'}
             >
               {isFullscreen ? (
@@ -1199,20 +1199,20 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
       </div>
 
       {/* DOMINANT 3D SCIENTIFIC ARTBOARD */}
-      <div className="bg-[#FAF9F5] rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col">
+      <div className="bg-[#FAF9F5] dark:bg-slate-950 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
         {/* Top Artboard Contextual Visibility Bar */}
-        <div className="px-4 py-2 bg-white border-b border-slate-200/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200/70 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
           {/* Layer & Component Visibility Pills */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">
+            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">
               Layers:
             </span>
             <button
               onClick={() => setShowMaterials((v) => !v)}
               className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
                 showMaterials
-                  ? 'bg-[#EEF3F8] text-[#3B5978] border-[#C5D6E8]'
-                  : 'bg-white text-slate-400 border-slate-200'
+                  ? 'bg-[#EEF3F8] dark:bg-slate-800 text-[#3B5978] dark:text-[#7FA3C7] border-[#C5D6E8] dark:border-slate-700'
+                  : 'bg-white dark:bg-slate-800/50 text-slate-400 border-slate-200 dark:border-slate-700'
               }`}
             >
               {showMaterials ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
@@ -1223,8 +1223,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               onClick={() => setShowContacts((v) => !v)}
               className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
                 showContacts
-                  ? 'bg-slate-100 text-slate-800 border-slate-300'
-                  : 'bg-white text-slate-400 border-slate-200'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700'
+                  : 'bg-white dark:bg-slate-800/50 text-slate-400 border-slate-200 dark:border-slate-700'
               }`}
             >
               {showContacts ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
@@ -1235,15 +1235,15 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               onClick={() => setShowOxide((v) => !v)}
               className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
                 showOxide
-                  ? 'bg-slate-100 text-slate-700 border-slate-300'
-                  : 'bg-white text-slate-400 border-slate-200'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700'
+                  : 'bg-white dark:bg-slate-800/50 text-slate-400 border-slate-200 dark:border-slate-700'
               }`}
             >
               {showOxide ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
               <span>STI & Spacers</span>
             </button>
 
-            <div className="h-4 w-px bg-slate-200 mx-1" />
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
 
             {/* Embedded HICUM Circuit Overlay Toggle & Category Filter */}
             <button
@@ -1251,7 +1251,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               className={`px-2.5 py-1 rounded-md font-semibold border transition-colors inline-flex items-center gap-1.5 ${
                 showHicumOverlay
                   ? 'bg-[#2C6E63] text-white border-[#2C6E63]'
-                  : 'bg-white text-slate-600 border-slate-200'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
               }`}
             >
               <Cpu className="w-3.5 h-3.5" />
@@ -1262,16 +1262,16 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               <div className="relative">
                 <button
                   onClick={() => setShowCategoryMenu((m) => !m)}
-                  className="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium inline-flex items-center gap-1"
+                  className="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium inline-flex items-center gap-1"
                 >
-                  <Sliders className="w-3 h-3 text-[#2C6E63]" />
+                  <Sliders className="w-3 h-3 text-[#2C6E63] dark:text-[#52B788]" />
                   <span>Filter Symbols</span>
                   <ChevronDown className="w-3 h-3" />
                 </button>
 
                 {showCategoryMenu && (
-                  <div className="absolute left-0 mt-1 w-60 bg-white rounded-xl border border-slate-200 shadow-lg p-3 z-40 space-y-2 text-xs">
-                    <div className="font-semibold text-slate-800 border-b border-slate-100 pb-1">
+                  <div className="absolute left-0 mt-1 w-60 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg p-3 z-40 space-y-2 text-xs">
+                    <div className="font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1">
                       HICUM Component Categories
                     </div>
                     {(
@@ -1284,7 +1284,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                     ).map((cat) => (
                       <label
                         key={cat.id}
-                        className="flex items-center gap-2 cursor-pointer text-slate-700 hover:text-slate-900"
+                        className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
                       >
                         <input
                           type="checkbox"
@@ -1300,8 +1300,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                         <span className="text-[11px]">{cat.label}</span>
                       </label>
                     ))}
-                    <div className="border-t border-slate-100 pt-2 space-y-1.5">
-                      <label className="flex items-center gap-2 cursor-pointer text-slate-700">
+                    <div className="border-t border-slate-100 dark:border-slate-800 pt-2 space-y-1.5">
+                      <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300">
                         <input
                           type="checkbox"
                           checked={showComponentLabels}
@@ -1310,7 +1310,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                         />
                         <span className="text-[11px]">Show Component Labels</span>
                       </label>
-                      <label className="flex items-center gap-2 cursor-pointer text-slate-700">
+                      <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300">
                         <input
                           type="checkbox"
                           checked={showComponentWires}
@@ -1332,8 +1332,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               onClick={() => setHoverLabelsEnabled((h) => !h)}
               className={`px-2.5 py-1 rounded-md font-medium border transition-colors inline-flex items-center gap-1 ${
                 hoverLabelsEnabled
-                  ? 'bg-[#EEF3F8] text-[#3B5978] border-[#C5D6E8]'
-                  : 'bg-white text-slate-500 border-slate-200'
+                  ? 'bg-[#EEF3F8] dark:bg-slate-800 text-[#3B5978] dark:text-[#7FA3C7] border-[#C5D6E8] dark:border-slate-700'
+                  : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
               }`}
               title="Toggle Hover Identification Labels ON/OFF"
             >
@@ -1344,17 +1344,17 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
             <div className="relative">
               <button
                 onClick={() => setShowRegionManager((r) => !r)}
-                className="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium inline-flex items-center gap-1"
+                className="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium inline-flex items-center gap-1"
               >
-                <Layers className="w-3 h-3 text-[#3B5978]" />
+                <Layers className="w-3 h-3 text-[#3B5978] dark:text-[#7FA3C7]" />
                 <span>Regions (13)</span>
                 <ChevronDown className="w-3 h-3" />
               </button>
 
               {showRegionManager && (
-                <div className="absolute right-0 mt-1 w-72 bg-white rounded-xl border border-slate-200 shadow-lg p-3 z-40 space-y-1.5 text-xs max-h-80 overflow-y-auto">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
-                    <span className="font-semibold text-slate-800">
+                <div className="absolute right-0 mt-1 w-72 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg p-3 z-40 space-y-1.5 text-xs max-h-80 overflow-y-auto">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
                       Show / Hide / Isolate Regions
                     </span>
                     <button
@@ -1362,7 +1362,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                         setIsolatedRegionId(null);
                         setHiddenRegionIds({});
                       }}
-                      className="text-[10px] text-[#3B5978] hover:underline font-medium"
+                      className="text-[10px] text-[#3B5978] dark:text-[#7FA3C7] hover:underline font-medium"
                     >
                       Show All
                     </button>
@@ -1373,7 +1373,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                     return (
                       <div
                         key={reg.id}
-                        className="flex items-center justify-between gap-2 py-1 px-1.5 rounded hover:bg-slate-50"
+                        className="flex items-center justify-between gap-2 py-1 px-1.5 rounded hover:bg-slate-50 dark:hover:bg-slate-800"
                       >
                         <button
                           onClick={() => setSelectedRegionId(reg.id)}
@@ -1383,7 +1383,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                             className="w-2.5 h-2.5 rounded-xs shrink-0 border border-slate-400"
                             style={{ backgroundColor: reg.colorHex }}
                           />
-                          <span className="truncate text-[11px] font-medium text-slate-700">
+                          <span className="truncate text-[11px] font-medium text-slate-700 dark:text-slate-300">
                             {reg.shortLabel}
                           </span>
                         </button>
@@ -1397,7 +1397,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                             className={`px-1.5 py-0.5 rounded text-[9.5px] font-mono border ${
                               isIsolated
                                 ? 'bg-[#3B5978] text-white border-[#3B5978]'
-                                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                                : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                           >
                             Iso
@@ -1409,7 +1409,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                                 [reg.id]: !prev[reg.id],
                               }))
                             }
-                            className="p-1 text-slate-500 hover:text-slate-900"
+                            className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                             title={isHidden ? 'Show Region' : 'Hide Region'}
                           >
                             {isHidden ? (
@@ -1598,7 +1598,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
           {/* RIGHT FLOATING NAVIGATION & CAMERA TOOLBAR */}
           <div
-            className="absolute top-3 right-3 z-20 flex flex-col gap-1.5 bg-white border border-slate-200/90 rounded-xl p-1.5 shadow-xs"
+            className="absolute top-3 right-3 z-20 flex flex-col gap-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs border border-slate-200/90 dark:border-slate-800 rounded-xl p-1.5 shadow-xs"
             onMouseDown={(e) => e.stopPropagation()}
           >
             <button
@@ -1606,7 +1606,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               className={`p-2 rounded-lg transition-colors ${
                 interactionTool === 'orbit'
                   ? 'bg-[#3B5978] text-white'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
               title="360° Orbit Tool (Left-Drag)"
             >
@@ -1617,13 +1617,13 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               className={`p-2 rounded-lg transition-colors ${
                 interactionTool === 'pan'
                   ? 'bg-[#3B5978] text-white'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
               title="Pan / Grab Tool (Drag to Reposition)"
             >
               <Hand className="w-4 h-4" />
             </button>
-            <div className="h-px bg-slate-200 my-0.5" />
+            <div className="h-px bg-slate-200 dark:bg-slate-800 my-0.5" />
             <button
               onClick={() => {
                 cameraStateRef.current.targetRadius = Math.max(
@@ -1631,7 +1631,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                   cameraStateRef.current.targetRadius - 3.2
                 );
               }}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               title="Zoom In"
             >
               <ZoomIn className="w-4 h-4" />
@@ -1643,22 +1643,22 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                   cameraStateRef.current.targetRadius + 3.2
                 );
               }}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               title="Zoom Out"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
             <button
               onClick={handleFitToScreen}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               title="Fit Complete Device to Screen"
             >
               <Focus className="w-4 h-4" />
             </button>
-            <div className="h-px bg-slate-200 my-0.5" />
+            <div className="h-px bg-slate-200 dark:bg-slate-800 my-0.5" />
             <button
               onClick={handleResetAll}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               title="Reset Assembly, Camera & Visibility"
             >
               <RotateCcw className="w-4 h-4" />
@@ -1667,31 +1667,31 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
           {/* SELECTED REGION CONTEXTUAL BAR (TOP-CENTER) */}
           <div
-            className="absolute top-3 left-1/2 -translate-x-1/2 z-20 hidden md:flex items-center gap-2 bg-white border border-slate-200/90 rounded-xl px-3 py-1.5 shadow-xs text-xs"
+            className="absolute top-3 left-1/2 -translate-x-1/2 z-20 hidden md:flex items-center gap-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs border border-slate-200/90 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs"
             onMouseDown={(e) => e.stopPropagation()}
           >
             <span
               className="w-3 h-3 rounded-xs border border-slate-400 shrink-0"
               style={{ backgroundColor: activeRegion.colorHex }}
             />
-            <span className="font-semibold text-slate-800">
+            <span className="font-semibold text-slate-800 dark:text-slate-200">
               {activeRegion.shortLabel}
             </span>
             <span
               className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
                 activeRegion.spatialNature === 'localized'
-                  ? 'bg-[#EDF6F4] text-[#2C6E63]'
-                  : 'bg-[#EEF3F8] text-[#3B5978]'
+                  ? 'bg-[#EDF6F4] text-[#2C6E63] dark:bg-emerald-950/40 dark:text-emerald-300'
+                  : 'bg-[#EEF3F8] text-[#3B5978] dark:bg-slate-800 dark:text-sky-300'
               }`}
             >
               {activeRegion.spatialNature === 'localized'
                 ? 'Localized'
                 : 'Distributed'}
             </span>
-            <div className="h-3.5 w-px bg-slate-200 mx-0.5" />
+            <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 mx-0.5" />
             <button
               onClick={() => handleFocusOnRegion(activeRegion)}
-              className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px]"
+              className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-[11px]"
               title="Focus Camera on This Region (or Double-Click Region)"
             >
               Focus
@@ -1705,12 +1705,12 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               className={`px-2 py-0.5 rounded font-medium text-[11px] ${
                 isolatedRegionId === activeRegion.id
                   ? 'bg-[#3B5978] text-white'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                  : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
               }`}
             >
               {isolatedRegionId === activeRegion.id ? 'Un-Isolate' : 'Isolate'}
             </button>
-            <div className="flex items-center gap-1 text-[11px] text-slate-500">
+            <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
               <span>α:</span>
               <input
                 type="range"
@@ -1740,22 +1740,22 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 left: Math.min(mouseScreenPos.x + 16, 620),
                 top: Math.max(mouseScreenPos.y - 16, 12),
               }}
-              className="absolute z-30 pointer-events-none bg-white border border-slate-300 rounded-xl px-3 py-2 shadow-md max-w-xs text-xs space-y-0.5"
+              className="absolute z-30 pointer-events-none bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 shadow-md max-w-xs text-xs space-y-0.5"
             >
               {hoveredComponentSpec ? (
                 <>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono font-bold text-[#B85D43]">
+                    <span className="font-mono font-bold text-[#B85D43] dark:text-[#E07A5F]">
                       {hoveredComponentSpec.symbolLabel}
                     </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                       {hoveredComponentSpec.spatialNature}
                     </span>
                   </div>
-                  <div className="font-semibold text-slate-900">
+                  <div className="font-semibold text-slate-900 dark:text-slate-100">
                     {hoveredComponentSpec.name}
                   </div>
-                  <p className="text-[11px] text-slate-600 leading-snug">
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
                     {hoveredComponentSpec.physicalOriginNote}
                   </p>
                 </>
@@ -1763,18 +1763,18 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 hoveredRegionSpec && (
                   <>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-slate-900">
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">
                         {hoveredRegionSpec.shortLabel}
                       </span>
-                      <span className="text-[10px] font-mono text-[#3B5978]">
+                      <span className="text-[10px] font-mono text-[#3B5978] dark:text-[#7FA3C7]">
                         {hoveredRegionSpec.materialName}
                       </span>
                     </div>
-                    <div className="text-[10.5px] font-mono text-slate-500">
+                    <div className="text-[10.5px] font-mono text-slate-500 dark:text-slate-400">
                       {hoveredRegionSpec.dopingSummary} ·{' '}
                       {hoveredRegionSpec.sentaurusCoordsUm}
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-snug">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
                       {hoveredRegionSpec.physicalFunction}
                     </p>
                   </>
@@ -1785,13 +1785,13 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
           {/* BOTTOM FLOATING ARTBOARD CONTROLS: EXPLODED VIEW, CUTAWAY PLANE & OPACITY */}
           <div
-            className="absolute bottom-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200/90 rounded-xl px-3.5 py-2 shadow-xs text-xs"
+            className="absolute bottom-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs border border-slate-200/90 dark:border-slate-800 rounded-xl px-3.5 py-2 shadow-xs text-xs"
             onMouseDown={(e) => e.stopPropagation()}
           >
             {/* Exploded View Slider (0-100%) */}
             <div className="flex items-center gap-2">
-              <Box className="w-3.5 h-3.5 text-[#3B5978]" />
-              <span className="font-semibold text-slate-700">
+              <Box className="w-3.5 h-3.5 text-[#3B5978] dark:text-[#7FA3C7]" />
+              <span className="font-semibold text-slate-700 dark:text-slate-300">
                 Exploded View:
               </span>
               <input
@@ -1803,15 +1803,15 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 onChange={(e) => setExplodePct(parseInt(e.target.value, 10))}
                 className="w-28 sm:w-36 accent-[#3B5978] cursor-pointer"
               />
-              <span className="font-mono font-semibold text-slate-800 w-9 text-right">
+              <span className="font-mono font-semibold text-slate-800 dark:text-slate-200 w-9 text-right">
                 {explodePct}%
               </span>
             </div>
 
             {/* Cutaway Clipping Plane Control */}
             <div className="flex items-center gap-2">
-              <Scissors className="w-3.5 h-3.5 text-[#2C6E63]" />
-              <span className="font-semibold text-slate-700">Cutaway:</span>
+              <Scissors className="w-3.5 h-3.5 text-[#2C6E63] dark:text-[#52B788]" />
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Cutaway:</span>
               <select
                 value={cutawayAxis}
                 onChange={(e) => {
@@ -1821,7 +1821,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                   else if (axis === 'x_half') setCutawayPos(0.0);
                   else if (axis === 'y_depth') setCutawayPos(0.05);
                 }}
-                className="bg-slate-50 border border-slate-200 rounded-md px-2 py-0.5 text-xs font-medium text-slate-700 outline-none cursor-pointer"
+                className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-0.5 text-xs font-medium text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
               >
                 <option value="z_cross">Z Cross-Section</option>
                 <option value="x_half">X Symmetry Slice</option>
@@ -1844,7 +1844,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
             {/* Global Model Opacity Slider */}
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-700">Opacity:</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Opacity:</span>
               <input
                 type="range"
                 min={0.2}
@@ -1854,7 +1854,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 onChange={(e) => setGlobalOpacity(parseFloat(e.target.value))}
                 className="w-20 accent-[#3B5978] cursor-pointer"
               />
-              <span className="font-mono text-[11px] text-slate-600 w-9 text-right">
+              <span className="font-mono text-[11px] text-slate-600 dark:text-slate-400 w-9 text-right">
                 {Math.round(globalOpacity * 100)}%
               </span>
             </div>
@@ -1862,9 +1862,9 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
         </div>
 
         {/* MATERIAL & EMBEDDED SYMBOL LEGEND BAR BELOW ARTBOARD */}
-        <div className="px-4 py-2.5 bg-white border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="px-4 py-2.5 bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="font-semibold text-slate-500">
+            <span className="font-semibold text-slate-500 dark:text-slate-400">
               Material (SiGe HBT):
             </span>
             {[
@@ -1914,8 +1914,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 }}
                 className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded transition-colors ${
                   selectedRegionId === item.id
-                    ? 'bg-slate-100 font-semibold text-slate-900 ring-1 ring-slate-300'
-                    : 'text-slate-600 hover:bg-slate-50'
+                    ? 'bg-slate-100 dark:bg-slate-800 font-semibold text-slate-900 dark:text-slate-100 ring-1 ring-slate-300 dark:ring-slate-700'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <span
@@ -1930,14 +1930,14 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowHicumOverlay((v) => !v)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200 bg-[#F8F7F4] hover:bg-slate-100 text-slate-700 font-medium text-[11px]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-[#F8F7F4] dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-[11px]"
             >
               <span className="font-mono font-bold">o—o</span>
               <span>HICUM element (embedded)</span>
             </button>
             <button
               onClick={() => setBottomCardsExpanded((b) => !b)}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-medium text-[11px]"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium text-[11px]"
             >
               <span>{bottomCardsExpanded ? 'Collapse Details' : 'Expand Details'}</span>
               {bottomCardsExpanded ? (
@@ -1954,13 +1954,13 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
       {bottomCardsExpanded && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           {/* Card 1 (Left 4 Cols): Synchronized HICUM Equivalent Circuit */}
-          <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between">
+          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
-                <h3 className="text-sm font-bold text-slate-900 font-scientific">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5 mb-3">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   Synchronized HICUM Circuit
                 </h3>
-                <span className="text-[10.5px] font-mono text-[#3B5978] bg-[#EEF3F8] px-2 py-0.5 rounded">
+                <span className="text-[10.5px] font-mono text-[#3B5978] dark:text-[#7FA3C7] bg-[#EEF3F8] dark:bg-slate-800 px-2 py-0.5 rounded">
                   Active: {activeEmbeddedComponent.symbolLabel}
                 </span>
               </div>
@@ -1968,7 +1968,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               {/* Clean Interactive Compact HICUM Schematic SVG */}
               <svg
                 viewBox="0 0 380 235"
-                className="w-full h-auto bg-[#FAF9F5] rounded-lg border border-slate-200/70 p-1 select-none"
+                className="w-full h-auto bg-[#FAF9F5] dark:bg-slate-950 rounded-lg border border-slate-200/70 dark:border-slate-800 p-1 select-none"
               >
                 {/* Dashed Intrinsic Transistor Box */}
                 <rect
@@ -1992,7 +1992,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 </text>
 
                 {/* Main Schematic Wires */}
-                <g stroke="#334155" strokeWidth={1.3} fill="none">
+                <g stroke="#475569" strokeWidth={1.3} fill="none">
                   {/* Collector C' top rail -> R_Cx -> C */}
                   <line x1={80} y1={56} x2={348} y2={56} />
                   {/* Base B -> R_Bx -> B* -> R_bi* -> B' */}
@@ -2088,79 +2088,79 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 })}
 
                 {/* Terminal Labels */}
-                <text x={14} y={125} className="fill-slate-900 font-bold text-[10px]">
+                <text x={14} y={125} className="fill-slate-700 dark:fill-slate-300 font-bold text-[10px]">
                   B
                 </text>
-                <text x={100} y={116} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                <text x={100} y={116} className="fill-slate-500 font-mono font-bold text-[8.5px]">
                   B*
                 </text>
-                <text x={175} y={116} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                <text x={175} y={116} className="fill-slate-500 font-mono font-bold text-[8.5px]">
                   B&apos;
                 </text>
-                <text x={174} y={51} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                <text x={174} y={51} className="fill-slate-500 font-mono font-bold text-[8.5px]">
                   C&apos;
                 </text>
-                <text x={174} y={180} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                <text x={174} y={180} className="fill-slate-500 font-mono font-bold text-[8.5px]">
                   E&apos;
                 </text>
-                <text x={115} y={13} className="fill-slate-700 font-mono font-bold text-[8.5px]">
+                <text x={115} y={13} className="fill-slate-500 font-mono font-bold text-[8.5px]">
                   S&apos;
                 </text>
-                <text x={355} y={22} className="fill-slate-900 font-bold text-[10px]">
+                <text x={355} y={22} className="fill-slate-700 dark:fill-slate-300 font-bold text-[10px]">
                   S
                 </text>
-                <text x={355} y={60} className="fill-slate-900 font-bold text-[10px]">
+                <text x={355} y={60} className="fill-slate-700 dark:fill-slate-300 font-bold text-[10px]">
                   C
                 </text>
-                <text x={224} y={224} className="fill-slate-900 font-bold text-[10px]">
+                <text x={224} y={224} className="fill-slate-700 dark:fill-slate-300 font-bold text-[10px]">
                   E
                 </text>
               </svg>
             </div>
 
-            <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="pt-2.5 mt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
               <span>Click any branch in 2D or 3D to synchronize</span>
-              <span className="font-mono text-slate-700 font-semibold">
+              <span className="font-mono text-slate-700 dark:text-slate-300 font-semibold">
                 I_C = {(opResult.Ic * 1e3).toFixed(2)} mA · f_T = {(opResult.Ft / 1e9).toFixed(1)} GHz
               </span>
             </div>
           </div>
 
           {/* Card 2 (Center 4 Cols): Documented Key Equation & Parameters */}
-          <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between space-y-3">
+          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between space-y-3">
             <div className="space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 font-scientific">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                     Key Documented Equation
                   </h3>
-                  <p className="text-[11px] text-slate-500 font-mono">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                     {activeEquation.eqNumber} · {activeEquation.section}
                   </p>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#EDF6F4] text-[#2C6E63] border border-[#CBE4DF]">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#EDF6F4] dark:bg-emerald-950/40 text-[#2C6E63] dark:text-emerald-300 border border-[#CBE4DF] dark:border-emerald-800/50">
                   {activeEmbeddedComponent.symbolLabel}
                 </span>
               </div>
 
               {/* LaTeX Equation Box */}
-              <div className="bg-[#FAF9F5] border border-slate-200/80 rounded-xl p-3 overflow-x-auto">
+              <div className="bg-[#FAF9F5] dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl p-3 overflow-x-auto">
                 <FormulaView latex={activeEquation.latex} displayMode={true} />
               </div>
 
               {/* Equation Title & Physical Meaning */}
               <div>
-                <div className="text-xs font-bold text-slate-800">
+                <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   {activeEquation.title}
                 </div>
-                <p className="text-[11.5px] text-slate-600 leading-relaxed mt-0.5">
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-300 leading-relaxed mt-0.5">
                   {activeEquation.summary}
                 </p>
               </div>
 
               {/* Related HICUM Parameters for Selected Component / Region */}
               <div>
-                <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-1.5">
+                <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold mb-1.5">
                   Associated HICUM/L2 Parameters (Click to Inspect)
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -2178,7 +2178,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[11px] font-medium border transition-colors ${
                             isSel
                               ? 'bg-[#3B5978] text-white border-[#3B5978]'
-                              : 'bg-[#F8F7F4] text-slate-800 border-slate-200 hover:border-[#3B5978]'
+                              : 'bg-[#F8F7F4] dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-[#3B5978] dark:hover:border-[#7FA3C7]'
                           }`}
                         >
                           <span>{pId}</span>
@@ -2190,8 +2190,8 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 space-y-1.5">
-              <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
+              <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">
                 Sources · Eq. ({activeEquation.eqNumber}) & {activeEmbeddedComponent.symbolLabel}
               </div>
               <CitationBadges
@@ -2214,17 +2214,17 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
           </div>
 
           {/* Card 3 (Right 4 Cols): Physical Mapping, Sentaurus TCAD Spec & Localization */}
-          <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between space-y-3">
+          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between space-y-3">
             <div className="space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                <h3 className="text-sm font-bold text-slate-900 font-scientific">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   Physical Mapping & Sentaurus Spec
                 </h3>
                 <span
                   className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold border ${
                     activeRegion.spatialNature === 'localized'
-                      ? 'bg-[#EDF6F4] text-[#2C6E63] border-[#CBE4DF]'
-                      : 'bg-[#EEF3F8] text-[#3B5978] border-[#D5E1EE]'
+                      ? 'bg-[#EDF6F4] dark:bg-emerald-950/40 text-[#2C6E63] dark:text-emerald-300 border-[#CBE4DF] dark:border-emerald-800/50'
+                      : 'bg-[#EEF3F8] dark:bg-slate-800 text-[#3B5978] dark:text-sky-300 border-[#D5E1EE] dark:border-slate-700'
                   }`}
                 >
                   {activeRegion.spatialNature === 'localized'
@@ -2235,7 +2235,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
               {/* Selected Region & Embedded Component Explanation */}
               <div className="space-y-1.5">
-                <div className="text-xs font-bold text-slate-900">
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-100">
                   {activeRegion.name}
                 </div>
                 <CitationBadges
@@ -2244,24 +2244,24 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                   vaCitation={activeRegion.vaCitation}
                   sentaurusCitation={activeRegion.sentaurusCitation}
                 />
-                <p className="text-[11.5px] text-slate-600 leading-relaxed">
+                <p className="text-[11.5px] text-slate-600 dark:text-slate-300 leading-relaxed">
                   {activeRegion.description}
                 </p>
               </div>
 
               {/* Localized vs Distributed Distinction */}
-              <div className="p-2.5 rounded-lg bg-[#FAF9F5] border border-slate-200/80 space-y-1">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-800">
-                  <Compass className="w-3.5 h-3.5 text-[#2C6E63] shrink-0" />
+              <div className="p-2.5 rounded-lg bg-[#FAF9F5] dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-1">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-800 dark:text-slate-200">
+                  <Compass className="w-3.5 h-3.5 text-[#2C6E63] dark:text-[#52B788] shrink-0" />
                   <span>Localized vs. Distributed Physical Origin</span>
                 </div>
-                <p className="text-[11px] text-slate-600 leading-snug">
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
                   {activeRegion.localizedVsDistributedNote}
                 </p>
               </div>
 
               {/* Authoritative Sentaurus TCAD Coordinates & Code */}
-              <div className="p-2.5 rounded-lg bg-slate-900 text-slate-100 font-mono text-[10.5px] space-y-1">
+              <div className="p-2.5 rounded-lg bg-slate-900 dark:bg-black text-slate-100 font-mono text-[10.5px] space-y-1 border border-slate-800">
                 <div className="flex items-center justify-between text-[#88C0D0] font-semibold">
                   <span>{activeRegion.sentaurusId}</span>
                   <span>{activeRegion.dopingSummary}</span>
@@ -2275,10 +2275,10 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               </div>
 
               {/* Non-Localized / Conceptual Parameter Distinction */}
-              <div className="p-2.5 rounded-lg bg-[#F4EAE3]/60 border border-[#DFC8B8]/80">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-[#6E3B1F] mb-1">
+              <div className="p-2.5 rounded-lg bg-[#F4EAE3]/60 dark:bg-amber-950/20 border border-[#DFC8B8]/80 dark:border-amber-900/40">
+                <div className="flex items-center justify-between text-[11px] font-semibold text-[#6E3B1F] dark:text-amber-300 mb-1">
                   <span className="inline-flex items-center gap-1">
-                    <Info className="w-3 h-3 text-[#9A5833]" />
+                    <Info className="w-3 h-3 text-[#9A5833] dark:text-amber-400" />
                     Conceptual / Global Parameters ({conceptualParams.length})
                   </span>
                   <span className="font-mono text-[9.5px]">No 3D Point Invented</span>
@@ -2288,7 +2288,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                     <button
                       key={p.id}
                       onClick={() => onSelectParamInLab(p.id)}
-                      className="px-1.5 py-0.5 rounded bg-white hover:bg-[#EBDACD] text-[#552D17] border border-[#DFC8B8] font-mono text-[10px]"
+                      className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 hover:bg-[#EBDACD] dark:hover:bg-slate-800 text-[#552D17] dark:text-amber-200 border border-[#DFC8B8] dark:border-amber-900/50 font-mono text-[10px]"
                       title={`${p.id}: ${p.description} (Conceptual/global parameter)`}
                     >
                       {p.id}

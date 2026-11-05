@@ -179,16 +179,16 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden">
       {/* Top Header & Filter Controls */}
-      <div className="px-4 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+      <div className="px-4 py-2.5 bg-slate-50/80 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <Cpu className="w-4 h-4 text-[#2B4C65] shrink-0" />
+          <Cpu className="w-4 h-4 text-[#2B4C65] dark:text-[#7FA3C7] shrink-0" />
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
               Complete HICUM/L2 Equivalent Circuit (Manual Fig. 2.1.0/1 & Fig. 2.13.0/1)
             </h3>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
               Click any circuit element (34 branches) or node (15 nodes) to inspect equations, physical meaning & sliders
             </p>
           </div>
@@ -196,11 +196,11 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
 
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Sub-network focus pills */}
-          <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 text-[11px]">
+          <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 text-[11px]">
             <button
               onClick={() => setNetworkFilter('all')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'all' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'all' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               All (34)
@@ -208,7 +208,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <button
               onClick={() => setNetworkFilter('main_core')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'main_core' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'main_core' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Intrinsic Core
@@ -216,7 +216,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <button
               onClick={() => setNetworkFilter('extrinsic_sub')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'extrinsic_sub' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'extrinsic_sub' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Perimeter & Substrate
@@ -224,7 +224,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <button
               onClick={() => setNetworkFilter('adjuncts')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'adjuncts' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'adjuncts' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Thermal / NQS / Noise
@@ -235,8 +235,8 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             onClick={() => setShowLiveValues((v) => !v)}
             className={`px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               showLiveValues
-                ? 'bg-[#E6F0EE] border-[#A1C4BE] text-[#22544F]'
-                : 'bg-white border-slate-200 text-slate-600'
+                ? 'bg-[#E6F0EE] dark:bg-emerald-950/40 border-[#A1C4BE] dark:border-emerald-800/50 text-[#22544F] dark:text-emerald-300'
+                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
             }`}
             title="Show live operating point currents, capacitances, and resistances on schematic components"
           >
@@ -248,32 +248,32 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             onClick={() => setShowTopologyNotes((v) => !v)}
             className={`px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               showTopologyNotes
-                ? 'bg-[#E7EEF4] border-[#A9BFD3] text-[#2B4C65]'
-                : 'bg-white border-slate-200 text-slate-600'
+                ? 'bg-[#E7EEF4] dark:bg-slate-800 border-[#A9BFD3] dark:border-slate-700 text-[#2B4C65] dark:text-[#7FA3C7]'
+                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
             }`}
           >
             <Info className="w-3.5 h-3.5" />
             <span>Why B* & No R_Ci?</span>
           </button>
 
-          <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden">
+          <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 overflow-hidden">
             <button
               onClick={() => setZoom((z) => Math.max(0.75, +(z - 0.12).toFixed(2)))}
-              className="p-1.5 text-slate-600 hover:bg-slate-100"
+              className="p-1.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
               title="Zoom Out"
             >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setZoom(1.0)}
-              className="px-1.5 text-[11px] font-mono text-slate-600 hover:bg-slate-100"
+              className="px-1.5 text-[11px] font-mono text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
               title="Reset Zoom"
             >
               {Math.round(zoom * 100)}%
             </button>
             <button
               onClick={() => setZoom((z) => Math.min(1.45, +(z + 0.12).toFixed(2)))}
-              className="p-1.5 text-slate-600 hover:bg-slate-100"
+              className="p-1.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
               title="Zoom In"
             >
               <ZoomIn className="w-3.5 h-3.5" />
@@ -284,28 +284,28 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
 
       {/* Collapsible HICUM Topology Notes Banner */}
       {showTopologyNotes && (
-        <div className="bg-[#E7EEF4]/60 border-b border-[#C5D4E2] px-4 py-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <div className="bg-white p-2.5 rounded-lg border border-[#DCE6EF]">
-            <div className="font-semibold text-[#23435C] mb-1">
+        <div className="bg-[#E7EEF4]/60 dark:bg-slate-800/40 border-b border-[#C5D4E2] dark:border-slate-800 px-4 py-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-[#DCE6EF] dark:border-slate-800">
+            <div className="font-semibold text-[#23435C] dark:text-[#7FA3C7] mb-1">
               1. Why Intermediate Perimeter Node B* (`bp`)?
             </div>
-            <p className="text-slate-600 text-[11px] leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
               {TOPOLOGY_DESIGN_NOTES.whyBStarNode}
             </p>
           </div>
-          <div className="bg-white p-2.5 rounded-lg border border-[#DCE6EF]">
-            <div className="font-semibold text-[#1C4642] mb-1">
+          <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-[#DCE6EF] dark:border-slate-800">
+            <div className="font-semibold text-[#1C4642] dark:text-[#52B788] mb-1">
               2. Why No Explicit Internal Collector Node / Resistor?
             </div>
-            <p className="text-slate-600 text-[11px] leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
               {TOPOLOGY_DESIGN_NOTES.whyOmitInternalCollectorNode}
             </p>
           </div>
-          <div className="bg-white p-2.5 rounded-lg border border-[#DCE6EF]">
-            <div className="font-semibold text-[#6E3B1F] mb-1">
+          <div className="bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-[#DCE6EF] dark:border-slate-800">
+            <div className="font-semibold text-[#6E3B1F] dark:text-amber-400 mb-1">
               3. Why Internal Substrate Node S&apos; (`si`)?
             </div>
-            <p className="text-slate-600 text-[11px] leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
               {TOPOLOGY_DESIGN_NOTES.whySPrimeNode}
             </p>
           </div>
@@ -313,7 +313,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
       )}
 
       {/* Interactive SVG Schematic Canvas */}
-      <div className="relative overflow-auto bg-[#F7F6F2] p-2">
+      <div className="relative overflow-auto bg-[#F7F6F2] dark:bg-slate-950 p-2">
         <div
           style={{
             width: `${Math.round(860 * zoom)}px`,
@@ -323,7 +323,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
         >
           <svg
             viewBox="0 0 860 590"
-            className="w-full h-auto select-none bg-white rounded-lg border border-slate-200/80 shadow-2xs"
+            className="w-full h-auto select-none bg-white dark:bg-slate-900 rounded-lg border border-slate-200/80 dark:border-slate-800 shadow-2xs"
           >
             {/* Background Sub-region Boxes */}
             {/* Effective Internal Transistor Dashed Box (Manual Fig. 2.1.0/1a) */}

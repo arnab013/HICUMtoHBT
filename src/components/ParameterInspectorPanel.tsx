@@ -15,6 +15,7 @@ import {
   Layers,
   CheckCircle2,
   AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
 
 interface ParameterInspectorPanelProps {
@@ -36,22 +37,22 @@ const SPATIAL_STYLE: Record<
   { badge: string; label: string; desc: string }
 > = {
   localized: {
-    badge: 'bg-[#E6F0EE] text-[#22544F] border-[#C0D8D4]',
-    label: 'Physically Localized Effect',
+    badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/60',
+    label: 'Physically Localized',
     desc: 'Directly tied to a specific physical junction, layer, or contact in the 3D SiGe HBT.',
   },
   distributed: {
-    badge: 'bg-[#E7EEF4] text-[#23435C] border-[#C5D4E2]',
+    badge: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200/80 dark:border-blue-900/60',
     label: 'Distributed 2D/3D Effect',
     desc: 'Models lateral voltage drops, RC transmission line partitioning, or multi-dimensional current spreading.',
   },
   conceptual: {
-    badge: 'bg-[#F4EAE3] text-[#824726] border-[#DFC8B8]',
-    label: 'Mathematical / Thermal Parameter',
+    badge: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200/80 dark:border-amber-900/60',
+    label: 'Mathematical / Thermal',
     desc: 'Hyperbolic smoothing constant, global temperature exponent, or lumped thermal network parameter.',
   },
   flag: {
-    badge: 'bg-[#EAE8E1] text-[#334155] border-[#D8D4CA]',
+    badge: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700',
     label: 'Simulator / Topology Flag',
     desc: 'Discrete switch controlling model version compatibility or sub-network activation.',
   },
@@ -72,10 +73,11 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
 }) => {
   if (!selectedParam && !selectedElement && !selectedNode) {
     return (
-      <div className="matte-card p-6 text-center animate-card-enter">
-        <p className="text-sm text-[#475569]">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-6 text-center shadow-xs animate-card-enter">
+        <HelpCircle className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
           Select any circuit component, node, or parameter to inspect its physical meaning,
-          verified manual page & line citations, governing equations, and live numerical controls.
+          governing equations, and interactive tuning controls.
         </p>
       </div>
     );
@@ -98,164 +100,96 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
             <button
               key={opt.value}
               onClick={() => onUpdateParamValue(param.id, opt.value)}
-              className={`px-3 py-1.5 text-xs font-mono rounded border matte-btn-transition ${
+              className={`btn-elite px-3 py-1 text-xs rounded-lg font-mono border transition-all ${
                 activeVal === opt.value
-                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
-                  : 'bg-white text-[#334155] border-[#D8D4CA] hover:bg-[#EAE8E1]'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-semibold'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
               }`}
             >
-              {opt.value}: {opt.label}
+              {opt.label} ({opt.value})
             </button>
           ))}
         </div>
       );
     }
 
-    const useLog =
-      param.isLogScale && param.sliderMin > 0 && param.sliderMax > param.sliderMin && activeVal > 0;
-
-    if (useLog) {
-      const logMin = Math.log10(param.sliderMin);
-      const logMax = Math.log10(param.sliderMax);
-      const currentLog = Math.min(
-        logMax,
-        Math.max(logMin, Math.log10(Math.max(param.sliderMin, activeVal)))
-      );
-
-      return (
-        <div className="space-y-1.5 mt-2">
-          <input
-            type="range"
-            min={logMin}
-            max={logMax}
-            step={(logMax - logMin) / 200}
-            value={currentLog}
-            onChange={(e) => {
-              const nextVal = Math.pow(10, parseFloat(e.target.value));
-              onUpdateParamValue(param.id, Number(nextVal.toPrecision(4)));
-            }}
-            className="w-full accent-[#2B4C65] cursor-pointer h-1.5 bg-[#D8D4CA] rounded-lg"
-          />
-          <div className="flex justify-between text-[10px] font-mono text-[#526071]">
-            <span>{param.sliderMin.toExponential(1)} (Log Min)</span>
-            <span>Logarithmic Sweep</span>
-            <span>{param.sliderMax.toExponential(1)} (Log Max)</span>
-          </div>
-        </div>
-      );
-    }
+    const min = param.sliderMin !== undefined ? param.sliderMin : activeVal > 0 ? activeVal * 0.1 : -10;
+    const max = param.sliderMax !== undefined ? param.sliderMax : activeVal > 0 ? activeVal * 5 : 10;
+    const step = (max - min) / 100 || 0.01;
 
     return (
-      <div className="space-y-1.5 mt-2">
+      <div className="mt-3 flex items-center gap-3">
         <input
           type="range"
-          min={param.sliderMin}
-          max={param.sliderMax}
-          step={param.sliderStep || (param.sliderMax - param.sliderMin) / 200 || 0.01}
-          value={Math.min(param.sliderMax, Math.max(param.sliderMin, activeVal))}
-          onChange={(e) => {
-            const v = parseFloat(e.target.value);
-            if (!Number.isNaN(v)) onUpdateParamValue(param.id, v);
-          }}
-          className="w-full accent-[#2B4C65] cursor-pointer h-1.5 bg-[#D8D4CA] rounded-lg"
+          min={min}
+          max={max}
+          step={step}
+          value={activeVal}
+          onChange={(e) => onUpdateParamValue(param.id, parseFloat(e.target.value))}
+          className="flex-1 cursor-pointer accent-blue-600"
         />
-        <div className="flex justify-between text-[10px] font-mono text-[#526071]">
-          <span>Min: {param.sliderMin}</span>
-          <span>Linear Sweep</span>
-          <span>Max: {param.sliderMax}</span>
-        </div>
       </div>
     );
   };
 
   return (
-    <div className="space-y-4">
-      {/* 1. Selected Circuit Element Context Card */}
+    <div className="space-y-5">
+      {/* 1. Circuit Component Context Header */}
       {selectedElement && (
-        <div
-          key={`el-${selectedElement.id}`}
-          className="matte-card p-4 animate-card-enter"
-        >
-          <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#E5E2DA] pb-3">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] font-semibold">
-                  Equivalent Circuit Branch · {selectedElement.manualSection}
-                </span>
-                <span className="text-[11px] font-mono text-[#526071]">
-                  Nodes: <strong>{selectedElement.fromNode}</strong> →{' '}
-                  <strong>{selectedElement.toNode}</strong> ({selectedElement.vaBranch})
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5 mt-1.5">
-                <h3 className="text-lg font-bold text-[#161E29] font-scientific">
-                  {selectedElement.name}
-                </h3>
-                <span className="px-2 py-0.5 rounded bg-[#F7F6F2] border border-[#D8D4CA] text-sm">
-                  <FormulaView latex={selectedElement.symbolLatex} inline />
-                </span>
-              </div>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-5 shadow-xs space-y-3 animate-card-enter">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-md bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900">
+                Branch: {selectedElement.id}
+              </span>
+              <span className="text-xs font-mono text-blue-600 dark:text-blue-400 font-semibold">
+                Between nodes {selectedElement.fromNode} ↔ {selectedElement.toNode}
+              </span>
             </div>
-            <span
-              className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${
-                SPATIAL_STYLE[selectedElement.spatialNature].badge
-              }`}
-            >
-              {SPATIAL_STYLE[selectedElement.spatialNature].label}
+            <span className="text-[11px] font-mono uppercase text-slate-400">
+              {selectedElement.subsystem || selectedElement.network}
             </span>
           </div>
 
-          {/* Authoritative Manual Page+Line & Verilog-A Citations */}
+          <div>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+              {selectedElement.name}
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+              {selectedElement.summary}
+            </p>
+          </div>
+
           <CitationBadges
-            className="mt-2.5"
+            compact
             manualCitation={selectedElement.manualCitation}
-            vaCitation={selectedElement.vaCitation || `hicumL2V2p34.va, ll. ${selectedElement.vaLines}`}
+            vaCitation={selectedElement.vaCitation}
           />
 
-          <p className="text-xs text-[#2C3746] leading-relaxed mt-2.5">
-            {selectedElement.physicalDescription}
-          </p>
-
-          <div className="mt-2.5 flex items-center gap-2 text-[11px] text-[#22544F] bg-[#E6F0EE] border border-[#C0D8D4] px-2.5 py-1.5 rounded">
-            <Layers className="w-3.5 h-3.5 shrink-0" />
-            <span>
-              <strong>Physical Device Region:</strong> {selectedElement.physicalRegion} (VA lines{' '}
-              {selectedElement.vaLines})
-            </span>
+          <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            <strong className="text-slate-900 dark:text-slate-100">Physical Origin:</strong>{' '}
+            {selectedElement.physicalDescription || selectedElement.summary}
           </div>
 
-          {/* Element's Parameters Selector Pills */}
           {elementParams.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-[#E5E2DA]">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-[#475569] font-semibold mb-1.5">
-                Governing Model Parameters ({elementParams.length}) — Click to Adjust & Plot:
+            <div>
+              <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-2">
+                Governing Parameters ({elementParams.length}):
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {elementParams.map((ep) => {
-                  const isSel = selectedParam?.id === ep.id;
-                  const val = activeParamValues[ep.id] ?? ep.testValue;
-                  const ref = refParamValues[ep.id] ?? ep.testValue;
-                  const mod = Math.abs(val - ref) > 1e-12 * (Math.abs(ref) + 1e-24);
+                {elementParams.map((p) => {
+                  const isSel = selectedParam?.id === p.id;
                   return (
                     <button
-                      key={ep.id}
-                      onClick={() => onSelectParam(ep.id)}
-                      className={`px-2.5 py-1 rounded text-xs font-mono border matte-btn-transition flex items-center gap-1.5 ${
+                      key={p.id}
+                      onClick={() => onSelectParam(p.id)}
+                      className={`btn-elite px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
                         isSel
-                          ? 'bg-[#2B4C65] text-white border-[#2B4C65] font-bold'
-                          : mod
-                          ? 'bg-[#F4EAE3] text-[#824726] border-[#DFC8B8] font-semibold'
-                          : 'bg-[#F7F6F2] text-[#2C3746] border-[#D8D4CA] hover:bg-[#EAE8E1]'
+                          ? 'bg-blue-600 text-white border-blue-600 font-bold shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                       }`}
                     >
-                      <span>{ep.name}</span>
-                      <span
-                        className={`text-[10px] ${
-                          isSel ? 'text-[#D6E4F0]' : 'text-[#526071]'
-                        }`}
-                      >
-                        ({ep.symbolLatex.replace(/\\/g, '')})
-                      </span>
+                      {p.name}
                     </button>
                   );
                 })}
@@ -265,52 +199,20 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
         </div>
       )}
 
-      {/* Selected Node Context if a Node was clicked */}
-      {selectedNode && !selectedElement && (
-        <div
-          key={`node-${selectedNode.id}`}
-          className="matte-card p-4 animate-card-enter"
-        >
-          <div className="flex items-center justify-between border-b border-[#E5E2DA] pb-2.5">
-            <div>
-              <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#E6F0EE] text-[#22544F] border border-[#C0D8D4] font-semibold">
-                {selectedNode.isExternal ? 'External Terminal Node' : 'Internal Equivalent Circuit Node'}
-              </span>
-              <h3 className="text-lg font-bold text-[#161E29] mt-1 font-scientific">
-                Node {selectedNode.id} (Verilog-A: <code>{selectedNode.vaName}</code>) — {selectedNode.label}
-              </h3>
-            </div>
-          </div>
-
-          <CitationBadges
-            className="mt-2.5"
-            manualCitation={selectedNode.manualCitation}
-            vaCitation={selectedNode.vaCitation}
-          />
-
-          <p className="text-xs text-[#2C3746] leading-relaxed mt-2">
-            {selectedNode.description}
-          </p>
-          <div className="mt-2 text-xs text-[#23435C] font-mono bg-[#E7EEF4] px-2.5 py-1.5 rounded border border-[#C5D4E2]">
-            Physical Location: {selectedNode.physicalLocation}
-          </div>
-        </div>
-      )}
-
-      {/* 2. Active Parameter Interactive Control & Explanation Card */}
+      {/* 2. Active Parameter Interactive Control Card */}
       {selectedParam && (
         <div
           key={`param-${selectedParam.id}`}
-          className="bg-white border-2 border-[#2B4C65] rounded-[10px] p-4 space-y-3.5 animate-card-enter"
+          className="bg-white dark:bg-slate-900 border-2 border-blue-600 dark:border-blue-500 rounded-xl p-5 space-y-4 shadow-xs animate-card-enter"
         >
-          <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#E5E2DA] pb-3">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5">
             <div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-[#1D2530] text-white">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900">
                   Parameter §{selectedParam.section}.{selectedParam.tableNo}
                 </span>
                 <span
-                  className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-md border ${
                     SPATIAL_STYLE[selectedParam.spatialNature].badge
                   }`}
                 >
@@ -318,7 +220,6 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
                 </span>
               </div>
 
-              {/* Verified Manual & Verilog-A Page + Line Citations */}
               <CitationBadges
                 className="mt-2"
                 manualCitation={selectedParam.manualCitation}
@@ -326,42 +227,42 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
                 vaCitation={selectedParam.vaCitation || `hicumL2V2p34.va, l. ${selectedParam.vaLine}`}
               />
 
-              <div className="flex flex-wrap items-center gap-3 mt-2">
-                <span className="text-2xl font-mono font-bold text-[#2B4C65]">
+              <div className="flex flex-wrap items-center gap-3 mt-2.5">
+                <span className="text-2xl font-mono font-bold text-blue-600 dark:text-blue-400">
                   {selectedParam.name}
                 </span>
-                <span className="px-2.5 py-0.5 rounded bg-[#F7F6F2] border border-[#D8D4CA] text-base">
+                <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
                   <FormulaView latex={selectedParam.symbolLatex} inline />
                 </span>
-                <span className="text-xs font-mono text-[#526071]">
+                <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                   Unit: <strong>{selectedParam.unit}</strong> · Range:{' '}
-                  <strong>{selectedParam.rangeStr}</strong> · M-Factor:{' '}
+                  <strong>{selectedParam.rangeStr}</strong> · M:{' '}
                   <strong>{selectedParam.mFactor || '—'}</strong>
                 </span>
               </div>
-              <div className="text-sm font-semibold text-[#161E29] mt-1">
+              <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-1.5">
                 {selectedParam.description}
               </div>
             </div>
 
             {isModified ? (
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2.5 py-1 rounded bg-[#F4EAE3] text-[#824726] border border-[#DFC8B8]">
-                <AlertCircle className="w-3.5 h-3.5" /> Illustrative Sweep Active
+              <span className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/60">
+                <AlertCircle className="w-3.5 h-3.5" /> Sweep Active
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2.5 py-1 rounded bg-[#E6F0EE] text-[#22544F] border border-[#C0D8D4]">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Verified Manual Card Value
+              <span className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/60">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Card Value
               </span>
             )}
           </div>
 
           {/* Interactive Value & Slider Box */}
-          <div className="p-3.5 rounded-md bg-[#F7F6F2] border border-[#D8D4CA]">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-[#2B4C65]" />
-                <span className="text-xs font-bold text-[#161E29]">
-                  Interactive Parameter Control:
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <Sliders className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                  Value Control:
                 </span>
                 <input
                   type="number"
@@ -371,9 +272,9 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
                     const v = parseFloat(e.target.value);
                     if (!Number.isNaN(v)) onUpdateParamValue(selectedParam.id, v);
                   }}
-                  className="w-32 px-2.5 py-1 text-xs font-mono font-bold text-[#2B4C65] bg-white border border-[#2B4C65] rounded focus:outline-none"
+                  className="w-32 px-2.5 py-1 text-xs font-mono font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/25"
                 />
-                <span className="text-xs font-mono text-[#475569]">
+                <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                   {selectedParam.unit !== '-' ? selectedParam.unit : ''}
                 </span>
               </div>
@@ -388,7 +289,7 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
                           Number((activeVal * 0.5).toPrecision(4))
                         )
                       }
-                      className="px-2 py-1 text-[11px] font-mono rounded bg-white border border-[#D8D4CA] text-[#2C3746] hover:bg-[#EAE8E1] matte-btn-transition"
+                      className="btn-elite px-2.5 py-1 text-xs font-mono rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
                     >
                       ×0.5
                     </button>
@@ -399,7 +300,7 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
                           Number((activeVal * 1.5).toPrecision(4))
                         )
                       }
-                      className="px-2 py-1 text-[11px] font-mono rounded bg-white border border-[#D8D4CA] text-[#2C3746] hover:bg-[#EAE8E1] matte-btn-transition"
+                      className="btn-elite px-2.5 py-1 text-xs font-mono rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
                     >
                       ×1.5
                     </button>
@@ -407,15 +308,15 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
                 )}
                 <button
                   onClick={() => onUpdateParamValue(selectedParam.id, selectedParam.defaultValue)}
-                  className="px-2 py-1 text-[11px] font-mono rounded bg-white border border-[#D8D4CA] text-[#475569] hover:bg-[#EAE8E1] matte-btn-transition"
-                  title={`Set to Manual Default (${selectedParam.defaultDisplay})`}
+                  className="btn-elite px-2.5 py-1 text-xs font-mono rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100"
+                  title={`Default (${selectedParam.defaultDisplay})`}
                 >
-                  Default ({selectedParam.defaultDisplay})
+                  Def ({selectedParam.defaultDisplay})
                 </button>
                 <button
                   onClick={() => onResetParam(selectedParam.id)}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono font-semibold rounded bg-[#2A645E] text-white hover:bg-[#22544F] matte-btn-transition"
-                  title={`Reset to Manual Test Card Value (${selectedParam.testDisplay})`}
+                  className="btn-elite inline-flex items-center gap-1 px-3 py-1 text-xs font-mono font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                  title={`Reset to Card Value (${selectedParam.testDisplay})`}
                 >
                   <RotateCcw className="w-3 h-3" /> Test ({selectedParam.testDisplay})
                 </button>
@@ -426,29 +327,28 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
           </div>
 
           {/* Physical Meaning & Operation Effect */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="p-3 rounded bg-[#F7F6F2] border border-[#D8D4CA]">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-[#2B4C65] font-bold mb-1">
-                Physical Meaning & Origin
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
+              <div className="text-xs font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-bold mb-1">
+                Physical Meaning &amp; Origin
               </div>
-              <p className="text-xs text-[#2C3746] leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 {selectedParam.physicalMeaning}
               </p>
-              <div className="mt-2 pt-2 border-t border-[#E5E2DA] text-[11px] text-[#475569]">
-                <strong>3D Device Localization:</strong> {selectedParam.physicalRegion}
+              <div className="mt-2.5 pt-2 border-t border-slate-200/70 dark:border-slate-700 text-[11px] text-slate-400">
+                <strong>Device Localization:</strong> {selectedParam.physicalRegion}
               </div>
             </div>
 
-            <div className="p-3 rounded bg-[#E6F0EE] border border-[#C0D8D4]">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-[#22544F] font-bold mb-1">
-                Effect on Equations, Curves & Operation
+            <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-900/40">
+              <div className="text-xs font-mono uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold mb-1">
+                Effect on Equations &amp; Curves
               </div>
-              <p className="text-xs text-[#2C3746] leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 {selectedParam.operationEffect}
               </p>
-              <div className="mt-2 pt-2 border-t border-[#C0D8D4] text-[11px] text-[#22544F]">
-                <strong>Spatial Classification:</strong>{' '}
-                {SPATIAL_STYLE[selectedParam.spatialNature].desc}
+              <div className="mt-2.5 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/40 text-[11px] text-emerald-700 dark:text-emerald-400">
+                <strong>Spatial Nature:</strong> {SPATIAL_STYLE[selectedParam.spatialNature].desc}
               </div>
             </div>
           </div>
@@ -457,16 +357,16 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
 
       {/* 3. Linked Documented Equations */}
       {linkedEquations.length > 0 && (
-        <div className="matte-card p-4 space-y-3 animate-card-enter">
-          <div className="flex items-center justify-between border-b border-[#E5E2DA] pb-2">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-5 space-y-3.5 shadow-xs animate-card-enter">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[#2B4C65]" />
-              <h4 className="text-sm font-bold text-[#161E29] font-scientific">
+              <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 tracking-tight">
                 Governing Documented Equations ({linkedEquations.length})
               </h4>
             </div>
-            <span className="text-[11px] font-mono text-[#526071]">
-              Exact Manual Page & Line Citations
+            <span className="text-xs font-mono text-slate-400">
+              Manual Page &amp; Line Citations
             </span>
           </div>
 
@@ -475,14 +375,14 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
               <div
                 key={eq.id}
                 onClick={() => onSelectEquation?.(eq.id)}
-                className="p-3 rounded border border-[#D8D4CA] bg-[#F7F6F2] hover:border-[#2B4C65] transition-colors cursor-pointer"
+                className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:border-blue-500 transition-colors cursor-pointer"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-[11px] px-1.5 py-0.5 rounded bg-[#1D2530] text-white">
+                    <span className="font-mono font-bold text-xs px-2 py-0.5 rounded-md bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900">
                       {eq.eqNumber}
                     </span>
-                    <span className="text-xs font-bold text-[#161E29]">{eq.title}</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{eq.title}</span>
                   </div>
                   <CitationBadges
                     compact
@@ -492,11 +392,11 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
                   />
                 </div>
 
-                <div className="bg-white border border-[#D8D4CA] rounded px-3 py-2 overflow-x-auto">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2 overflow-x-auto text-slate-900 dark:text-slate-100">
                   <FormulaView latex={eq.latex} displayMode />
                 </div>
 
-                <p className="text-[11px] text-[#475569] mt-1.5 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
                   {eq.summary}
                 </p>
               </div>
@@ -507,3 +407,5 @@ export const ParameterInspectorPanel: React.FC<ParameterInspectorPanelProps> = (
     </div>
   );
 };
+
+export default ParameterInspectorPanel;

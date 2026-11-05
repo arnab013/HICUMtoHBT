@@ -28,8 +28,9 @@ interface CitationBadgesProps {
 }
 
 /**
- * Clickable source citations: HICUM/L2 v2.4.0 manual (page + line, opens the PDF at the page),
- * hicumL2V2p34.va (line numbers) and the Sentaurus SDE command file (line numbers).
+ * Clickable source citations with elite design tokens:
+ * HICUM/L2 v2.4.0 manual (page + line, opens PDF),
+ * hicumL2V2p34.va, and Sentaurus SDE command file.
  */
 export const CitationBadges: React.FC<CitationBadgesProps> = ({
   manualCitation,
@@ -51,12 +52,12 @@ export const CitationBadges: React.FC<CitationBadgesProps> = ({
           target="_blank"
           rel="noreferrer"
           onClick={stop}
-          className="citation-badge-manual"
+          className="btn-elite inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-mono text-[11px] font-medium bg-slate-100 hover:bg-slate-200/80 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80"
           title={`HICUM/L2 v2.4.0 Manual — ${manualText} (opens PDF${page ? ` at page ${page}` : ''})`}
         >
-          <FileText className="w-3 h-3 shrink-0" />
-          <span className={compact ? 'truncate max-w-[220px]' : ''}>Manual · {manualText}</span>
-          {!compact && <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-70" />}
+          <FileText className="w-3 h-3 shrink-0 text-slate-500 dark:text-slate-400" />
+          <span className={compact ? 'truncate max-w-[200px]' : ''}>Manual · {manualText}</span>
+          {!compact && <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-60" />}
         </a>
       )}
       {vaCitation && (
@@ -65,12 +66,12 @@ export const CitationBadges: React.FC<CitationBadgesProps> = ({
           target="_blank"
           rel="noreferrer"
           onClick={stop}
-          className="citation-badge-va"
+          className="btn-elite inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-mono text-[11px] font-medium bg-blue-50 hover:bg-blue-100/80 text-blue-700 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 dark:text-blue-300 border border-blue-200/70 dark:border-blue-900/60"
           title={`Verilog-A source — ${vaCitation}`}
         >
-          <Code2 className="w-3 h-3 shrink-0" />
-          <span className={compact ? 'truncate max-w-[220px]' : ''}>{vaCitation}</span>
-          {!compact && <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-70" />}
+          <Code2 className="w-3 h-3 shrink-0 text-blue-500 dark:text-blue-400" />
+          <span className={compact ? 'truncate max-w-[200px]' : ''}>{vaCitation}</span>
+          {!compact && <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-60" />}
         </a>
       )}
       {sentaurusCitation && (
@@ -79,12 +80,12 @@ export const CitationBadges: React.FC<CitationBadgesProps> = ({
           target="_blank"
           rel="noreferrer"
           onClick={stop}
-          className="citation-badge-tcad"
+          className="btn-elite inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-mono text-[11px] font-medium bg-emerald-50 hover:bg-emerald-100/80 text-emerald-700 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-900/60"
           title={`Sentaurus SDE structure file — ${sentaurusCitation}`}
         >
-          <Box className="w-3 h-3 shrink-0" />
-          <span className={compact ? 'truncate max-w-[220px]' : ''}>{sentaurusCitation}</span>
-          {!compact && <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-70" />}
+          <Box className="w-3 h-3 shrink-0 text-emerald-500 dark:text-emerald-400" />
+          <span className={compact ? 'truncate max-w-[200px]' : ''}>{sentaurusCitation}</span>
+          {!compact && <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-60" />}
         </a>
       )}
     </div>

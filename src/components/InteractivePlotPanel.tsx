@@ -62,9 +62,9 @@ function formatReadoutValue(val: number, unit: string): string {
   if (abs === 0) return `0 ${unit}`;
   if (unit === 'A') {
     if (abs >= 1e-3) return `${(val * 1e3).toFixed(3)} mA`;
-    if (abs >= 1e-6) return `${(val * 1e6).toFixed(3)} μA`;
-    if (abs >= 1e-9) return `${(val * 1e9).toFixed(3)} nA`;
-    if (abs >= 1e-12) return `${(val * 1e12).toFixed(3)} pA`;
+    if (abs >= 1e-6) return `${(val * 1e6).toFixed(2)} μA`;
+    if (abs >= 1e-9) return `${(val * 1e9).toFixed(2)} nA`;
+    if (abs >= 1e-12) return `${(val * 1e12).toFixed(2)} pA`;
     return `${val.toExponential(2)} A`;
   }
   if (unit === 'F' || unit === 'pF' || unit === 'fF') {
@@ -98,102 +98,96 @@ const REGIME_GUIDE: Record<
 > = {
   transfer_gummel: [
     {
-      title: 'Low-Bias Perimeter / Depletion Recombination',
-      formula: 'i_{jBEi} = I_{REiS}[\\exp(v_{b\'e\'}/(m_{REi}V_T))-1]',
-      summary: 'Governed by ireis, mrei, ireps, mrep at low V_BE where SRH recombination increases base current and reduces low-current β_DC.',
-      eqId: 'eq-2.3.1-1',
-    },
-    {
-      title: 'Ideal GICCR Transfer Current Regime',
-      formula: 'i_T = i_{Tf} - i_{Tr} = \\frac{c_{10}}{Q_p}\\exp\\left(\\frac{v_{b\'e\'}}{m_{Cf}V_T}\\right)',
-      summary: 'Mid-bias exponential region controlled by c10, qp0, and mcf. Collector and base currents track in parallel on a semi-log Gummel plot.',
+      title: 'Generalized Integral Charge-Control Relation (GICCR)',
+      formula: 'i_T = \\frac{c_{10}}{Q_{p,T}}\\left[\\exp\\left(\\frac{v_{B\'E\'}}{m_{Tf}V_T}\\right) - \\exp\\left(\\frac{v_{B\'C\'}}{m_{Tr}V_T}\\right)\\right]',
+      summary: 'Accurately predicts collector transfer current from sub-pA forward active injection up to high current Kirk effect.',
       eqId: 'eq-2.2.0-1',
     },
     {
-      title: 'High-Current HBT Weighting & Kirk Roll-Off',
-      formula: 'Q_{p,T} = Q_{p0} + h_{jEi}Q_{jEi} + h_{jCi}Q_{jCi} + Q_{f,T} + Q_{r,T}',
-      summary: 'At high V_BE, voltage drops across rBi*/re/rcx and mobile charge Q_f,T bend i_T and i_B downward.',
-      eqId: 'eq-2.2.2-5',
+      title: 'Non-Ideal Low-Current Base Recombination',
+      formula: 'i_{jBEi,non} = I_{REiS}\\left[\\exp\\left(\\frac{v_{B\'E\'}}{m_{REi}V_T}\\right) - 1\\right]',
+      summary: 'Recombination in the base-emitter space-charge region causes the low-VBE non-ideal base current slope (mREi ≈ 2).',
+      eqId: 'eq-2.3.1-7',
+    },
+    {
+      title: 'Base Current Partitioning: Intrinsic vs Peripheral',
+      formula: 'i_{B,tot} = i_{jBEi} + i_{jBEp} + i_{jBCi} + i_{jBCx} + i_{BEt}',
+      summary: 'Separates bottom intrinsic injection from perimeter injection across sidewall spacers and reverse-bias band-to-band tunneling.',
+      eqId: 'eq-2.3.1-6',
     },
   ],
   critical_current: [
     {
-      title: 'Quasi-Saturation & Velocity Saturation Onset',
-      formula: 'I_{CK} = \\frac{v_{ceff}}{r_{Ci0}\\sqrt{1+(v_{ceff}/V_{lim})^2}}\\left[1+\\frac{x+\\sqrt{x^2+a_{ick}}}{2}\\right]',
-      summary: 'At low V_CE and high I_C, internal BC junction forward-biases and epitaxial velocity saturation (rci0, vlim, vces) shapes the knee.',
-      eqId: 'eq-2.2.1-1',
+      title: 'Kirk Effect Critical Push-Out Current',
+      formula: 'I_{CK} = \\frac{v_{ces}}{\\overline{r}_{Ci0}}\\frac{1}{\\left[1 + (v_{ces}/V_{lim})^2\\right]^{1/2}}\\left(1 + \\frac{x_{i}}{1 + x_i}\\right)',
+      summary: 'Critical current where injected electrons neutralize collector dopants, causing electric field collapse and base push-out.',
+      eqId: 'eq-2.3.1-4',
     },
     {
-      title: 'Forward Active & Physics-Based Early Effect',
-      formula: 'g_o = \\frac{\\partial I_C}{\\partial V_{CE}} \\propto \\frac{h_{jCi}C_{jCi}}{Q_{p,T}}',
-      summary: 'Output conductance is physically determined by BC depletion charge modulation of Q_p,T via hjci, cjci0, vdci, and zci—without an artificial V_A parameter.',
-      eqId: 'eq-2.2.2-5',
+      title: 'Quasi-Saturation Collector Transit Charge',
+      formula: '\\Delta Q_{fh} = \\tau_{hcs}\\,i_{Tf}\\left(\\frac{i_{Tf}}{I_{CK}}\\right)^2\\frac{1}{1 + (i_{Tf}/I_{CK})^2}',
+      summary: 'Massive minority carrier charge accumulation in the pushed-out collector under high forward bias.',
+      eqId: 'eq-2.3.1-5',
     },
     {
-      title: 'High-Field Punch-Through Asymptote',
-      formula: 'x = \\frac{v_{ceff} - V_{lim}}{V_{PT}}, \\quad I_{CK} \\propto 1 + x',
-      summary: 'At large V_C\'E\' approaching V_PT, full depletion of the collector epitaxial layer increases I_CK linearly.',
-      eqId: 'eq-2.2.1-3',
+      title: 'Early Voltage & Collector Series Drop',
+      formula: 'v_{ces} = v_{C\'E\'} - V_{CE,sat}',
+      summary: 'Effective internal collector-emitter voltage controlling velocity saturation and output conductance go = dIC/dVCE.',
+      eqId: 'eq-2.3.1-1',
     },
   ],
   transit_time_ft: [
     {
-      title: 'Low-Current Transit Time',
-      formula: '\\tau_{f0}(V_{b\'c\'}) = \\tau_0 + \\Delta\\tau_{0h}(c - 1) + \\tau_{Bfvl}(1/c - 1)',
-      summary: 'Base and BC space-charge delay at low injection governed by t0, dt0h, and tbvl via normalized depletion ratio c = CjCi0/CjCi.',
-      eqId: 'eq-2.2.2-1',
+      title: 'Unity Current-Gain Cutoff Frequency fT',
+      formula: 'f_T = \\frac{1}{2\\pi\\tau_{EC}}, \\quad \\tau_{EC} = \\tau_f + \\frac{V_T}{I_C}(C_{jEi} + C_{jCi}) + (R_E + R_{Cx})C_{jCi}',
+      summary: 'Forward cutoff frequency peaks at optimum collector current before Kirk effect transit time degradation sets in.',
+      eqId: 'eq-2.14.0-1',
     },
     {
-      title: 'High-Current Kirk Base Widening & Barrier Storage',
-      formula: '\\Delta\\tau_{f,h} = \\tau_{hcs}\\,w^2 + \\Delta\\tau_{Ef} + \\Delta\\tau_{Bf,b}',
-      summary: 'Above I_CK, neutral base widening (thcs, ahc, fthc), emitter storage (tef0, gtfe), and SiGe BC barrier (vcbar, icbar) rapidly increase τ_f.',
-      eqId: 'eq-2.2.2-8',
+      title: 'Maximum Oscillation Frequency fmax',
+      formula: 'f_{max} = \\sqrt{\\frac{f_T}{8\\pi R_B C_{BC}}}',
+      summary: 'Governed by total base resistance RB = rBx + rBi* and partitioned base-collector capacitance CBC = CjCi + CjCx.',
+      eqId: 'eq-2.14.0-2',
     },
     {
-      title: 'Transit Frequency f_T Peak & Roll-Off',
-      formula: 'f_T = \\frac{g_{m,i}}{2\\pi(C_{\\pi i}+C_{\\pi x}+C_{\\mu i}+C_{\\mu x} + g_{m,i}R_{eff}C_{\\mu})}',
-      summary: 'Low-current f_T is limited by depletion charging (Cjei0, Cjci0); peak f_T is set by τ_0; high-current f_T rolls off above I_CK.',
-      eqId: 'eq-4.0-ft',
+      title: 'Forward Transit Time Bias Dependence',
+      formula: '\\tau_f = \\tau_0 + \\Delta\\tau_f(v_{B\'E\'}, v_{B\'C\'}, i_{Tf})',
+      summary: 'Composed of neutral base transit time, emitter storage delay, collector space charge delay, and high-current Kirk accumulation.',
+      eqId: 'eq-2.3.1-2',
     },
   ],
   depletion_cap: [
     {
-      title: 'Reverse-Bias Depletion Law',
-      formula: 'C_j(V) = \\frac{C_{j0}}{(1 - V/V_D)^z}',
-      summary: 'Standard space-charge capacitance controlled by zero-bias capacitance Cj0, built-in voltage VD, and grading coefficient z.',
+      title: 'Classical vs Limiting Depletion Capacitance',
+      formula: 'C_j(v) = \\frac{C_{j0}}{\\left(1 - v/V_D\\right)^z}, \\quad v \\le a_{j}V_D',
+      summary: 'Standard power-law depletion capacitance transitioning smoothly to a linear approximation at forward bias ajVD.',
       eqId: 'eq-2.4.1-1',
     },
     {
-      title: 'Forward-Bias Singularity Avoidance (QJMODF)',
-      formula: 'C_{j,max} = a_j \\cdot C_{j0}',
-      summary: 'Smoothly limits depletion capacitance to aj·Cj0 as junction voltage approaches and exceeds VD, ensuring continuous C(V) and Q(V) derivatives.',
-      eqId: 'eq-2.4.1-2',
+      title: 'Collector Space-Charge Punch-Through',
+      formula: 'C_{jCi}(v) \\rightarrow C_{jCi,PT} \\quad \\text{for } v_{B\'C\'} \\le -V_{PT,Ci}',
+      summary: 'When the lightly doped epitaxial collector is fully depleted at punch-through voltage VPT, capacitance saturates.',
+      eqId: 'eq-2.4.2-1',
     },
     {
-      title: 'Collector Epitaxial Punch-Through Limiting (QJMOD)',
-      formula: 'C_{jCi}(V) \\to C_{jCi,min} \\text{ for } V_{D,Ci} - v_{B\'C\'} \\ge V_{PT,Ci}',
-      summary: 'When the collector epi layer fully depletes at V_PT, CjCi smoothly approaches a constant minimum plateau set by vptci.',
-      eqId: 'eq-2.4.2-1',
+      title: 'Diffusion Capacitance & Dynamic Charge Storage',
+      formula: 'C_{dE} = \\frac{d Q_f}{d v_{B\'E\'}} = \\tau_f g_{mi} + i_{Tf}\\frac{d\\tau_f}{d v_{B\'E\'}}',
+      summary: 'Diffusion capacitance dominant at high forward current, composed of transit delay product and charge derivative.',
+      eqId: 'eq-2.5.0-1',
     },
   ],
   base_resistance: [
     {
-      title: 'Conductivity Modulation by Total Base Charge',
-      formula: 'r_i = \\frac{r_{Bi0}}{1 + (Q_{jEi} + Q_{jCi} + Q_f)/[(1+f_{dQr0})Q_{p0}]}',
-      summary: 'Increasing forward bias injects minority charge Q_f into the intrinsic base, strongly reducing pinch-base sheet resistance r_i.',
-      eqId: 'eq-2.5.1-1',
+      title: 'Internal Base Resistance & Conductivity Modulation',
+      formula: 'r_{Bi}^* = \\frac{r_{Bi0}}{\\psi(\\eta)}, \\quad \\psi(\\eta) = \\frac{Q_{p,T}}{Q_{p0}}',
+      summary: 'Pinch base sheet resistance modulated by minority hole injection and Early effects.',
+      eqId: 'eq-2.6.0-1',
     },
     {
-      title: 'Lateral Emitter Current Crowding Factor ψ(η)',
-      formula: 'r_{Bi}^* = r_i \\cdot \\psi(\\eta), \\quad \\eta = f_{geo}\\frac{r_i\\,i_{jBEi}}{V_T}',
-      summary: 'At high base current i_jBEi, lateral voltage drop along the emitter width crowds injection toward the perimeter, lowering effective DC/AC r_Bi*.',
-      eqId: 'eq-2.5.1-3',
-    },
-    {
-      title: 'Lateral NQS AC Shunt Capacitance C_rBi',
-      formula: 'C_{rBi} = f_{CrBi}(C_{jEi} + C_{jCi} + C_{dEi} + C_{dCi})',
-      summary: 'Models the high-frequency complex impedance of the distributed intrinsic base impedance network via fcrbi.',
-      eqId: 'eq-2.5.2-1',
+      title: 'AC Base Crowding Capacitance',
+      formula: 'C_{rBi} = f_{CrBi}\\,C_{jEi0}',
+      summary: 'High-frequency AC current crowding shunt in parallel with rBi*.',
+      eqId: 'eq-2.6.0-18',
     },
   ],
   breakdown_tunneling: [
@@ -206,7 +200,7 @@ const REGIME_GUIDE: Record<
     {
       title: 'Base-Emitter Band-to-Band Tunneling',
       formula: 'i_{BEt} = I_{BEtS}(-v_{BE}/V_{DE})^{1/2}\\exp\\left[-a_{BEt}(1 - v_{BE}/V_{DE})^{z_{BE}-1}\\right]',
-      summary: 'In heavily doped emitter-base junctions under reverse bias, Zener tunneling current flows at perimeter (tunode=1) or intrinsic (tunode=0) nodes.',
+      summary: 'In heavily doped emitter-base junctions under reverse bias, Zener tunneling current flows at perimeter or intrinsic nodes.',
       eqId: 'eq-2.9.0-1',
     },
     {
@@ -220,7 +214,7 @@ const REGIME_GUIDE: Record<
     {
       title: 'Bandgap & Saturation Current Temperature Scaling',
       formula: 'V_g(T) = V_{g}(0) + K_1 T \\ln T + K_2 T',
-      summary: 'Non-linear temperature dependence of bandgap (vgb, vge, vgc, f1vg, f2vg) governs c10(T), qp0(T), and junction built-in voltages VD(T).',
+      summary: 'Non-linear temperature dependence of bandgap governs c10(T), qp0(T), and junction built-in voltages VD(T).',
       eqId: 'eq-2.15.1-1',
     },
     {
@@ -240,19 +234,19 @@ const REGIME_GUIDE: Record<
     {
       title: 'Vertical Non-Quasi-Static (NQS) Delay Network',
       formula: '\\tau_{d,Qf} = \\alpha_{Qf}\\tau_f, \\quad \\tau_{d,iT} = \\alpha_{iT}\\tau_f',
-      summary: 'Models excess phase lag of minority charge Q_f (RC network, alqf) and transfer current i_Tf (2nd-order Bessel LCR network, alit) when flnqs=1.',
+      summary: 'Models excess phase lag of minority charge Q_f and transfer current i_Tf when flnqs=1.',
       eqId: 'eq-2.13.0-1',
     },
     {
       title: 'Correlated Base/Collector HF Shot Noise',
       formula: '\\overline{i_{n,B} i_{n,C}^*} = j\\omega\\,\\alpha_{iT}\\tau_f\\,2qI_T',
-      summary: 'Dynamic base charging by transit electrons correlates base and collector shot noise (flcono=1), significantly reducing minimum noise figure NF_min near f_T.',
+      summary: 'Dynamic base charging by transit electrons correlates base and collector shot noise (flcono=1).',
       eqId: 'eq-2.14.0-3',
     },
     {
       title: 'Substrate Coupling & Parasitic PNP Action',
       formula: 'Z_{sub}(\\omega) = \\frac{R_{su}}{1 + j\\omega R_{su}C_{su}} + \\frac{1}{j\\omega C_{jS}}',
-      summary: 'Models RF signal coupling from collector C\' through CjS into the lossy silicon substrate network (rsu, csu) and parasitic PNP transfer current i_TS.',
+      summary: 'Models RF signal coupling from collector C\' through CjS into the lossy silicon substrate network and parasitic PNP transfer current.',
       eqId: 'eq-2.12.0-1',
     },
   ],
@@ -350,170 +344,142 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
     if (xVals.length === 0) xVals = [0, 1];
     if (yVals.length === 0) yVals = [0, 1];
 
-    let xMin = Math.min(...xVals);
-    let xMax = Math.max(...xVals);
-    if (Math.abs(xMax - xMin) < 1e-12) {
-      xMin -= 0.5;
-      xMax += 0.5;
+    let minX = Math.min(...xVals);
+    let maxX = Math.max(...xVals);
+    let minY = Math.min(...yVals);
+    let maxY = Math.max(...yVals);
+
+    if (minX === maxX) {
+      minX -= 1;
+      maxX += 1;
+    }
+    if (minY === maxY) {
+      minY -= 1;
+      maxY += 1;
     }
 
-    let yMin = Math.min(...yVals);
-    let yMax = Math.max(...yVals);
-    if (Math.abs(yMax - yMin) < 1e-12) {
-      yMin -= 0.5;
-      yMax += 0.5;
-    } else {
-      const span = yMax - yMin;
-      yMin -= span * 0.06;
-      yMax += span * 0.08;
+    if (!useLogY) {
+      const spanY = maxY - minY;
+      minY = Math.min(minY, 0);
+      maxY = maxY + spanY * 0.08;
     }
 
-    return { xMin, xMax, yMin, yMax };
+    return { minX, maxX, minY, maxY };
   }, [visibleSeries, plotData.series, useLogX, useLogY, modifiedCount, showBaselineComparison]);
 
-  const mapX = (rawX: number): number => {
-    const val = useLogX ? Math.log10(Math.max(rawX, 1e-18)) : rawX;
-    const ratio = (val - domain.xMin) / (domain.xMax - domain.xMin || 1);
-    return padLeft + Math.max(0, Math.min(1, ratio)) * plotW;
+  const mapX = (xVal: number) => {
+    const xv = useLogX ? Math.log10(Math.max(xVal, 1e-18)) : xVal;
+    return padLeft + ((xv - domain.minX) / (domain.maxX - domain.minX)) * plotW;
   };
 
-  const mapY = (rawY: number): number => {
-    const val = useLogY ? Math.log10(Math.max(rawY, 1e-18)) : rawY;
-    const ratio = (val - domain.yMin) / (domain.yMax - domain.yMin || 1);
-    return padTop + plotH - Math.max(0, Math.min(1, ratio)) * plotH;
+  const mapY = (yVal: number) => {
+    const yv = useLogY ? Math.log10(Math.max(yVal, 1e-18)) : yVal;
+    return padTop + plotH - ((yv - domain.minY) / (domain.maxY - domain.minY)) * plotH;
   };
-
-  // Generate grid ticks
-  const xTicks = useMemo(() => {
-    const count = 6;
-    const ticks: { pos: number; label: string }[] = [];
-    for (let i = 0; i <= count; i++) {
-      const v = domain.xMin + (i / count) * (domain.xMax - domain.xMin);
-      const raw = useLogX ? Math.pow(10, v) : v;
-      ticks.push({
-        pos: padLeft + (i / count) * plotW,
-        label: formatSciTick(raw, useLogX),
-      });
-    }
-    return ticks;
-  }, [domain.xMin, domain.xMax, useLogX, plotW]);
 
   const yTicks = useMemo(() => {
+    const ticks: { val: number; pos: number; label: string }[] = [];
     const count = 5;
-    const ticks: { pos: number; label: string }[] = [];
     for (let i = 0; i <= count; i++) {
-      const v = domain.yMin + (i / count) * (domain.yMax - domain.yMin);
-      const raw = useLogY ? Math.pow(10, v) : v;
+      const frac = i / count;
+      const yv = domain.minY + frac * (domain.maxY - domain.minY);
+      const val = useLogY ? Math.pow(10, yv) : yv;
       ticks.push({
-        pos: padTop + plotH - (i / count) * plotH,
-        label: formatSciTick(raw, useLogY),
+        val,
+        pos: padTop + plotH - frac * plotH,
+        label: formatSciTick(val, useLogY),
       });
     }
     return ticks;
-  }, [domain.yMin, domain.yMax, useLogY, plotH]);
+  }, [domain, useLogY, padTop, plotH]);
 
-  // Operating point vertical marker on the X axis
-  const opMarker = useMemo(() => {
-    let xVal: number | null = null;
-    let label = '';
-    if (activeCategory === 'transfer_gummel' || activeCategory === 'base_resistance') {
-      xVal = bias.Vbe;
-      label = `V_BE = ${bias.Vbe.toFixed(3)} V`;
-    } else if (activeCategory === 'critical_current') {
-      xVal = bias.Vce;
-      label = `V_CE = ${bias.Vce.toFixed(2)} V`;
-    } else if (activeCategory === 'depletion_cap') {
-      xVal = bias.Vbe;
-      label = `V_BE = ${bias.Vbe.toFixed(2)} V`;
-    } else if (activeCategory === 'transit_time_ft') {
-      if (opResult.Ic > 0) {
-        xVal = opResult.Ic;
-        label = `I_C = ${formatReadoutValue(opResult.Ic, 'A')}`;
-      }
-    } else if (activeCategory === 'breakdown_tunneling') {
-      xVal = Math.max(0, bias.Vce - bias.Vbe);
-      label = `V_CB = ${xVal.toFixed(2)} V`;
-    } else if (activeCategory === 'temperature_selfheating') {
-      xVal = bias.Tamb;
-      label = `T_amb = ${bias.Tamb.toFixed(1)} K`;
-    } else if (activeCategory === 'noise_nqs_substrate') {
-      if (opResult.Ft > 0) {
-        xVal = opResult.Ft;
-        label = `f_T = ${formatReadoutValue(opResult.Ft, 'Hz')}`;
-      }
+  const xTicks = useMemo(() => {
+    const ticks: { val: number; pos: number; label: string }[] = [];
+    const count = 6;
+    for (let i = 0; i <= count; i++) {
+      const frac = i / count;
+      const xv = domain.minX + frac * (domain.maxX - domain.minX);
+      const val = useLogX ? Math.pow(10, xv) : xv;
+      ticks.push({
+        val,
+        pos: padLeft + frac * plotW,
+        label: formatSciTick(val, useLogX),
+      });
     }
-
-    if (xVal === null) return null;
-    const mapped = mapX(xVal);
-    if (mapped < padLeft || mapped > padLeft + plotW) return null;
-    return { x: mapped, label, rawX: xVal };
-  }, [activeCategory, bias, opResult.Ic, opResult.Ft, domain, useLogX]);
-
-  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-    if (!svgRef.current || plotData.series.length === 0) return;
-    const rect = svgRef.current.getBoundingClientRect();
-    const scaleX = width / rect.width;
-    const svgX = (e.clientX - rect.left) * scaleX;
-    if (svgX < padLeft || svgX > padLeft + plotW) {
-      setHoverIndex(null);
-      return;
-    }
-    const pts = plotData.series[0].points;
-    if (pts.length === 0) return;
-    let bestIdx = 0;
-    let bestDist = Infinity;
-    for (let i = 0; i < pts.length; i++) {
-      const px = mapX(pts[i].x);
-      const dist = Math.abs(px - svgX);
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestIdx = i;
-      }
-    }
-    setHoverIndex(bestIdx);
-  };
+    return ticks;
+  }, [domain, useLogX, padLeft, plotW]);
 
   const toggleSeries = (id: string) => {
     setHiddenSeries((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const primarySeriesPts = plotData.series[0]?.points ?? [];
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!svgRef.current || visibleSeries.length === 0) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const svgX = ((e.clientX - rect.left) / rect.width) * width;
+    const refSeries = visibleSeries[0];
+    if (!refSeries || refSeries.points.length === 0) return;
+
+    let closestIdx = 0;
+    let closestDist = Infinity;
+    for (let i = 0; i < refSeries.points.length; i++) {
+      const px = mapX(refSeries.points[i].x);
+      const dist = Math.abs(px - svgX);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestIdx = i;
+      }
+    }
+    setHoverIndex(closestIdx);
+  };
+
   const hoveredX =
-    hoverIndex !== null && primarySeriesPts[hoverIndex]
-      ? primarySeriesPts[hoverIndex].x
+    hoverIndex !== null && visibleSeries[0]?.points[hoverIndex]
+      ? visibleSeries[0].points[hoverIndex].x
       : null;
 
-  const regimeItems = REGIME_GUIDE[activeCategory] || [];
+  const opMarker = useMemo(() => {
+    if (activeCategory === 'transfer_gummel') {
+      const vbe = bias.Vbe;
+      if (vbe >= domain.minX && vbe <= domain.maxX) {
+        return { x: mapX(vbe), label: `VBE=${vbe.toFixed(3)}V` };
+      }
+    } else if (activeCategory === 'critical_current') {
+      const vce = bias.Vce;
+      if (vce >= domain.minX && vce <= domain.maxX) {
+        return { x: mapX(vce), label: `VCE=${vce.toFixed(2)}V` };
+      }
+    }
+    return null;
+  }, [activeCategory, bias, domain]);
+
+  const regimeItems = REGIME_GUIDE[activeCategory] || REGIME_GUIDE.transfer_gummel;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
-      {/* Top Category Bar */}
-      <div className="border-b border-slate-200 bg-slate-50/80 px-3 py-2 flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-xs overflow-hidden transition-colors">
+      {/* Category Navigation Strip */}
+      <div className="px-4 py-3 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {PLOT_CATEGORY_DEFINITIONS.map((cat) => {
-            const active = cat.id === activeCategory;
+            const isCur = activeCategory === cat.id;
             return (
               <button
                 key={cat.id}
-                onClick={() => {
-                  onSelectCategory(cat.id);
-                  setHoverIndex(null);
-                }}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                  active
-                    ? 'bg-[#2B4C65] text-white shadow-sm'
-                    : 'bg-white text-slate-700 border border-slate-200/80 hover:border-[#A9BFD3] hover:text-[#2B4C65]'
+                onClick={() => onSelectCategory(cat.id)}
+                className={`btn-elite px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  isCur
+                    ? 'bg-blue-600 text-white shadow-2xs font-bold'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                 }`}
-                title={cat.subtitle}
               >
-                <span>{cat.shortTitle}</span>
+                {cat.shortTitle}
               </button>
             );
           })}
         </div>
 
-        {/* Scale & Baseline Controls */}
-        <div className="flex items-center gap-1.5 text-xs">
+        {/* Log / Linear and Baseline Comparison Controls */}
+        <div className="flex items-center gap-2">
           <button
             onClick={() =>
               setLogYOverride((prev) => ({
@@ -521,84 +487,67 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                 [activeCategory]: !useLogY,
               }))
             }
-            className={`px-2 py-1 rounded border font-mono text-[11px] transition-colors ${
+            className={`btn-elite px-2.5 py-1 rounded-lg border text-xs font-mono font-medium ${
               useLogY
-                ? 'bg-[#E6F0EE] border-[#A1C4BE] text-[#22544F] font-semibold'
-                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-900/60'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
             }`}
-            title="Toggle Logarithmic / Linear Y-Axis"
+            title="Toggle between Logarithmic and Linear Y-axis scaling"
           >
-            {useLogY ? 'Y: Log10' : 'Y: Linear'}
-          </button>
-
-          <button
-            onClick={() =>
-              setLogXOverride((prev) => ({
-                ...prev,
-                [activeCategory]: !useLogX,
-              }))
-            }
-            className={`px-2 py-1 rounded border font-mono text-[11px] transition-colors ${
-              useLogX
-                ? 'bg-[#E6F0EE] border-[#A1C4BE] text-[#22544F] font-semibold'
-                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
-            }`}
-            title="Toggle Logarithmic / Linear X-Axis"
-          >
-            {useLogX ? 'X: Log10' : 'X: Linear'}
+            Y: {useLogY ? 'Log10' : 'Linear'}
           </button>
 
           {modifiedCount > 0 && (
             <button
               onClick={() => setShowBaselineComparison((v) => !v)}
-              className={`px-2.5 py-1 rounded border text-[11px] font-medium flex items-center gap-1 transition-colors ${
+              className={`btn-elite px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1.5 ${
                 showBaselineComparison
-                  ? 'bg-[#F4EAE3] border-[#CFAE97] text-[#6E3B1F]'
-                  : 'bg-white border-slate-200 text-slate-600'
+                  ? 'bg-amber-50 border-amber-200/80 text-amber-800 dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-300'
+                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
               }`}
-              title="Overlay dashed baseline curves from the verified Manual card to compare against your adjusted parameters"
+              title="Overlay dashed baseline curves from verified card to compare against tuned parameters"
             >
-              <Sparkles className="w-3 h-3 text-[#A8653D]" />
-              <span>Baseline Overlay ({modifiedCount} modified)</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>Baseline ({modifiedCount})</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Plot Header & Provenance Banner */}
-      <div className="px-4 pt-3 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100">
+      <div className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
-            <LineChart className="w-4 h-4 text-[#2B4C65] shrink-0" />
-            <h3 className="text-sm font-semibold text-slate-900">{plotData.title}</h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            <LineChart className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">{plotData.title}</h3>
             {selectedParamName && (
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-mono bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2]">
+              <span className="px-2 py-0.5 rounded-md text-xs font-mono bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/70 dark:border-blue-900/60">
                 Linked to: {selectedParamName}
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-600 mt-0.5">{plotData.subtitle}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{plotData.subtitle}</p>
         </div>
 
-        {/* Provenance distinction badge: Verified Manual Card vs Illustrative User Adjustment */}
+        {/* Provenance badge */}
         <div className="flex items-center gap-1.5 shrink-0">
           {modifiedCount === 0 ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#E6F0EE] text-[#22544F] border border-[#C0D8D4]">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#2F726A]" />
-              Verified Manual Model Card
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/60">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              Verified Card
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F4EAE3] text-[#6E3B1F] border border-[#DFC8B8]">
-              <Sliders className="w-3.5 h-3.5 text-[#9A5833]" />
-              Illustrative Sweep ({modifiedCount} param{modifiedCount > 1 ? 's' : ''} adjusted vs. Manual dashed)
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/60">
+              <Sliders className="w-3.5 h-3.5 text-amber-600" />
+              Sweep ({modifiedCount} tuned vs. dashed baseline)
             </span>
           )}
         </div>
       </div>
 
       {/* Series Legend Pills */}
-      <div className="px-4 py-2 bg-slate-50/50 border-b border-slate-100 flex items-center flex-wrap gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">
+      <div className="px-5 py-2.5 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800 flex items-center flex-wrap gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1 font-mono">
           Traces:
         </span>
         {plotData.series.map((s) => {
@@ -607,10 +556,10 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             <button
               key={s.id}
               onClick={() => toggleSeries(s.id)}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-all ${
+              className={`btn-elite inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
                 isHidden
-                  ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
-                  : 'bg-white text-slate-700 border-slate-200 shadow-2xs hover:border-slate-300'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700 opacity-60'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 shadow-2xs hover:border-slate-300'
               }`}
               title={s.description || s.label}
             >
@@ -633,7 +582,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
         {Object.values(hiddenSeries).some(Boolean) && (
           <button
             onClick={() => setHiddenSeries({})}
-            className="text-[11px] text-[#2E4C66] hover:underline flex items-center gap-1 ml-auto"
+            className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 ml-auto"
           >
             <RotateCcw className="w-3 h-3" />
             Show All
@@ -641,8 +590,8 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
         )}
       </div>
 
-      {/* Interactive SVG Plot Canvas */}
-      <div className="relative px-2 pt-2 pb-1 bg-white select-none">
+      {/* SVG Plot Canvas */}
+      <div className="relative px-3 pt-3 pb-2 bg-white dark:bg-slate-900 select-none">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${width} ${height}`}
@@ -652,7 +601,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
         >
           <defs>
             <clipPath id={`plot-clip-${activeCategory}`}>
-              <rect x={padLeft} y={padTop} width={plotW} height={plotH} rx={4} />
+              <rect x={padLeft} y={padTop} width={plotW} height={plotH} rx={6} />
             </clipPath>
           </defs>
 
@@ -662,10 +611,9 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             y={padTop}
             width={plotW}
             height={plotH}
-            fill="#F7F6F2"
-            stroke="#E5E2DA"
+            className="fill-slate-50 dark:fill-slate-950 stroke-slate-200 dark:stroke-slate-800"
             strokeWidth={1}
-            rx={4}
+            rx={6}
           />
 
           {/* Horizontal Grid Lines & Y Ticks */}
@@ -676,7 +624,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                 y1={t.pos}
                 x2={padLeft + plotW}
                 y2={t.pos}
-                stroke="#E5E2DA"
+                className="stroke-slate-200/80 dark:stroke-slate-800"
                 strokeDasharray={idx === 0 || idx === yTicks.length - 1 ? undefined : '3 3'}
                 strokeWidth={1}
               />
@@ -684,7 +632,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                 x={padLeft - 8}
                 y={t.pos + 4}
                 textAnchor="end"
-                className="fill-slate-500 font-mono text-[10.5px]"
+                className="fill-slate-400 font-mono text-[10.5px]"
               >
                 {t.label}
               </text>
@@ -699,15 +647,15 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                 y1={padTop}
                 x2={t.pos}
                 y2={padTop + plotH}
-                stroke="#E5E2DA"
+                className="stroke-slate-200/80 dark:stroke-slate-800"
                 strokeDasharray={idx === 0 || idx === xTicks.length - 1 ? undefined : '3 3'}
                 strokeWidth={1}
               />
               <text
                 x={t.pos}
-                y={padTop + plotH + 17}
+                y={padTop + plotH + 18}
                 textAnchor="middle"
-                className="fill-slate-500 font-mono text-[10.5px]"
+                className="fill-slate-400 font-mono text-[10.5px]"
               >
                 {t.label}
               </text>
@@ -719,7 +667,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             x={padLeft + plotW / 2}
             y={height - 6}
             textAnchor="middle"
-            className="fill-slate-700 font-medium text-[11.5px]"
+            className="fill-slate-600 dark:fill-slate-400 font-semibold text-xs"
           >
             {plotData.xLabel} ({plotData.xUnit})
           </text>
@@ -728,7 +676,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             y={padTop + plotH / 2}
             textAnchor="middle"
             transform={`rotate(-90, 16, ${padTop + plotH / 2})`}
-            className="fill-slate-700 font-medium text-[11.5px]"
+            className="fill-slate-600 dark:fill-slate-400 font-semibold text-xs"
           >
             {plotData.yLabel} ({plotData.yUnit})
           </text>
@@ -743,7 +691,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                   y1={padTop}
                   x2={opMarker.x}
                   y2={padTop + plotH}
-                  stroke="#2A645E"
+                  className="stroke-emerald-600 dark:stroke-emerald-400"
                   strokeWidth={1.5}
                   strokeDasharray="4 3"
                 />
@@ -753,22 +701,21 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                   width={100}
                   height={18}
                   rx={4}
-                  fill="#F0FDFA"
-                  stroke="#C0D8D4"
+                  className="fill-emerald-50 dark:fill-emerald-950 stroke-emerald-300 dark:stroke-emerald-800"
                   strokeWidth={1}
                 />
                 <text
                   x={Math.min(opMarker.x + 54, padLeft + plotW - 55)}
                   y={padTop + 18}
                   textAnchor="middle"
-                  className="fill-[#22544F] font-mono text-[9.5px] font-semibold"
+                  className="fill-emerald-700 dark:fill-emerald-300 font-mono text-[9.5px] font-semibold"
                 >
                   OP: {opMarker.label}
                 </text>
               </g>
             )}
 
-            {/* Baseline Dashed Curves (when parameters are modified) */}
+            {/* Baseline Dashed Curves */}
             {modifiedCount > 0 &&
               showBaselineComparison &&
               visibleSeries.map((s) => {
@@ -797,7 +744,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                     stroke={s.color}
                     strokeWidth={1.6}
                     strokeDasharray="4 4"
-                    opacity={0.55}
+                    opacity={0.5}
                   />
                 );
               })}
@@ -824,7 +771,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                   d={d}
                   fill="none"
                   stroke={s.color}
-                  strokeWidth={2.3}
+                  strokeWidth={2.4}
                   strokeDasharray={s.dashed ? '6 4' : undefined}
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -840,7 +787,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                   y1={padTop}
                   x2={mapX(hoveredX)}
                   y2={padTop + plotH}
-                  stroke="#475569"
+                  className="stroke-slate-400 dark:stroke-slate-500"
                   strokeWidth={1}
                   strokeDasharray="2 2"
                 />
@@ -852,7 +799,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                       key={`dot-${s.id}`}
                       cx={mapX(pt.x)}
                       cy={mapY(pt.y)}
-                      r={4.2}
+                      r={4.5}
                       fill={s.color}
                       stroke="#FFFFFF"
                       strokeWidth={1.5}
@@ -864,17 +811,17 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
           </g>
         </svg>
 
-        {/* Interactive Cursor Readout Bar */}
-        <div className="mx-2 mb-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between flex-wrap gap-2 text-xs">
-          <div className="flex items-center gap-2 text-slate-600">
-            <Crosshair className="w-3.5 h-3.5 text-[#2E4C66] shrink-0" />
+        {/* Cursor Readout Bar */}
+        <div className="mx-2 mb-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+            <Crosshair className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
             {hoverIndex !== null && hoveredX !== null ? (
-              <span className="font-mono font-semibold text-slate-800">
+              <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                 {plotData.xLabel} = {formatReadoutValue(hoveredX, plotData.xUnit)}
               </span>
             ) : (
-              <span className="text-slate-500">
-                Hover over the plot to inspect exact HICUM/L2 equations & numerical trace readouts
+              <span className="text-slate-400">
+                Hover over the plot to inspect exact HICUM/L2 numerical trace readouts
               </span>
             )}
           </div>
@@ -893,21 +840,21 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                   ? (((pt.y - (pt.yBaseline as number)) / Math.abs(pt.yBaseline as number)) * 100).toFixed(1)
                   : null;
                 return (
-                  <div key={`readout-${s.id}`} className="flex items-center gap-1.5 font-mono text-[11px]">
+                  <div key={`readout-${s.id}`} className="flex items-center gap-1.5 font-mono text-xs">
                     <span
                       className="w-2 h-2 rounded-full shrink-0"
                       style={{ backgroundColor: s.color }}
                     />
-                    <span className="text-slate-600">{s.label.split(' ')[0]}:</span>
-                    <span className="font-semibold text-slate-900">
+                    <span className="text-slate-500 dark:text-slate-400">{s.label.split(' ')[0]}:</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                       {formatReadoutValue(pt.y, plotData.yUnit)}
                     </span>
                     {pctDelta !== null && (
                       <span
                         className={`px-1 py-0.2 rounded text-[10px] ${
                           Number(pctDelta) >= 0
-                            ? 'bg-[#EBDACD] text-[#6E3B1F]'
-                            : 'bg-[#DCE6EF] text-[#23435C]'
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                            : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
                         }`}
                       >
                         {Number(pctDelta) >= 0 ? `+${pctDelta}%` : `${pctDelta}%`}
@@ -921,31 +868,31 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
         </div>
       </div>
 
-      {/* Physical Regime & Governing Equations Strip */}
-      <div className="border-t border-slate-200 bg-slate-50/70 px-4 py-3">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 mb-2">
-          <Info className="w-3.5 h-3.5 text-[#2B4C65]" />
-          <span>Physical Regimes & Governing HICUM/L2 Equations in This Plot</span>
+      {/* Physical Regime & Equations Strip */}
+      <div className="border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-5">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 mb-3">
+          <Info className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span>Physical Regimes &amp; Governing HICUM/L2 Equations in This Plot</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
           {regimeItems.map((reg, idx) => (
             <div
               key={idx}
               onClick={() => onSelectEquation && onSelectEquation(reg.eqId)}
-              className="bg-white rounded-lg border border-slate-200/90 p-2.5 hover:border-[#A9BFD3] transition-all cursor-pointer flex flex-col justify-between"
+              className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-3.5 hover:border-blue-500 transition-all cursor-pointer flex flex-col justify-between shadow-2xs"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="text-xs font-semibold text-slate-800">{reg.title}</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2] shrink-0">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 tracking-tight">{reg.title}</span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/70 dark:border-blue-900/60 shrink-0 font-semibold">
                     {reg.eqId}
                   </span>
                 </div>
-                <div className="my-1.5 py-1 px-2 bg-slate-50 rounded border border-slate-100 overflow-x-auto">
+                <div className="my-2 py-1.5 px-2.5 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-800 overflow-x-auto text-slate-900 dark:text-slate-100">
                   <FormulaView latex={reg.formula} displayMode={false} className="text-xs" />
                 </div>
               </div>
-              <p className="text-[11px] text-slate-600 leading-relaxed mt-1">{reg.summary}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">{reg.summary}</p>
             </div>
           ))}
         </div>

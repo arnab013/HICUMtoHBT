@@ -6,7 +6,8 @@ import {
 } from '../data/hicumTypes';
 import { FormulaView } from './FormulaView';
 import { CitationBadges } from './CitationBadges';
-import { Search, Filter, ArrowUpRight, Layers } from 'lucide-react';
+import { EmptyState } from './EmptyState';
+import { Search, Filter, ArrowUpRight, Layers, Database } from 'lucide-react';
 
 interface ParameterDatabaseViewProps {
   parameters: HicumParameter[];
@@ -23,22 +24,22 @@ const SPATIAL_BADGES: Record<
 > = {
   localized: {
     label: 'Physically Localized',
-    className: 'bg-[#E6F0EE] text-[#2A645E] border-[#C0D8D4]',
+    className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/60',
     tooltip: 'Directly maps to a distinct physical junction, layer, or contact region in the 3D SiGe HBT.',
   },
   distributed: {
     label: 'Distributed / 2D-3D',
-    className: 'bg-[#E7EEF4] text-[#2B4C65] border-[#C5D4E2]',
+    className: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200/80 dark:border-blue-900/60',
     tooltip: 'Represents a spatially distributed resistance, capacitance partitioning, or 2D/3D current spreading effect.',
   },
   conceptual: {
-    label: 'Empirical / Smoothing / Thermal',
-    className: 'bg-[#F4EAE3] text-[#824726] border-[#DFC8B8]',
+    label: 'Empirical / Smoothing',
+    className: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200/80 dark:border-amber-900/60',
     tooltip: 'Mathematical smoothing constant, global temperature coefficient, or lumped compact-model parameter.',
   },
   flag: {
     label: 'Model Control Flag',
-    className: 'bg-[#EAE8E1] text-[#334155] border-[#D8D4CA]',
+    className: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700',
     tooltip: 'Simulator switch or version/topology selector.',
   },
 };
@@ -73,48 +74,53 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
     });
   }, [parameters, searchQuery, selectedSection, selectedSpatial]);
 
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setSelectedSection('all');
+    setSelectedSpatial('all');
+  };
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Header & Filter Controls */}
-      <div className="bg-white border border-[#E5E2DA] rounded-lg p-5 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-6 shadow-xs transition-colors">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] font-semibold">
-                Manual Chapter 3 (Tables 3.1–3.17 · pp. 101–111)
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/70 dark:border-blue-900/60 font-semibold">
+                Manual Chapter 3 · Tables 3.1–3.17 (pp. 101–111)
               </span>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#E6F0EE] text-[#2A645E] font-medium">
+              <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-900/60 font-medium">
                 {parameters.length} Verified Parameters
               </span>
             </div>
-            <h2 className="text-2xl font-bold text-[#0F172A] mt-1.5 font-scientific">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mt-2 tracking-tight">
               Complete HICUM/L2 Model Parameter Knowledge Database
             </h2>
-            <p className="text-sm text-[#475569] mt-1 max-w-3xl">
-              Every parameter extracted systematically from M. Schröter & A. Pawlak,{' '}
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-3xl leading-relaxed">
+              Every parameter extracted systematically from M. Schröter &amp; A. Pawlak,{' '}
               <em>HICUM/L2 v2.4.0 Manual</em> and <code>hicumL2V2p34.va</code>, including default
-              simulator values, full-physics test card values, M-scaling factors, linked equations,
-              and physical localization.
+              simulator values, full-physics test card values, M-scaling factors, and physical localization.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode('table')}
-              className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors ${
+              className={`btn-elite px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                 viewMode === 'table'
-                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
-                  : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
               Structured Table View
             </button>
             <button
               onClick={() => setViewMode('cards')}
-              className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors ${
+              className={`btn-elite px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                 viewMode === 'cards'
-                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
-                  : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
               Detailed Physics Cards
@@ -123,24 +129,24 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
         </div>
 
         {/* Search & Filters */}
-        <div className="mt-4 pt-4 border-t border-[#E5E2DA] grid grid-cols-1 md:grid-cols-12 gap-3">
+        <div className="mt-5 pt-5 border-t border-slate-200/80 dark:border-slate-800 grid grid-cols-1 md:grid-cols-12 gap-3.5">
           <div className="md:col-span-5 relative">
-            <Search className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search parameter name (e.g. c10, rbi0, hjei, thcs, vcbar), mechanism, or region..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-[#F7F6F2] border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65] focus:bg-white text-[#0F172A]"
+              placeholder="Search parameter (e.g. c10, rbi0, hjei, thcs), mechanism, or region…"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 transition-all"
             />
           </div>
 
           <div className="md:col-span-4 flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#64748B] shrink-0" />
+            <Filter className="w-4 h-4 text-slate-400 shrink-0" />
             <select
               value={selectedSection}
               onChange={(e) => setSelectedSection(e.target.value)}
-              className="w-full py-2 px-2.5 text-xs bg-[#F7F6F2] border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65] text-[#0F172A]"
+              className="w-full py-2 px-2.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 text-slate-900 dark:text-slate-100 transition-all cursor-pointer"
             >
               <option value="all">All 17 Manual Sections ({parameters.length} parameters)</option>
               {sections.map((sec) => {
@@ -155,11 +161,11 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
           </div>
 
           <div className="md:col-span-3 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#64748B] shrink-0" />
+            <Layers className="w-4 h-4 text-slate-400 shrink-0" />
             <select
               value={selectedSpatial}
               onChange={(e) => setSelectedSpatial(e.target.value)}
-              className="w-full py-2 px-2.5 text-xs bg-[#F7F6F2] border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65] text-[#0F172A]"
+              className="w-full py-2 px-2.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 text-slate-900 dark:text-slate-100 transition-all cursor-pointer"
             >
               <option value="all">All Spatial Classifications</option>
               <option value="localized">Physically Localized (Junction/Layer)</option>
@@ -171,13 +177,13 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
         </div>
 
         {/* Section Quick-Pills */}
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-3.5 flex flex-wrap gap-1.5">
           <button
             onClick={() => setSelectedSection('all')}
-            className={`px-2 py-0.5 text-[11px] font-mono rounded border transition-colors ${
+            className={`btn-elite px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
               selectedSection === 'all'
-                ? 'bg-[#0F172A] text-white border-[#0F172A]'
-                : 'bg-[#F7F6F2] text-[#475569] border-[#E5E2DA] hover:bg-[#E5E2DA]'
+                ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100 font-bold'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-700 hover:bg-slate-200'
             }`}
           >
             All ({parameters.length})
@@ -186,10 +192,10 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
             <button
               key={sec.id}
               onClick={() => setSelectedSection(sec.id)}
-              className={`px-2 py-0.5 text-[11px] font-mono rounded border transition-colors ${
+              className={`btn-elite px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
                 selectedSection === sec.id
-                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
-                  : 'bg-[#F7F6F2] text-[#475569] border-[#E5E2DA] hover:bg-[#E5E2DA]'
+                  ? 'bg-blue-600 text-white border-blue-600 font-bold shadow-2xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
               title={sec.title}
             >
@@ -199,34 +205,43 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
         </div>
       </div>
 
-      {/* Results Count */}
-      <div className="flex items-center justify-between text-xs text-[#475569] px-1">
+      {/* Results Count Banner */}
+      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
         <span>
-          Showing <strong>{filteredParams.length}</strong> of <strong>{parameters.length}</strong>{' '}
-          documented HICUM/L2 parameters
+          Showing <strong className="text-slate-800 dark:text-slate-200">{filteredParams.length}</strong> of{' '}
+          <strong className="text-slate-800 dark:text-slate-200">{parameters.length}</strong> documented parameters
         </span>
-        <span>Click any parameter to inspect equations & simulate its effect in the Circuit Lab</span>
+        <span className="hidden sm:inline">Click any parameter row to inspect equations &amp; tune in Circuit Lab</span>
       </div>
 
-      {viewMode === 'table' ? (
-        <div className="bg-white border border-[#E5E2DA] rounded-lg shadow-sm overflow-hidden">
+      {/* Empty State when no matches */}
+      {filteredParams.length === 0 ? (
+        <EmptyState
+          icon={Database}
+          title="No parameters match your criteria"
+          description="We couldn't find any parameters matching your active search query or filter selection. Try adjusting your search term."
+          actionLabel="Reset search filters"
+          onAction={handleResetFilters}
+        />
+      ) : viewMode === 'table' ? (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-xs overflow-hidden transition-colors">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#EAE8E1] border-b border-[#D8D4CA] text-[11px] font-mono uppercase text-[#475569]">
-                  <th className="py-2.5 px-3">Sec / #</th>
-                  <th className="py-2.5 px-3">Parameter</th>
-                  <th className="py-2.5 px-3">Symbol</th>
-                  <th className="py-2.5 px-4">Manual Description & Physical Role</th>
-                  <th className="py-2.5 px-3">Default</th>
-                  <th className="py-2.5 px-3">Test Card</th>
-                  <th className="py-2.5 px-3">Active Value</th>
-                  <th className="py-2.5 px-3">Range / Unit / M</th>
-                  <th className="py-2.5 px-3">Localization</th>
-                  <th className="py-2.5 px-3 text-right">Action</th>
+                <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">
+                  <th className="py-3 px-3.5">Sec</th>
+                  <th className="py-3 px-3.5">Parameter</th>
+                  <th className="py-3 px-3.5">Symbol</th>
+                  <th className="py-3 px-4">Manual Description &amp; Physical Role</th>
+                  <th className="py-3 px-3.5 text-right">Default</th>
+                  <th className="py-3 px-3.5 text-right">Test Card</th>
+                  <th className="py-3 px-3.5 text-right">Active Value</th>
+                  <th className="py-3 px-3.5">Range / Unit / M</th>
+                  <th className="py-3 px-3.5">Localization</th>
+                  <th className="py-3 px-3.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E2DA] text-xs">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                 {filteredParams.map((p) => {
                   const isSelected = selectedParamId === p.id;
                   const activeVal = activeParamValues[p.id] ?? p.testValue;
@@ -238,50 +253,50 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                       onClick={() => onSelectParam(p.id, false)}
                       className={`cursor-pointer transition-colors ${
                         isSelected
-                          ? 'bg-[#E7EEF4]/35 hover:bg-[#E7EEF4]/50'
-                          : 'hover:bg-[#F7F6F2]'
+                          ? 'bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-50 dark:hover:bg-blue-950/60'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
                       }`}
                     >
-                      <td className="py-2.5 px-3 font-mono text-[11px] text-[#64748B] whitespace-nowrap">
+                      <td className="py-3 px-3.5 font-mono text-xs text-slate-400 whitespace-nowrap">
                         §{p.section}.{p.tableNo}
                       </td>
-                      <td className="py-2.5 px-3 font-mono font-bold text-[#2B4C65] whitespace-nowrap">
+                      <td className="py-3 px-3.5 font-mono font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
                         {p.name}
                       </td>
-                      <td className="py-2.5 px-3 whitespace-nowrap">
+                      <td className="py-3 px-3.5 whitespace-nowrap text-slate-800 dark:text-slate-200">
                         <FormulaView latex={p.symbolLatex} inline />
                       </td>
-                      <td className="py-2.5 px-4 max-w-md">
-                        <div className="font-semibold text-[#0F172A]">{p.description}</div>
-                        <div className="text-[11px] text-[#475569] line-clamp-2 mt-0.5">
+                      <td className="py-3 px-4 max-w-md">
+                        <div className="font-semibold text-slate-900 dark:text-slate-100">{p.description}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5 leading-relaxed">
                           {p.physicalMeaning}
                         </div>
                         <CitationBadges
-                          className="mt-1.5"
+                          className="mt-2"
                           compact
                           manualCitation={p.manualCitation}
                           manualPage={p.manualPages[0]}
                           vaCitation={p.vaCitation || `hicumL2V2p34.va, l. ${p.vaLine}`}
                         />
-                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                           {p.circuitElements.slice(0, 3).map((el) => (
                             <span
                               key={el}
-                              className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#EAE8E1] text-[#334155] border border-[#D8D4CA]"
+                              className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                             >
                               EC:{el}
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td className="py-2.5 px-3 font-mono text-[11px] text-[#64748B] whitespace-nowrap">
+                      <td className="py-3 px-3.5 font-mono text-xs text-slate-500 dark:text-slate-400 text-right tabular-nums whitespace-nowrap">
                         {p.defaultDisplay}
                       </td>
-                      <td className="py-2.5 px-3 font-mono text-[11px] font-medium text-[#2A645E] whitespace-nowrap">
+                      <td className="py-3 px-3.5 font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400 text-right tabular-nums whitespace-nowrap">
                         {p.testDisplay}
                       </td>
                       <td
-                        className="py-2.5 px-3 whitespace-nowrap"
+                        className="py-3 px-3.5 text-right whitespace-nowrap"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <input
@@ -292,35 +307,35 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                             const v = parseFloat(e.target.value);
                             if (!Number.isNaN(v)) onUpdateParamValue(p.id, v);
                           }}
-                          className="w-24 px-2 py-1 text-xs font-mono bg-white border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65]"
+                          className="w-24 px-2 py-1 text-xs font-mono text-right tabular-nums bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 text-slate-900 dark:text-slate-100"
                         />
                       </td>
-                      <td className="py-2.5 px-3 font-mono text-[11px] text-[#475569] whitespace-nowrap">
+                      <td className="py-3 px-3.5 font-mono text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
                         <div>{p.rangeStr || '(-inf:inf)'}</div>
-                        <div className="text-[10px] text-[#64748B]">
-                          Unit: <strong>{p.unit}</strong> · M: <strong>{p.mFactor || '—'}</strong>
+                        <div className="text-[11px] text-slate-400">
+                          Unit: <strong className="text-slate-700 dark:text-slate-300">{p.unit}</strong> · M: <strong className="text-slate-700 dark:text-slate-300">{p.mFactor || '—'}</strong>
                         </div>
                       </td>
-                      <td className="py-2.5 px-3 whitespace-nowrap">
+                      <td className="py-3 px-3.5 whitespace-nowrap">
                         <span
                           title={badge.tooltip}
-                          className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded border ${badge.className}`}
+                          className={`inline-block text-[10.5px] font-medium px-2 py-0.5 rounded-md border ${badge.className}`}
                         >
                           {badge.label}
                         </span>
-                        <div className="text-[10px] text-[#64748B] mt-0.5 max-w-[160px] truncate">
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[160px] truncate">
                           {p.physicalRegion}
                         </div>
                       </td>
-                      <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                      <td className="py-3 px-3.5 text-right whitespace-nowrap">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onSelectParam(p.id, true);
                           }}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded bg-[#2B4C65] text-white hover:bg-[#23435C] transition-colors"
+                          className="btn-elite inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-2xs"
                         >
-                          Lab <ArrowUpRight className="w-3 h-3" />
+                          Lab <ArrowUpRight className="w-3.5 h-3.5" />
                         </button>
                       </td>
                     </tr>
@@ -331,84 +346,84 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredParams.map((p) => {
             const badge = SPATIAL_BADGES[p.spatialNature];
             const activeVal = activeParamValues[p.id] ?? p.testValue;
             return (
               <div
                 key={p.id}
-                className="bg-white border border-[#E5E2DA] rounded-lg p-4 shadow-sm hover:border-[#94A3B8] transition-all flex flex-col justify-between"
+                className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-base text-[#2B4C65]">
+                      <span className="font-mono font-bold text-base text-blue-600 dark:text-blue-400">
                         {p.name}
                       </span>
-                      <span className="text-sm text-[#334155]">
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
                         (<FormulaView latex={p.symbolLatex} inline />)
                       </span>
                     </div>
                     <span
-                      className={`text-[10px] font-medium px-2 py-0.5 rounded border ${badge.className}`}
+                      className={`text-[10.5px] font-medium px-2 py-0.5 rounded-md border ${badge.className}`}
                     >
                       {badge.label}
                     </span>
                   </div>
 
-                  <div className="text-xs font-semibold text-[#0F172A] mt-1">
+                  <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-2">
                     {p.description}
                   </div>
 
-                  <div className="mt-2 text-xs text-[#334155] leading-relaxed">
+                  <div className="mt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                     {p.physicalMeaning}
                   </div>
 
-                  <div className="mt-2 p-2.5 rounded bg-[#F7F6F2] border border-[#E5E2DA] text-[11px] text-[#475569]">
-                    <strong className="text-[#0F172A]">Operation & Curve Effect:</strong>{' '}
+                  <div className="mt-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <strong className="text-slate-900 dark:text-slate-100">Operation &amp; Curve Effect:</strong>{' '}
                     {p.operationEffect}
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-[#E5E2DA]">
-                  <div className="grid grid-cols-3 gap-2 text-[11px] font-mono mb-2.5">
-                    <div className="bg-[#F7F6F2] p-1.5 rounded border border-[#E5E2DA]">
-                      <div className="text-[9px] text-[#64748B] uppercase">Default</div>
-                      <div className="font-semibold text-[#0F172A]">
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <div className="grid grid-cols-3 gap-2 text-xs font-mono mb-3">
+                    <div className="bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-200/80 dark:border-slate-700">
+                      <div className="text-[10px] text-slate-400 uppercase">Default</div>
+                      <div className="font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
                         {p.defaultDisplay} {p.unit !== '-' ? p.unit : ''}
                       </div>
                     </div>
-                    <div className="bg-[#E6F0EE]/30 p-1.5 rounded border border-[#C0D8D4]">
-                      <div className="text-[9px] text-[#2A645E] uppercase">Manual Test</div>
-                      <div className="font-semibold text-[#2A645E]">
+                    <div className="bg-emerald-50/50 dark:bg-emerald-950/30 p-2 rounded-lg border border-emerald-200/70 dark:border-emerald-900/60">
+                      <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase">Test Card</div>
+                      <div className="font-semibold text-emerald-700 dark:text-emerald-300 mt-0.5">
                         {p.testDisplay} {p.unit !== '-' ? p.unit : ''}
                       </div>
                     </div>
-                    <div className="bg-[#F7F6F2] p-1.5 rounded border border-[#E5E2DA]">
-                      <div className="text-[9px] text-[#64748B] uppercase">Range / M</div>
-                      <div className="font-semibold text-[#0F172A] truncate">
+                    <div className="bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-200/80 dark:border-slate-700">
+                      <div className="text-[10px] text-slate-400 uppercase">Range / M</div>
+                      <div className="font-semibold text-slate-900 dark:text-slate-100 mt-0.5 truncate">
                         {p.rangeStr} ({p.mFactor || '1'})
                       </div>
                     </div>
                   </div>
 
                   <CitationBadges
-                    className="mb-2.5"
+                    className="mb-3"
                     compact
                     manualCitation={p.manualCitation}
                     manualPage={p.manualPages[0]}
                     vaCitation={p.vaCitation || `hicumL2V2p34.va, l. ${p.vaLine}`}
                   />
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-mono text-[#526071]">
-                      §{p.section} · Active: <strong>{activeVal}</strong>
+                    <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                      §{p.section} · Active: <strong className="text-slate-800 dark:text-slate-200">{activeVal}</strong>
                     </span>
                     <button
                       onClick={() => onSelectParam(p.id, true)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded bg-[#2B4C65] text-white hover:bg-[#23435C]"
+                      className="btn-elite inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-2xs"
                     >
-                      Inspect & Plot <ArrowUpRight className="w-3.5 h-3.5" />
+                      Inspect &amp; Plot <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -420,3 +435,5 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
     </div>
   );
 };
+
+export default ParameterDatabaseView;

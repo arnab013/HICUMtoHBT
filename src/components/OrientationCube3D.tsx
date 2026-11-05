@@ -166,14 +166,14 @@ export const OrientationCube3D: React.FC<OrientationCube3DProps> = ({
 
   return (
     <div className="flex flex-col items-center select-none">
-      <div className="relative bg-white/90 backdrop-blur-xs border border-slate-200/90 rounded-xl shadow-xs p-1.5">
+      <div className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-xs border border-slate-200/90 dark:border-slate-800 rounded-xl shadow-xs p-1.5">
         {/* Quick ISO Corner Button */}
         <button
           onClick={() => onSelectPreset('iso')}
           className={`absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border transition-colors z-10 ${
             activePreset === 'iso'
               ? 'bg-[#3B5978] text-white border-[#3B5978]'
-              : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
           }`}
           title="Rotate to Isometric 3D View"
         >
@@ -265,7 +265,7 @@ export const OrientationCube3D: React.FC<OrientationCube3DProps> = ({
         </svg>
 
         {/* Compact 6-Face Preset Strip Below Cube */}
-        <div className="grid grid-cols-3 gap-0.5 pt-1 border-t border-slate-100">
+        <div className="grid grid-cols-3 gap-0.5 pt-1 border-t border-slate-100 dark:border-slate-800">
           {(
             [
               { id: 'front', label: 'Front' },
@@ -282,7 +282,7 @@ export const OrientationCube3D: React.FC<OrientationCube3DProps> = ({
               className={`px-1 py-0.5 rounded text-[9px] font-medium transition-colors ${
                 activePreset === btn.id
                   ? 'bg-[#3B5978] text-white'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               {btn.label}

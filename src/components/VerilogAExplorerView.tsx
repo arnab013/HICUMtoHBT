@@ -230,10 +230,10 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                 Originator: M. Schröter & A. Pawlak
               </span>
             </div>
-            <h2 className="text-2xl font-bold text-[#0F172A] mt-1.5 font-scientific">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1.5 tracking-tight">
               Verilog-A Architecture & Manual Cross-Reference
             </h2>
-            <p className="text-sm text-[#475569] mt-1 max-w-3xl">
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-3xl">
               Direct structural mapping between the compact model source code (<code>hic2_full</code>{' '}
               module with nodes <code>c, b, e, s, tnode</code> and internal nodes{' '}
               <code>ci, ei, bp, bi, si, xf, xf1, xf2</code>) and the manual equations.
@@ -253,8 +253,8 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                 onClick={() => setSelectedBlockId(blk.id)}
                 className={`w-full text-left p-3.5 rounded-lg border transition-all ${
                   active
-                    ? 'bg-[#2B4C65] text-white border-[#2B4C65] shadow-sm'
-                    : 'bg-white text-[#0F172A] border-[#E5E2DA] hover:border-[#94A3B8]'
+                    ? 'bg-[#2B4C65] text-white border-[#2B4C65] shadow-xs'
+                    : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -262,14 +262,14 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                     className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded ${
                       active
                         ? 'bg-white/20 text-white'
-                        : 'bg-[#EAE8E1] text-[#475569]'
+                        : 'bg-[#EAE8E1] dark:bg-slate-800 text-[#475569] dark:text-slate-400'
                     }`}
                   >
                     {blk.category}
                   </span>
                   <span
                     className={`text-[11px] font-mono ${
-                      active ? 'text-[#DCE6EF]' : 'text-[#64748B]'
+                      active ? 'text-[#DCE6EF]' : 'text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {blk.lines}
@@ -278,7 +278,7 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                 <div className="font-mono font-bold text-xs mt-1.5">{blk.name}</div>
                 <div
                   className={`text-[11px] mt-1 line-clamp-2 ${
-                    active ? 'text-[#DCE6EF]' : 'text-[#475569]'
+                    active ? 'text-[#DCE6EF]' : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
                   {blk.manualSection}
@@ -293,35 +293,35 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
           {VA_BLOCKS.filter((b) => b.id === selectedBlockId).map((blk) => (
             <div
               key={blk.id}
-              className="bg-white border border-[#E5E2DA] rounded-lg p-5 shadow-sm space-y-4"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-xs space-y-4"
             >
-              <div className="border-b border-[#E5E2DA] pb-3">
+              <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65]">
+                  <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded bg-[#E7EEF4] dark:bg-slate-800 text-[#2B4C65] dark:text-[#7FA3C7]">
                     {blk.lines}
                   </span>
-                  <span className="text-xs font-mono text-[#2A645E] font-medium">
+                  <span className="text-xs font-mono text-[#2A645E] dark:text-[#52B788] font-medium">
                     {blk.manualSection}
                   </span>
                 </div>
-                <h3 className="text-xl font-bold font-mono text-[#0F172A] mt-1.5">
+                <h3 className="text-xl font-bold font-mono text-slate-900 dark:text-slate-100 mt-1.5">
                   {blk.name}
                 </h3>
-                <p className="text-xs text-[#334155] leading-relaxed mt-2">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-2">
                   {blk.purpose}
                 </p>
               </div>
 
               {/* Governing Equations */}
               <div className="space-y-2">
-                <div className="text-xs font-mono uppercase tracking-wider text-[#475569] font-semibold">
+                <div className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
                   Corresponding Documented Equations
                 </div>
                 <div className="grid grid-cols-1 gap-2">
                   {blk.keyEquationsLatex.map((eq, i) => (
                     <div
                       key={i}
-                      className="p-3 rounded bg-[#F7F6F2] border border-[#D8D4CA] overflow-x-auto"
+                      className="p-3 rounded bg-[#F7F6F2] dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-x-auto"
                     >
                       <FormulaView latex={eq} displayMode />
                     </div>
@@ -331,35 +331,35 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
 
               {/* Verilog-A Source Excerpt */}
               <div className="space-y-2">
-                <div className="text-xs font-mono uppercase tracking-wider text-[#475569] font-semibold">
+                <div className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
                   Verilog-A Implementation Excerpt (`hicumL2V2p34.va`)
                 </div>
-                <pre className="p-4 rounded-md bg-[#0F172A] text-[#F7F6F2] font-mono text-xs overflow-x-auto leading-relaxed">
+                <pre className="p-4 rounded-md bg-slate-950 dark:bg-black text-slate-100 font-mono text-xs overflow-x-auto leading-relaxed border border-slate-800">
                   <code>{blk.codeSnippet}</code>
                 </pre>
               </div>
 
               {/* Linked Parameters & Elements */}
-              <div className="pt-3 border-t border-[#E5E2DA] flex flex-wrap items-center justify-between gap-3">
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-xs font-mono text-[#64748B]">Parameters:</span>
+                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400">Parameters:</span>
                   {blk.linkedParams.map((pid) => (
                     <button
                       key={pid}
                       onClick={() => onSelectParamInLab(pid)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-semibold rounded bg-[#E7EEF4]/70 text-[#2B4C65] hover:bg-[#2B4C65] hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-semibold rounded bg-[#E7EEF4]/70 dark:bg-slate-800 text-[#2B4C65] dark:text-[#7FA3C7] hover:bg-[#2B4C65] hover:text-white transition-colors"
                     >
                       {pid} <ArrowUpRight className="w-3 h-3" />
                     </button>
                   ))}
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-xs font-mono text-[#64748B]">Circuit Elements:</span>
+                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400">Circuit Elements:</span>
                   {blk.linkedElements.map((cid) => (
                     <button
                       key={cid}
                       onClick={() => onSelectElementInLab(cid)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono rounded bg-[#E6F0EE]/70 text-[#2A645E] hover:bg-[#2A645E] hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono rounded bg-[#E6F0EE]/70 dark:bg-emerald-950/40 text-[#2A645E] dark:text-emerald-300 hover:bg-[#2A645E] hover:text-white transition-colors"
                     >
                       EC:{cid} <ArrowUpRight className="w-3 h-3" />
                     </button>

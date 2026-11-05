@@ -53,34 +53,34 @@ const CATEGORY_META: Record<
   { label: string; badgeClass: string; icon: React.ReactNode }
 > = {
   figure_of_merit: {
-    label: 'Figures of Merit (Ch. 4)',
-    badgeClass: 'bg-[#E7EEF4] text-[#2B4C65] border-[#C5D4E2]',
-    icon: <Gauge className="w-4 h-4 text-[#2B4C65]" />,
+    label: 'Figures of Merit',
+    badgeClass: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200/80 dark:border-blue-900/60',
+    icon: <Gauge className="w-4 h-4 text-blue-600 dark:text-blue-400" />,
   },
   terminal_dc: {
-    label: 'Terminal Voltages & Currents',
-    badgeClass: 'bg-[#E6F0EE] text-[#2A645E] border-[#C0D8D4]',
-    icon: <Zap className="w-4 h-4 text-[#2A645E]" />,
+    label: 'Terminal DC',
+    badgeClass: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/60',
+    icon: <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
   },
   small_signal_conductance: {
-    label: 'Small-Signal Transconductance & Resistances',
-    badgeClass: 'bg-[#ECEAF3] text-[#4A4F7A] border-[#D3D1E2]',
-    icon: <Activity className="w-4 h-4 text-[#4A4F7A]" />,
+    label: 'Small-Signal Conductance',
+    badgeClass: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 border-indigo-200/80 dark:border-indigo-900/60',
+    icon: <Activity className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />,
   },
   small_signal_capacitance: {
-    label: 'Small-Signal Hybrid-π Capacitances',
-    badgeClass: 'bg-[#EAE8E1] text-[#334155] border-[#D8D4CA]',
-    icon: <Cpu className="w-4 h-4 text-[#334155]" />,
+    label: 'Hybrid-π Capacitances',
+    badgeClass: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+    icon: <Cpu className="w-4 h-4 text-slate-600 dark:text-slate-400" />,
   },
   resistance: {
-    label: 'Operating-Point Series Resistances',
-    badgeClass: 'bg-[#F4EAE3] text-[#824726] border-[#DFC8B8]',
-    icon: <Sliders className="w-4 h-4 text-[#824726]" />,
+    label: 'Series Resistances',
+    badgeClass: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200/80 dark:border-amber-900/60',
+    icon: <Sliders className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
   },
   thermal: {
-    label: 'Electro-Thermal Operating State',
-    badgeClass: 'bg-[#F3E3E1] text-[#8A3B33] border-[#E2C4BF]',
-    icon: <Thermometer className="w-4 h-4 text-[#8A3B33]" />,
+    label: 'Electro-Thermal',
+    badgeClass: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200/80 dark:border-rose-900/60',
+    icon: <Thermometer className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
   },
 };
 
@@ -106,29 +106,29 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
       : specs.filter((s) => s.category === selectedCategory);
 
   return (
-    <div className="bg-white border border-[#E5E2DA] rounded-lg shadow-sm overflow-hidden">
-      <div className="px-5 py-4 bg-[#F7F6F2] border-b border-[#E5E2DA] flex flex-wrap items-center justify-between gap-3">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-xs overflow-hidden transition-colors">
+      <div className="p-6 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] font-semibold">
-              Manual Chapter 4 (pp. 113–115) & VA Lines 1980–2063
+            <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200/70 dark:border-blue-900/60 font-semibold">
+              Manual Chapter 4 (pp. 113–115) &amp; VA Lines 1980–2063
             </span>
           </div>
-          <h3 className="text-lg font-bold text-[#0F172A] mt-1 font-scientific">
-            Live Circuit Simulator Operating Point (`CALC_OP`)
+          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mt-2 tracking-tight">
+            Live Circuit Simulator Operating Point (<code>CALC_OP</code>)
           </h3>
-          <p className="text-xs text-[#475569]">
-            Exact small-signal linearized hybrid-π parameters and DC operating point values evaluated from the active bias and model card.
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            Exact small-signal linearized hybrid-π parameters and DC operating point values evaluated from active bias and model card.
           </p>
         </div>
 
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-2.5 py-1 text-xs font-medium rounded border transition-colors ${
+            className={`btn-elite px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
               selectedCategory === 'all'
-                ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
-                : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
+                ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
             }`}
           >
             All ({specs.length})
@@ -137,20 +137,20 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-2.5 py-1 text-xs font-medium rounded border transition-colors ${
+              className={`btn-elite px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                 selectedCategory === cat
-                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
-                  : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
               }`}
             >
-              {CATEGORY_META[cat].label.split(' ')[0]}
+              {CATEGORY_META[cat].label}
             </button>
           ))}
         </div>
       </div>
 
       {/* Key Highlight Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-4 bg-[#F7F6F2]/60 border-b border-[#E5E2DA]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 p-5 bg-slate-50/40 dark:bg-slate-900/40 border-b border-slate-200/80 dark:border-slate-800">
         {[
           { id: 'FT', label: 'Transit Freq. fT', unit: 'Hz' },
           { id: 'TF', label: 'Forward Transit τf', unit: 's' },
@@ -168,18 +168,18 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
           return (
             <div
               key={item.id}
-              className="bg-white border border-[#E5E2DA] rounded p-2.5 flex flex-col justify-between"
+              className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 rounded-xl p-3.5 flex flex-col justify-between shadow-2xs"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono font-semibold text-[#2B4C65]">
+                <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
                   {item.id}
                 </span>
                 {Math.abs(diffPct) > 0.05 && (
                   <span
-                    className={`text-[10px] font-mono px-1 rounded ${
+                    className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded ${
                       diffPct > 0
-                        ? 'bg-[#E6F0EE] text-[#2A645E]'
-                        : 'bg-[#F4EAE3] text-[#824726]'
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                        : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300'
                     }`}
                   >
                     {diffPct > 0 ? '+' : ''}
@@ -187,10 +187,10 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
                   </span>
                 )}
               </div>
-              <div className="text-sm font-mono font-bold text-[#0F172A] mt-1">
+              <div className="text-base font-mono font-bold text-slate-900 dark:text-slate-100 mt-2 tabular-nums">
                 {formatSciValue(val, item.unit)}
               </div>
-              <div className="text-[10px] text-[#64748B] truncate">{item.label}</div>
+              <div className="text-[11px] text-slate-400 dark:text-slate-400 mt-1 truncate">{item.label}</div>
             </div>
           );
         })}
@@ -200,15 +200,15 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#EAE8E1] border-b border-[#D8D4CA] text-[11px] font-mono uppercase text-[#475569]">
-              <th className="py-2.5 px-4">OP Variable</th>
-              <th className="py-2.5 px-3">Live Value</th>
-              <th className="py-2.5 px-3">Baseline (Test Card)</th>
-              <th className="py-2.5 px-4">Documented Definition (Manual Ch. 4)</th>
-              <th className="py-2.5 px-4">Description & VA Ref</th>
+            <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">
+              <th className="py-3 px-4">OP Variable</th>
+              <th className="py-3 px-3.5 text-right">Live Value</th>
+              <th className="py-3 px-3.5 text-right">Baseline (Test Card)</th>
+              <th className="py-3 px-4">Documented Definition (Manual Ch. 4)</th>
+              <th className="py-3 px-4">Description &amp; VA Ref</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E5E2DA] text-xs">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
             {filteredSpecs.map((spec) => {
               const val = opValues[spec.id];
               const refVal = refOpValues?.[spec.id];
@@ -220,35 +220,35 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
               return (
                 <tr
                   key={spec.id}
-                  className={`hover:bg-[#F7F6F2] transition-colors ${
-                    changed ? 'bg-[#E7EEF4]/15' : ''
+                  className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+                    changed ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
                   }`}
                 >
-                  <td className="py-2.5 px-4 whitespace-nowrap">
+                  <td className="py-3 px-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-[#2B4C65] text-xs">
+                      <span className="font-mono font-bold text-blue-600 dark:text-blue-400 text-xs">
                         {spec.id}
                       </span>
-                      <span className="text-[#64748B]">
+                      <span className="text-slate-400">
                         (<FormulaView latex={spec.symbolLatex} inline />)
                       </span>
                     </div>
                   </td>
-                  <td className="py-2.5 px-3 font-mono font-semibold text-[#0F172A] whitespace-nowrap">
+                  <td className="py-3 px-3.5 font-mono font-semibold text-slate-900 dark:text-slate-100 text-right tabular-nums whitespace-nowrap">
                     {formatSciValue(val, spec.unit)}
                   </td>
-                  <td className="py-2.5 px-3 font-mono text-[#64748B] whitespace-nowrap">
+                  <td className="py-3 px-3.5 font-mono text-slate-500 dark:text-slate-400 text-right tabular-nums whitespace-nowrap">
                     {formatSciValue(refVal, spec.unit)}
                   </td>
-                  <td className="py-2.5 px-4">
-                    <div className="text-xs text-[#0F172A] overflow-x-auto max-w-md">
+                  <td className="py-3 px-4">
+                    <div className="text-xs text-slate-800 dark:text-slate-200 overflow-x-auto max-w-md">
                       <FormulaView latex={spec.definitionLatex} inline />
                     </div>
                   </td>
-                  <td className="py-2.5 px-4">
-                    <div className="text-[#334155] font-medium">{spec.description}</div>
+                  <td className="py-3 px-4">
+                    <div className="text-slate-700 dark:text-slate-300 font-medium">{spec.description}</div>
                     <CitationBadges
-                      className="mt-1"
+                      className="mt-1.5"
                       compact
                       manualCitation={spec.manualCitation}
                       manualPage={spec.manualPage}
@@ -264,3 +264,5 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
     </div>
   );
 };
+
+export default OperatingPointDashboard;
