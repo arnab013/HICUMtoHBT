@@ -882,7 +882,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
   function renderInteractiveVectorSvg() {
     return (
       <svg
-        viewBox="0 0 940 520"
+        viewBox="0 0 940 575"
         className="w-full h-auto select-none font-sans"
       >
         {/* Definitions for arrowheads */}
@@ -902,42 +902,42 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
 
         {/* ---------------------------------------------------- 1. Semiconductor Layers & Regions */}
         {/* P- Substrate Background Bulk */}
-        <rect x={40} y={370} width={860} height={135} fill="#FFFFFF" stroke="#CBD5E1" strokeWidth={1.2} />
+        <rect x={40} y={370} width={860} height={135} fill="#E2EEEA" stroke="#ADC7C0" strokeWidth={1.2} />
 
         {/* P+ Isolation Wells on Left & Right */}
-        <path d="M 40 145 C 75 160 85 300 85 410 L 40 410 Z" fill="#818CF8" fillOpacity={0.4} />
-        <path d="M 690 145 C 690 280 750 410 750 410 L 795 410 C 795 280 750 145 750 145 Z" fill="#818CF8" fillOpacity={0.4} />
-        <path d="M 810 145 C 810 280 870 410 870 410 L 900 410 L 900 145 Z" fill="#818CF8" fillOpacity={0.4} />
+        <path d="M 40 145 C 75 160 85 300 85 410 L 40 410 Z" fill="#9FB4EB" fillOpacity={0.65} stroke="#8299D6" strokeWidth={1} />
+        <path d="M 690 145 C 690 280 750 410 750 410 L 795 410 C 795 280 750 145 750 145 Z" fill="#9FB4EB" fillOpacity={0.65} stroke="#8299D6" strokeWidth={1} />
+        <path d="M 810 145 C 810 280 870 410 870 410 L 900 410 L 900 145 Z" fill="#9FB4EB" fillOpacity={0.65} stroke="#8299D6" strokeWidth={1} />
 
         {/* N+ Buried Layer & Sinker */}
         <path
           d="M 125 315 L 690 315 L 690 285 L 650 285 L 650 145 L 690 145 L 690 370 L 125 370 Z"
-          fill="#FDE68A"
-          stroke="#EAB308"
+          fill="#FDE6B0"
+          stroke="#E5B962"
           strokeWidth={1.2}
         />
 
         {/* N- Epitaxy Layer */}
-        <rect x={125} y={265} width={525} height={50} fill="#93C5FD" fillOpacity={0.5} stroke="#60A5FA" strokeWidth={1} />
+        <rect x={125} y={265} width={525} height={50} fill="#C0D7F5" fillOpacity={0.7} stroke="#99BAE5" strokeWidth={1} />
 
         {/* P Base Layer */}
         <path
           d="M 125 145 L 610 145 C 610 190 590 265 520 265 L 125 265 Z"
-          fill="#F87171"
-          fillOpacity={0.45}
+          fill="#FCA5A5"
+          fillOpacity={0.55}
           stroke="#EF4444"
-          strokeWidth={1}
+          strokeWidth={1.1}
         />
 
         {/* N+ Emitter Layer */}
-        <rect x={245} y={145} width={345} height={42} rx={6} fill="#3B82F6" fillOpacity={0.75} stroke="#1D4ED8" strokeWidth={1.2} />
+        <rect x={245} y={145} width={345} height={42} rx={6} fill="#60A5FA" fillOpacity={0.85} stroke="#2563EB" strokeWidth={1.3} />
 
         {/* Metal Contact Electrodes (Surface Metallization) */}
-        <rect x={50} y={135} width={150} height={12} fill="#64748B" />
-        <rect x={235} y={135} width={365} height={12} fill="#64748B" />
-        <rect x={630} y={135} width={50} height={12} fill="#64748B" />
-        <rect x={730} y={135} width={50} height={12} fill="#64748B" />
-        <rect x={830} y={135} width={70} height={12} fill="#64748B" />
+        <rect x={50} y={135} width={150} height={12} fill="#64748B" rx={1} />
+        <rect x={235} y={135} width={365} height={12} fill="#64748B" rx={1} />
+        <rect x={630} y={135} width={50} height={12} fill="#64748B" rx={1} />
+        <rect x={730} y={135} width={50} height={12} fill="#64748B" rx={1} />
+        <rect x={830} y={135} width={70} height={12} fill="#64748B" rx={1} />
 
         {/* Region Labels with Badges */}
         <g className="font-sans font-medium text-[11px] select-none pointer-events-none">
@@ -1237,6 +1237,44 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             <text x={260} y={445} textAnchor="middle">Network</text>
             <path d="M 215 435 L 190 435" stroke="#DC2626" strokeWidth={1.4} markerEnd="url(#red-arrow)" fill="none" />
           </g>
+        </g>
+
+        {/* ---------------------------------------------------- 8. Publication Material & Element Legend */}
+        <g className="font-sans text-[11px] select-none">
+          {/* Subtle separator line */}
+          <line x1={40} y1={525} x2={900} y2={525} stroke="#E2E8F0" strokeWidth={1} />
+
+          {/* Group Header */}
+          <text x={42} y={549} className="fill-slate-600 font-semibold text-[11.5px]">
+            Material (SiGe HBT)
+          </text>
+
+          {/* N+ Emitter Swatch */}
+          <rect x={180} y={537} width={18} height={13} rx={2} fill="#60A5FA" stroke="#2563EB" strokeWidth={1} />
+          <text x={204} y={548} className="fill-slate-700 font-medium">N⁺ (Emitter)</text>
+
+          {/* P Base Swatch */}
+          <rect x={290} y={537} width={18} height={13} rx={2} fill="#FCA5A5" stroke="#EF4444" strokeWidth={1} />
+          <text x={314} y={548} className="fill-slate-700 font-medium">P (Base, SiGe)</text>
+
+          {/* N+ Buried Layer Swatch */}
+          <rect x={422} y={537} width={18} height={13} rx={2} fill="#FDE6B0" stroke="#E5B962" strokeWidth={1} />
+          <text x={446} y={548} className="fill-slate-700 font-medium">N⁺ (Buried Layer)</text>
+
+          {/* P- Substrate Swatch */}
+          <rect x={565} y={537} width={18} height={13} rx={2} fill="#E2EEEA" stroke="#ADC7C0" strokeWidth={1} />
+          <text x={589} y={548} className="fill-slate-700 font-medium">P⁻ (Substrate)</text>
+
+          {/* Contact / Metal Swatch */}
+          <rect x={692} y={537} width={18} height={13} rx={1} fill="#64748B" />
+          <text x={716} y={548} className="fill-slate-700 font-medium">Contact / Metal</text>
+
+          {/* Embedded Element Pill Badge */}
+          <rect x={815} y={533} width={85} height={22} rx={11} fill="#FFFFFF" stroke="#CBD5E1" strokeWidth={1} />
+          <circle cx={827} cy={544} r={2.5} fill="#FFFFFF" stroke="#1E293B" strokeWidth={1.2} />
+          <line x1={829.5} y1={544} x2={838.5} y2={544} stroke="#1E293B" strokeWidth={1.2} />
+          <circle cx={841} cy={544} r={2.5} fill="#FFFFFF" stroke="#1E293B" strokeWidth={1.2} />
+          <text x={847} y={548} className="fill-slate-600 font-mono text-[9px] font-semibold">HICUM</text>
         </g>
       </svg>
     );
