@@ -26,21 +26,20 @@ import { OperatingPointDashboard } from './components/OperatingPointDashboard';
 import { ParameterDatabaseView } from './components/ParameterDatabaseView';
 import { EquationsReferenceView } from './components/EquationsReferenceView';
 import { CrossSectionDiagrams } from './components/CrossSectionDiagrams';
+import { Interactive3DTransistorView } from './components/Interactive3DTransistorView';
 import { VerilogAExplorerView } from './components/VerilogAExplorerView';
 import {
   Cpu,
   Database,
   BookOpen,
   Layers,
+  Box,
   Code2,
   RotateCcw,
   Sliders,
   Search,
   CheckCircle2,
-  Activity,
   Thermometer,
-  Zap,
-  Gauge,
 } from 'lucide-react';
 
 type MainTabId = 'lab' | 'parameters' | 'equations' | 'cross_section' | 'veriloga';
@@ -71,6 +70,7 @@ export const App: React.FC = () => {
   const [selectedParamId, setSelectedParamId] = useState<string | null>('c10');
   const [selectedEquationId, setSelectedEquationId] = useState<string | null>('eq-2.2.0-1');
   const [activePlotCategory, setActivePlotCategory] = useState<PlotCategoryId>('transfer_gummel');
+  const [labDiagramMode, setLabDiagramMode] = useState<'schematic' | '3d_device'>('schematic');
 
   // Global quick search state
   const [quickSearch, setQuickSearch] = useState<string>('');
@@ -459,8 +459,8 @@ export const App: React.FC = () => {
                     : 'text-slate-600 hover:bg-white hover:text-slate-900'
                 }`}
               >
-                <Layers className="w-3.5 h-3.5" />
-                <span>4. SiGe HBT Cross-Sections & Localization</span>
+                <Box className="w-3.5 h-3.5" />
+                <span>4. 3D SiGe HBT & Cross-Sections</span>
               </button>
 
               <button
@@ -545,20 +545,68 @@ export const App: React.FC = () => {
       <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 py-4">
         {activeTab === 'lab' && (
           <div className="space-y-5">
+            {/* Quick Mode Switcher in Lab: Equivalent Circuit vs Interactive 3D SiGe HBT */}
+            <div className="bg-white rounded-xl border border-slate-200 px-4 py-2 shadow-2xs flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 text-xs text-slate-600">
+                <span className="font-semibold text-slate-800">Primary Interactive Model View:</span>
+                <span>Synchronized with parameter sliders, equations, and plots</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg text-xs">
+                <button
+                  onClick={() => setLabDiagramMode('schematic')}
+                  className={`px-3 py-1 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
+                    labDiagramMode === 'schematic'
+                      ? 'bg-blue-800 text-white shadow-2xs'
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Cpu className="w-3.5 h-3.5" />
+                  <span>Equivalent Circuit Schematic (Fig. 2.1.0/1)</span>
+                </button>
+                <button
+                  onClick={() => setLabDiagramMode('3d_device')}
+                  className={`px-3 py-1 rounded-md font-semibold flex items-center gap-1.5 transition-all ${
+                    labDiagramMode === '3d_device'
+                      ? 'bg-blue-800 text-white shadow-2xs'
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Box className="w-3.5 h-3.5" />
+                  <span>Interactive 3D SiGe HBT Device Model</span>
+                </button>
+              </div>
+            </div>
+
+            {labDiagramMode === '3d_device' && (
+              <Interactive3DTransistorView
+                parameters={HICUM_PARAMETERS}
+                elements={CIRCUIT_ELEMENTS}
+                nodes={CIRCUIT_NODES}
+                bias={bias}
+                opResult={opResult}
+                selectedParamId={selectedParamId}
+                selectedElementId={selectedElementId}
+                onSelectParamInLab={(paramId) => handleSelectParam(paramId, false)}
+                onSelectElementInLab={(elId) => handleSelectElement(elId, false)}
+              />
+            )}
+
             {/* Top 12-Column Interactive Workspace: Left 7 Cols (Schematic + Plot) | Right 5 Cols (Inspector & Sliders) */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
               {/* Left 7 Columns: Interactive Equivalent Circuit + Synchronized Plot */}
               <div className="xl:col-span-7 space-y-5">
-                <EquivalentCircuitDiagram
-                  nodes={CIRCUIT_NODES}
-                  elements={CIRCUIT_ELEMENTS}
-                  selectedElementId={selectedElementId}
-                  selectedNodeId={selectedNodeId}
-                  highlightedElementIds={selectedParam ? selectedParam.circuitElements : []}
-                  opResult={opResult}
-                  onSelectElement={(id) => handleSelectElement(id, false)}
-                  onSelectNode={handleSelectNode}
-                />
+                {labDiagramMode === 'schematic' && (
+                  <EquivalentCircuitDiagram
+                    nodes={CIRCUIT_NODES}
+                    elements={CIRCUIT_ELEMENTS}
+                    selectedElementId={selectedElementId}
+                    selectedNodeId={selectedNodeId}
+                    highlightedElementIds={selectedParam ? selectedParam.circuitElements : []}
+                    opResult={opResult}
+                    onSelectElement={(id) => handleSelectElement(id, false)}
+                    onSelectNode={handleSelectNode}
+                  />
+                )}
 
                 <InteractivePlotPanel
                   activeCategory={activePlotCategory}
@@ -627,12 +675,26 @@ export const App: React.FC = () => {
         )}
 
         {activeTab === 'cross_section' && (
-          <CrossSectionDiagrams
-            parameters={HICUM_PARAMETERS}
-            elements={CIRCUIT_ELEMENTS}
-            onSelectParamInLab={(paramId) => handleSelectParam(paramId, true)}
-            onSelectElementInLab={(elId) => handleSelectElement(elId, true)}
-          />
+          <div className="space-y-8">
+            <Interactive3DTransistorView
+              parameters={HICUM_PARAMETERS}
+              elements={CIRCUIT_ELEMENTS}
+              nodes={CIRCUIT_NODES}
+              bias={bias}
+              opResult={opResult}
+              selectedParamId={selectedParamId}
+              selectedElementId={selectedElementId}
+              onSelectParamInLab={(paramId) => handleSelectParam(paramId, true)}
+              onSelectElementInLab={(elId) => handleSelectElement(elId, true)}
+            />
+
+            <CrossSectionDiagrams
+              parameters={HICUM_PARAMETERS}
+              elements={CIRCUIT_ELEMENTS}
+              onSelectParamInLab={(paramId) => handleSelectParam(paramId, true)}
+              onSelectElementInLab={(elId) => handleSelectElement(elId, true)}
+            />
+          </div>
         )}
 
         {activeTab === 'veriloga' && (
