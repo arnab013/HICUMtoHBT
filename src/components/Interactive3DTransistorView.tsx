@@ -60,6 +60,7 @@ interface Interactive3DTransistorViewProps {
   selectedElementId: string | null;
   onSelectParamInLab: (paramId: string) => void;
   onSelectElementInLab: (elementId: string) => void;
+  onUpdateBias?: (biasUpdate: Partial<BiasState>) => void;
 }
 
 type InteractionTool = 'orbit' | 'pan';
@@ -84,11 +85,13 @@ const SCALE_UM_TO_3D = 10.0; // 1 um = 10 Three.js world units
 export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewProps> = ({
   parameters,
   elements,
+  bias,
   opResult,
   selectedParamId,
   selectedElementId,
   onSelectParamInLab,
   onSelectElementInLab,
+  onUpdateBias,
 }) => {
   // Primary Workspace State
   const [viewModePreset, setViewModePreset] = useState<ViewModePreset>('cross_section');
@@ -1198,9 +1201,11 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
         </div>
       </div>
 
-      {/* DOMINANT 3D SCIENTIFIC ARTBOARD */}
-      <div className="bg-[#FAF9F5] dark:bg-slate-950 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
-        {/* Top Artboard Contextual Visibility Bar */}
+      {/* MAIN DASHBOARD MIDDLE ROW: 3D ARTBOARD + ACTIVITY INSPECTOR */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+        {/* Dominant 3D Artboard (8 cols on xl, 9 cols on 2xl) */}
+        <div className="xl:col-span-8 2xl:col-span-9 bg-white rounded-3xl border border-slate-200/70 shadow-sm overflow-hidden flex flex-col justify-between">
+          {/* Top Artboard Contextual Visibility Bar */}
         <div className="px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200/70 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
           {/* Layer & Component Visibility Pills */}
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -1950,11 +1955,142 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
         </div>
       </div>
 
+      {/* Right Activity Card (4 cols on xl, 3 cols on 2xl) */}
+      <div className="xl:col-span-4 2xl:col-span-3 bg-white rounded-3xl border border-slate-200/70 p-5 shadow-sm relative pt-8 flex flex-col justify-between">
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#0D7C66] text-white px-5 py-1 rounded-full text-xs font-semibold shadow-xs whitespace-nowrap">
+          Activity
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <span className="text-xs font-bold text-slate-800">Dynamic Charge &amp; Transit</span>
+            <span className="text-[11px] font-mono text-[#0D7C66] bg-teal-50 px-2 py-0.5 rounded-full border border-teal-100 font-semibold">
+              Live State
+            </span>
+          </div>
+
+          {/* Circular Donut Gauge (matching Image 3) */}
+          <div className="py-4 flex flex-col items-center justify-center">
+            <div className="relative w-40 h-40 flex items-center justify-center">
+              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#F1F5F9" strokeWidth="8" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  fill="none"
+                  stroke="#F59E0B"
+                  strokeWidth="8"
+                  strokeDasharray="186.2 238.8"
+                  strokeDashoffset="0"
+                  strokeLinecap="round"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  fill="none"
+                  stroke="#0D7C66"
+                  strokeWidth="8"
+                  strokeDasharray="52.5 238.8"
+                  strokeDashoffset="-186.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span className="text-xl font-bold font-mono text-slate-900 tracking-tight">
+                  {(opResult.Ft / 1e9).toFixed(1)}
+                </span>
+                <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">
+                  GHz (f_T)
+                </span>
+              </div>
+            </div>
+
+            {/* Donut Legend */}
+            <div className="w-full flex items-center justify-around text-xs mt-2 px-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shrink-0" />
+                <div className="text-left">
+                  <div className="text-[10px] text-slate-400">Intrinsic τ₀</div>
+                  <div className="font-mono font-bold text-slate-700">1.12 ps</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#0D7C66] shrink-0" />
+                <div className="text-left">
+                  <div className="text-[10px] text-slate-400">Kirk Δτ_f</div>
+                  <div className="font-mono font-bold text-slate-700">0.16 ps</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Selected Element Live Probe */}
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold flex items-center justify-between">
+              <span>Active 3D Probe</span>
+              <span className="text-[#0D7C66] font-bold">{activeEmbeddedComponent.symbolLabel}</span>
+            </div>
+            <div className="text-xs font-bold text-slate-800 truncate">
+              {activeEmbeddedComponent.name}
+            </div>
+            <div className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+              {activeEmbeddedComponent.physicalOriginNote}
+            </div>
+          </div>
+        </div>
+
+        {/* Interactive Bias Sliders */}
+        <div className="space-y-2.5 pt-3 border-t border-slate-100">
+          <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 font-semibold flex items-center justify-between">
+            <span>Operating Bias</span>
+            <span className="text-slate-500 font-mono">Tamb = {bias.Tamb.toFixed(0)} K</span>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-slate-500">V_BE</span>
+              <span className="font-bold text-[#0D7C66]">{bias.Vbe.toFixed(3)} V</span>
+            </div>
+            <input
+              type="range"
+              min={0.5}
+              max={1.0}
+              step={0.005}
+              value={bias.Vbe}
+              onChange={(e) => onUpdateBias?.({ Vbe: parseFloat(e.target.value) })}
+              className="w-full accent-[#0D7C66] cursor-pointer"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-slate-500">V_CE</span>
+              <span className="font-bold text-slate-800">{bias.Vce.toFixed(2)} V</span>
+            </div>
+            <input
+              type="range"
+              min={0.1}
+              max={3.5}
+              step={0.05}
+              value={bias.Vce}
+              onChange={(e) => onUpdateBias?.({ Vce: parseFloat(e.target.value) })}
+              className="w-full accent-[#0D7C66] cursor-pointer"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
       {/* COLLAPSIBLE 3-COLUMN SCIENTIFIC PUBLICATION CARDS BELOW ARTBOARD */}
       {bottomCardsExpanded && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch pt-2">
           {/* Card 1 (Left 4 Cols): Synchronized HICUM Equivalent Circuit */}
-          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between">
+          <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200/70 p-5 shadow-sm relative pt-8 flex flex-col justify-between">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#0D7C66] text-white px-5 py-1 rounded-full text-xs font-semibold shadow-xs whitespace-nowrap">
+              Circuit Branch
+            </div>
             <div>
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5 mb-3">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
@@ -2127,7 +2263,10 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
           </div>
 
           {/* Card 2 (Center 4 Cols): Documented Key Equation & Parameters */}
-          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between space-y-3">
+          <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200/70 p-5 shadow-sm relative pt-8 flex flex-col justify-between space-y-3">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#0D7C66] text-white px-5 py-1 rounded-full text-xs font-semibold shadow-xs whitespace-nowrap">
+              Key Equation
+            </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
                 <div>
@@ -2214,7 +2353,10 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
           </div>
 
           {/* Card 3 (Right 4 Cols): Physical Mapping, Sentaurus TCAD Spec & Localization */}
-          <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between space-y-3">
+          <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200/70 p-5 shadow-sm relative pt-8 flex flex-col justify-between space-y-3">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#0D7C66] text-white px-5 py-1 rounded-full text-xs font-semibold shadow-xs whitespace-nowrap">
+              TCAD Geometry &amp; Physics
+            </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
