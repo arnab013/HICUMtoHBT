@@ -219,14 +219,14 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
 
   return (
     <div className="space-y-5">
-      <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 shadow-sm">
+      <div className="bg-white border border-[#E5E2DA] rounded-lg p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#DBEAFE] text-[#1E40AF] font-semibold">
+              <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] font-semibold">
                 Official Verilog-A Implementation (`hicumL2V2p34.va` · 2,066 Lines)
               </span>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#CCFBF1] text-[#0F766E] font-medium">
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#E6F0EE] text-[#2A645E] font-medium">
                 Originator: M. Schröter & A. Pawlak
               </span>
             </div>
@@ -253,8 +253,8 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                 onClick={() => setSelectedBlockId(blk.id)}
                 className={`w-full text-left p-3.5 rounded-lg border transition-all ${
                   active
-                    ? 'bg-[#1E40AF] text-white border-[#1E40AF] shadow-sm'
-                    : 'bg-white text-[#0F172A] border-[#E2E8F0] hover:border-[#94A3B8]'
+                    ? 'bg-[#2B4C65] text-white border-[#2B4C65] shadow-sm'
+                    : 'bg-white text-[#0F172A] border-[#E5E2DA] hover:border-[#94A3B8]'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -262,14 +262,14 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                     className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded ${
                       active
                         ? 'bg-white/20 text-white'
-                        : 'bg-[#F1F5F9] text-[#475569]'
+                        : 'bg-[#EAE8E1] text-[#475569]'
                     }`}
                   >
                     {blk.category}
                   </span>
                   <span
                     className={`text-[11px] font-mono ${
-                      active ? 'text-blue-100' : 'text-[#64748B]'
+                      active ? 'text-[#DCE6EF]' : 'text-[#64748B]'
                     }`}
                   >
                     {blk.lines}
@@ -278,7 +278,7 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                 <div className="font-mono font-bold text-xs mt-1.5">{blk.name}</div>
                 <div
                   className={`text-[11px] mt-1 line-clamp-2 ${
-                    active ? 'text-blue-100' : 'text-[#475569]'
+                    active ? 'text-[#DCE6EF]' : 'text-[#475569]'
                   }`}
                 >
                   {blk.manualSection}
@@ -293,14 +293,14 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
           {VA_BLOCKS.filter((b) => b.id === selectedBlockId).map((blk) => (
             <div
               key={blk.id}
-              className="bg-white border border-[#E2E8F0] rounded-lg p-5 shadow-sm space-y-4"
+              className="bg-white border border-[#E5E2DA] rounded-lg p-5 shadow-sm space-y-4"
             >
-              <div className="border-b border-[#E2E8F0] pb-3">
+              <div className="border-b border-[#E5E2DA] pb-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded bg-[#DBEAFE] text-[#1E40AF]">
+                  <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65]">
                     {blk.lines}
                   </span>
-                  <span className="text-xs font-mono text-[#0F766E] font-medium">
+                  <span className="text-xs font-mono text-[#2A645E] font-medium">
                     {blk.manualSection}
                   </span>
                 </div>
@@ -321,7 +321,7 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                   {blk.keyEquationsLatex.map((eq, i) => (
                     <div
                       key={i}
-                      className="p-3 rounded bg-[#F8FAFC] border border-[#CBD5E1] overflow-x-auto"
+                      className="p-3 rounded bg-[#F7F6F2] border border-[#D8D4CA] overflow-x-auto"
                     >
                       <FormulaView latex={eq} displayMode />
                     </div>
@@ -334,20 +334,20 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                 <div className="text-xs font-mono uppercase tracking-wider text-[#475569] font-semibold">
                   Verilog-A Implementation Excerpt (`hicumL2V2p34.va`)
                 </div>
-                <pre className="p-4 rounded-md bg-[#0F172A] text-[#F8FAFC] font-mono text-xs overflow-x-auto leading-relaxed">
+                <pre className="p-4 rounded-md bg-[#0F172A] text-[#F7F6F2] font-mono text-xs overflow-x-auto leading-relaxed">
                   <code>{blk.codeSnippet}</code>
                 </pre>
               </div>
 
               {/* Linked Parameters & Elements */}
-              <div className="pt-3 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3">
+              <div className="pt-3 border-t border-[#E5E2DA] flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-1.5">
                   <span className="text-xs font-mono text-[#64748B]">Parameters:</span>
                   {blk.linkedParams.map((pid) => (
                     <button
                       key={pid}
                       onClick={() => onSelectParamInLab(pid)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-semibold rounded bg-[#DBEAFE]/70 text-[#1E40AF] hover:bg-[#1E40AF] hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono font-semibold rounded bg-[#E7EEF4]/70 text-[#2B4C65] hover:bg-[#2B4C65] hover:text-white transition-colors"
                     >
                       {pid} <ArrowUpRight className="w-3 h-3" />
                     </button>
@@ -359,7 +359,7 @@ export const VerilogAExplorerView: React.FC<VerilogAExplorerViewProps> = ({
                     <button
                       key={cid}
                       onClick={() => onSelectElementInLab(cid)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono rounded bg-[#CCFBF1]/70 text-[#0F766E] hover:bg-[#0F766E] hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-mono rounded bg-[#E6F0EE]/70 text-[#2A645E] hover:bg-[#2A645E] hover:text-white transition-colors"
                     >
                       EC:{cid} <ArrowUpRight className="w-3 h-3" />
                     </button>

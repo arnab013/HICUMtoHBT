@@ -59,7 +59,7 @@ export const CircuitSymbolGlyph: React.FC<CircuitSymbolGlyphProps> = ({
         r={active ? 15 : 12.5}
         fill={badgeBg}
         fillOpacity={active ? 0.96 : 0.88}
-        stroke={active ? strokeColor : '#CBD5E1'}
+        stroke={active ? strokeColor : '#D8D4CA'}
         strokeWidth={active ? 1.6 : 0.9}
       />
 
@@ -179,7 +179,7 @@ export const CircuitSymbolGlyph: React.FC<CircuitSymbolGlyphProps> = ({
             rx={3}
             fill={isSelected ? '#B85D43' : '#FFFFFF'}
             fillOpacity={0.94}
-            stroke={isSelected ? '#B85D43' : '#CBD5E1'}
+            stroke={isSelected ? '#B85D43' : '#D8D4CA'}
             strokeWidth={0.9}
           />
           <text

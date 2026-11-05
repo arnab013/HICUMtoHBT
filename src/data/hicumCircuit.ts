@@ -25,6 +25,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Base metallization contact pad & outer poly-base contact',
     description:
       'External base terminal connected to the outer base contact metallization. Feeds the extrinsic base resistance rBx, outer B-C split capacitance CjCx1 + CBCpar1, and outer B-E isolation capacitance CBEpar1.',
+    manualCitation: 'Ch. 2.1, p. 8, Fig. 2.1.0/1; Ch. 2.7, p. 52, Fig. 2.7.0/2; Ch. 2.8.1, p. 54, ll. 1–15',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 631, 639–641',
   },
   {
     id: 'B*',
@@ -36,6 +38,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Emitter perimeter sidewall / link-base boundary just outside the emitter window',
     description:
       'Crucial intermediate base node introduced by HICUM between rBx and rBi*. Separates peripheral B-E injection (ijBEp, CjEp), inner extrinsic B-C capacitance (CjCx2 + CBCpar2), extrinsic B-C diode (ijBCx), and parasitic substrate PNP base action from the 1D intrinsic base node B\'.',
+    manualCitation: 'Ch. 2.1, p. 7, ll. 23–28; p. 8, Fig. 2.1.0/1; Ch. 2.6, p. 45, ll. 1–15',
+    vaCitation: 'hicumL2V2p34.va, ll. 634, 639–646',
   },
   {
     id: "B'",
@@ -47,6 +51,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Neutral pinch-base layer directly beneath the intrinsic emitter window',
     description:
       'Intrinsic base node after the conductivity-modulated and crowding-corrected pinch resistance rBi* (shunted by lateral NQS capacitance CrBi). Controls the 1D GICCR transfer current iT, internal B-E/B-C diodes, depletion charges QjEi/QjCi, and diffusion charges Qf/Qr.',
+    manualCitation: 'Ch. 2.1, p. 7, ll. 15–22; p. 8, Fig. 2.1.0/1; Ch. 2.2, p. 9, ll. 15–26',
+    vaCitation: 'hicumL2V2p34.va, ll. 634, 637–638',
   },
   {
     id: 'C',
@@ -58,6 +64,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Collector metal contact pad above deep n+ sinker',
     description:
       'External collector terminal connected to the collector contact metallization and peripheral S-C capacitance CSCp.',
+    manualCitation: 'Ch. 2.1, p. 8, Fig. 2.1.0/1; Ch. 2.8.2, p. 55, ll. 1–12',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 631, 648, 653',
   },
   {
     id: "C'",
@@ -69,6 +77,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Highly doped n+ buried layer / bottom of epitaxial collector under the emitter',
     description:
       'Internal collector node separated from terminal C by the external collector series resistance rCx (buried layer + sinker + contact). HICUM omits an extra internal epitaxial collector resistance node; instead, epitaxial collector drop (rCi0, Vlim, VPT) is embedded analytically inside ICK(vC\'E\') and Qf(vC\'E\', iTf).',
+    manualCitation: 'Ch. 2.1, p. 7, ll. 15–31; p. 8, Fig. 2.1.0/1; Ch. 2.3.1, p. 19, ll. 1–17',
+    vaCitation: 'hicumL2V2p34.va, ll. 634, 637, 648',
   },
   {
     id: "E'",
@@ -80,6 +90,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Metallurgical n+ emitter / silicon interface beneath emitter polysilicon',
     description:
       'Internal emitter node receiving the intrinsic transfer current iT, internal B-E diode current ijBEi, peripheral B-E diode current ijBEp, and B-E depletion/diffusion charges before passing through emitter series resistance rE.',
+    manualCitation: 'Ch. 2.1, p. 8, Fig. 2.1.0/1; Ch. 2.8.3, p. 56, ll. 1–15',
+    vaCitation: 'hicumL2V2p34.va, ll. 634, 638, 643, 649',
   },
   {
     id: 'E',
@@ -91,6 +103,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Emitter metal contact on top of polysilicon emitter finger',
     description:
       'External emitter terminal separated from the intrinsic emitter junction node E\' by the emitter series resistance rE and shunted to B and B* by oxide overlap capacitances CBEpar1 and CBEpar2.',
+    manualCitation: 'Ch. 2.1, p. 8, Fig. 2.1.0/1; Ch. 2.7, p. 53, Fig. 2.7.0/3; Ch. 2.8.3, p. 56, ll. 1–15',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 631, 649–650',
   },
   {
     id: "S'",
@@ -102,6 +116,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'P-type silicon substrate directly beneath the n+ buried layer (C-S junction)',
     description:
       'Internal substrate node introduced by HICUM between the collector-substrate junction (CjS, ijSC, parasitic PNP collector current iTS) and the bulk substrate network (rSu || CSu) to capture intra-device RF substrate coupling.',
+    manualCitation: 'Ch. 2.1, p. 8, Fig. 2.1.0/1; Ch. 2.11, p. 65, ll. 1–16; Ch. 2.12, p. 67, ll. 1–24',
+    vaCitation: 'hicumL2V2p34.va, ll. 634, 645, 651–652',
   },
   {
     id: 'S',
@@ -113,6 +129,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Substrate contact ring / wafer backside ground reference',
     description:
       'External substrate terminal connected to S\' via the parallel substrate resistance rSu and capacitance CSu, and to C via the peripheral substrate-collector capacitance CSCp.',
+    manualCitation: 'Ch. 2.1, p. 8, Fig. 2.1.0/1; Ch. 2.11, pp. 65–66, ll. 1–16',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 631, 652–653',
   },
   {
     id: 'T',
@@ -124,6 +142,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Electro-thermal equivalent node representing local device temperature rise ΔTj',
     description:
       'External/accessible electro-thermal node whose voltage V(tnode) in Volts equals the local junction temperature rise DTSH = ΔTj in Kelvin, driven by dissipated power current source P (pterm) across Rth(T) || Cth.',
+    manualCitation: 'Ch. 2.1, p. 8, Fig. 2.1.0/1; Ch. 2.15, p. 93, ll. 1–24',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 632, 654',
   },
   {
     id: 'XF',
@@ -135,6 +155,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Adjunct RC state node for vertical NQS delay of minority charge Qf',
     description:
       'Internal adjunct node implementing the 1st-order RC differential equation for delayed forward minority charge Qdeix = V(xf) with delay time τ2 = αQf τf when flnqs=1.',
+    manualCitation: 'Ch. 2.9.1, pp. 57–58, ll. 1–26 (Eq. 2.9.1-1)',
+    vaCitation: 'hicumL2V2p34.va, ll. 635, 659, 1770–1775',
   },
   {
     id: 'XF1',
@@ -146,6 +168,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Adjunct LCR state node 1 for vertical NQS delay of transfer current iTf',
     description:
       'First internal state node of the 2nd-order Bessel gyrator/LCR network implementing excess phase delay τm = αiT τf on the forward transfer current iTf.',
+    manualCitation: 'Ch. 2.9.1, pp. 57–58, ll. 1–26 (Eq. 2.9.1-1)',
+    vaCitation: 'hicumL2V2p34.va, ll. 635, 657, 1760–1769',
   },
   {
     id: 'XF2',
@@ -157,6 +181,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Adjunct LCR output node 2 for vertical NQS transfer current Itxf',
     description:
       'Second internal state node of the 2nd-order Bessel network whose voltage V(xf2) directly sets the NQS-delayed forward transfer current Itxf injected into branch (C\', E\').',
+    manualCitation: 'Ch. 2.9.1, pp. 57–58, ll. 1–26 (Eq. 2.9.1-1)',
+    vaCitation: 'hicumL2V2p34.va, ll. 635, 658, 1760–1769',
   },
   {
     id: 'N1',
@@ -168,6 +194,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Adjunct noise branch b_n1 for HF base shot noise correlation',
     description:
       'Internal noise reference node used when flcono=1 to generate white base shot noise 2q|iBEi| and couple its time derivative ddt() into the intrinsic B\'-E\' branch.',
+    manualCitation: 'Ch. 2.13.3, pp. 71–72, ll. 1–18 (Eqs. 2.13.3-1 to 2.13.3-4)',
+    vaCitation: 'hicumL2V2p34.va, ll. 636, 661, 1933–1964',
   },
   {
     id: 'N2',
@@ -179,6 +207,8 @@ export const CIRCUIT_NODES: CircuitNode[] = [
     physicalLocation: 'Adjunct noise branch b_n2 for HF collector-to-base noise correlation',
     description:
       'Internal noise reference node used when flcono=1 to generate collector shot noise 2q|iT| and cross-couple its delayed time derivative n1*ddt(V(b_n2)) into the intrinsic base B\'-E\'.',
+    manualCitation: 'Ch. 2.13.3, pp. 71–72, ll. 1–18 (Eqs. 2.13.3-1 to 2.13.3-4)',
+    vaCitation: 'hicumL2V2p34.va, ll. 636, 662, 1933–1964',
   },
 ];
 
@@ -194,7 +224,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "E'",
     vaBranch: 'br_ciei / br_eici',
     vaLines: '1448–1596, 1829–1830',
-    manualSection: 'Section 2.2',
+    manualSection: 'Section 2.2 (pp. 9–17)',
+    manualCitation: 'Ch. 2.2, p. 9, ll. 20–22 (Eq. 2.2.0-1); p. 8, Fig. 2.1.0/1',
     subsystem: 'intrinsic_transfer',
     plotCategory: 'transfer_gummel',
     summary:
@@ -217,7 +248,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "E'",
     vaBranch: 'br_biei',
     vaLines: '1435–1436, 1634, 1815–1817',
-    manualSection: 'Section 2.5',
+    manualSection: 'Section 2.5 (pp. 42–44)',
+    manualCitation: 'Ch. 2.5, p. 42, l. 15 (Eq. 2.5.0-1) & p. 44, l. 1 (Eq. 2.5.0-5)',
     subsystem: 'intrinsic_be',
     plotCategory: 'transfer_gummel',
     summary:
@@ -240,7 +272,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "E'",
     vaBranch: 'br_bpei',
     vaLines: '1664–1665, 1812–1813',
-    manualSection: 'Section 2.5',
+    manualSection: 'Section 2.5 (p. 43)',
+    manualCitation: 'Ch. 2.5, p. 43, ll. 1–5 (Eq. 2.5.0-2); p. 8, Fig. 2.1.0/1',
     subsystem: 'external_be_bc',
     plotCategory: 'transfer_gummel',
     summary:
@@ -263,7 +296,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_bici',
     vaLines: '1614, 1824',
-    manualSection: 'Section 2.5',
+    manualSection: 'Section 2.5 (p. 43)',
+    manualCitation: 'Ch. 2.5, p. 43, l. 8 (Eq. 2.5.0-3); p. 8, Fig. 2.1.0/1',
     subsystem: 'intrinsic_bc',
     plotCategory: 'transfer_gummel',
     summary:
@@ -286,7 +320,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_bpci',
     vaLines: '1693, 1820',
-    manualSection: 'Section 2.5',
+    manualSection: 'Section 2.5 (p. 43)',
+    manualCitation: 'Ch. 2.5, p. 43, l. 10 (Eq. 2.5.0-4); p. 8, Fig. 2.1.0/1',
     subsystem: 'external_be_bc',
     plotCategory: 'transfer_gummel',
     summary:
@@ -309,7 +344,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'B*',
     vaBranch: 'br_bpei (tunode=1) / br_biei (tunode=0)',
     vaLines: '1671–1686, 1807–1811',
-    manualSection: 'Section 2.10.2',
+    manualSection: 'Section 2.10.2 (pp. 62–64)',
+    manualCitation: 'Ch. 2.10.2, p. 63, l. 9 (Eq. 2.10.2-7); p. 64, Fig. 2.10.2/1',
     subsystem: 'breakdown_tunneling',
     plotCategory: 'breakdown_tunneling',
     summary:
@@ -332,7 +368,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "B'",
     vaBranch: 'br_bici',
     vaLines: '1617–1631, 1824',
-    manualSection: 'Section 2.10.1',
+    manualSection: 'Section 2.10.1 (pp. 60–61)',
+    manualCitation: 'Ch. 2.10.1, p. 60, ll. 11–18 (Eqs. 2.10.1-1 to 2.10.1-4)',
     subsystem: 'breakdown_tunneling',
     plotCategory: 'breakdown_tunneling',
     summary:
@@ -355,7 +392,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "B'",
     vaBranch: 'br_bpbi_i',
     vaLines: '1637–1661, 1801–1805',
-    manualSection: 'Section 2.6',
+    manualSection: 'Section 2.6 (pp. 45–49)',
+    manualCitation: 'Ch. 2.6, p. 45, l. 12 (Eq. 2.6.0-7); p. 47, l. 6 (Eq. 2.6.0-14); p. 48, l. 12 (Eq. 2.6.0-20)',
     subsystem: 'base_resistance',
     plotCategory: 'base_resistance',
     summary:
@@ -378,7 +416,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "B'",
     vaBranch: 'br_bpbi_i',
     vaLines: '1603–1608, 1803',
-    manualSection: 'Section 2.9.2',
+    manualSection: 'Section 2.9.2 (pp. 58–59)',
+    manualCitation: 'Ch. 2.9.2, p. 58, l. 19 (Eq. 2.9.2-1) & p. 59, l. 18 (Eq. 2.9.2-4)',
     subsystem: 'nqs_effects',
     plotCategory: 'base_resistance',
     summary:
@@ -401,7 +440,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'B*',
     vaBranch: 'br_bbp_i',
     vaLines: '1175, 1394, 1796–1800',
-    manualSection: 'Section 2.8.1',
+    manualSection: 'Section 2.8.1 (p. 54)',
+    manualCitation: 'Ch. 2.8.1, p. 54, ll. 1–15 (Eq. 2.8.1-1, Fig. 2.8.1/1)',
     subsystem: 'base_resistance',
     plotCategory: 'base_resistance',
     summary:
@@ -424,7 +464,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'E',
     vaBranch: 'br_eie_i',
     vaLines: '1176, 1395, 1836–1840',
-    manualSection: 'Section 2.8',
+    manualSection: 'Section 2.8.3 (p. 56)',
+    manualCitation: 'Ch. 2.8.3, p. 56, ll. 1–15; Table 3.6, p. 104, row 8',
     subsystem: 'external_be_bc',
     plotCategory: 'base_resistance',
     summary:
@@ -447,7 +488,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'C',
     vaBranch: 'br_cic_i',
     vaLines: '1174, 1393, 1831–1835',
-    manualSection: 'Section 2.8.2',
+    manualSection: 'Section 2.8.2 (p. 55)',
+    manualCitation: 'Ch. 2.8.2, p. 55, ll. 1–12 (Eq. 2.8.2-1, Fig. 2.8.2/1)',
     subsystem: 'external_be_bc',
     plotCategory: 'base_resistance',
     summary:
@@ -470,7 +512,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "E'",
     vaBranch: 'br_biei',
     vaLines: '240–256, 1454, 1818',
-    manualSection: 'Section 2.4.1',
+    manualSection: 'Section 2.4.1 (pp. 32–35)',
+    manualCitation: 'Ch. 2.4.1, p. 33, l. 16 (Eq. 2.4.1-1); p. 34, ll. 2–18',
     subsystem: 'depletion_charge',
     plotCategory: 'depletion_cap',
     summary:
@@ -493,7 +536,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "E'",
     vaBranch: 'br_bpei',
     vaLines: '240–256, 1668, 1814',
-    manualSection: 'Section 2.4.1',
+    manualSection: 'Section 2.4.1 (pp. 32–35)',
+    manualCitation: 'Ch. 2.4.1, p. 34, ll. 19–22; Table 3.9, p. 105, rows 5–8',
     subsystem: 'depletion_charge',
     plotCategory: 'depletion_cap',
     summary:
@@ -516,7 +560,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_bici',
     vaLines: '280–333, 1471, 1825',
-    manualSection: 'Section 2.4.2',
+    manualSection: 'Section 2.4.2 (pp. 35–39)',
+    manualCitation: 'Ch. 2.4.2, p. 37, ll. 3–15 (Eqs. 2.4.2-4 to 2.4.2-7); p. 38, ll. 1–15',
     subsystem: 'depletion_charge',
     plotCategory: 'depletion_cap',
     summary:
@@ -539,7 +584,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_bci',
     vaLines: '971–982, 1696, 1793–1794',
-    manualSection: 'Section 2.4.3 & 2.7',
+    manualSection: 'Section 2.4.3 & 2.7 (pp. 39–41, 50–53)',
+    manualCitation: 'Ch. 2.4.3, p. 40, ll. 5–26 (Eqs. 2.4.3-1 & 2.4.3-2); Ch. 2.7, p. 51, l. 12',
     subsystem: 'depletion_charge',
     plotCategory: 'depletion_cap',
     summary:
@@ -562,7 +608,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_bpci',
     vaLines: '971–982, 1690, 1795, 1821',
-    manualSection: 'Section 2.4.3 & 2.7',
+    manualSection: 'Section 2.4.3 & 2.7 (pp. 39–41, 50–53)',
+    manualCitation: 'Ch. 2.4.3, p. 40, ll. 5–26 (Eqs. 2.4.3-1 & 2.4.3-2); Ch. 2.7, p. 52, Fig. 2.7.0/2',
     subsystem: 'depletion_charge',
     plotCategory: 'depletion_cap',
     summary:
@@ -585,7 +632,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "E'",
     vaBranch: 'br_biei',
     vaLines: '490–533, 1599, 1774, 1818',
-    manualSection: 'Section 2.3.1',
+    manualSection: 'Section 2.3.1 (pp. 18–31)',
+    manualCitation: 'Ch. 2.3.1, p. 18, ll. 6–11 (Eq. 2.3.1-1); pp. 21–31',
     subsystem: 'minority_charge',
     plotCategory: 'transit_time_ft',
     summary:
@@ -638,7 +686,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_bici',
     vaLines: '1542, 1600, 1825',
-    manualSection: 'Section 2.3.2',
+    manualSection: 'Section 2.3.2 (p. 31)',
+    manualCitation: 'Ch. 2.3.2, p. 31, ll. 13–19 (Eq. 2.3.2-1)',
     subsystem: 'minority_charge',
     plotCategory: 'transit_time_ft',
     summary:
@@ -661,7 +710,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'E',
     vaBranch: 'br_be',
     vaLines: '985–986, 1822',
-    manualSection: 'Section 2.7',
+    manualSection: 'Section 2.7 (pp. 50–53)',
+    manualCitation: 'Ch. 2.7, p. 51, l. 15 (Eq. 2.7.0-25); p. 53, Fig. 2.7.0/3',
     subsystem: 'parasitic_isolation',
     plotCategory: 'depletion_cap',
     summary:
@@ -684,7 +734,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'E',
     vaBranch: 'br_bpe',
     vaLines: '985–986, 1823',
-    manualSection: 'Section 2.7',
+    manualSection: 'Section 2.7 (pp. 50–53)',
+    manualCitation: 'Ch. 2.7, p. 51, l. 15 (Eq. 2.7.0-25); p. 53, Fig. 2.7.0/3',
     subsystem: 'parasitic_isolation',
     plotCategory: 'depletion_cap',
     summary:
@@ -707,7 +758,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "S'",
     vaBranch: 'br_bpsi',
     vaLines: '1712–1725, 1819',
-    manualSection: 'Section 2.12',
+    manualSection: 'Section 2.12 (pp. 67–68)',
+    manualCitation: 'Ch. 2.12, p. 67, l. 22 (Eq. 2.12.0-10); p. 68, ll. 4–8',
     subsystem: 'substrate_network',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -730,7 +782,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_bpci',
     vaLines: '1717–1721, 1821',
-    manualSection: 'Section 2.12',
+    manualSection: 'Section 2.12 (pp. 67–68)',
+    manualCitation: 'Ch. 2.12, p. 68, l. 8 (Eq. 2.12.0-12)',
     subsystem: 'substrate_network',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -753,7 +806,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_sici',
     vaLines: '1735, 1826',
-    manualSection: 'Section 2.12',
+    manualSection: 'Section 2.12 (p. 67)',
+    manualCitation: 'Ch. 2.12, p. 67, ll. 10–15; Table 3.7, p. 104, rows 3–4',
     subsystem: 'substrate_network',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -776,7 +830,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: "C'",
     vaBranch: 'br_sici',
     vaLines: '1699, 1827',
-    manualSection: 'Section 2.4.2 & 2.12',
+    manualSection: 'Section 2.4.4 & 2.12 (pp. 41, 67)',
+    manualCitation: 'Ch. 2.4.4, p. 41, ll. 4–18; Table 3.9, p. 105, rows 17–20',
     subsystem: 'substrate_network',
     plotCategory: 'depletion_cap',
     summary:
@@ -799,7 +854,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'C',
     vaBranch: 'br_sc',
     vaLines: '1703–1709, 1828',
-    manualSection: 'Section 2.4.2 & 2.12',
+    manualSection: 'Section 2.4.4 & 2.11 (pp. 41, 65)',
+    manualCitation: 'Ch. 2.4.4, p. 41, ll. 10–18; Table 3.9, p. 105, rows 21–24',
     subsystem: 'substrate_network',
     plotCategory: 'depletion_cap',
     summary:
@@ -822,7 +878,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'S',
     vaBranch: 'br_sis_i',
     vaLines: '1841–1846',
-    manualSection: 'Section 2.12',
+    manualSection: 'Section 2.11 (pp. 65–66)',
+    manualCitation: 'Ch. 2.11, pp. 65–66, ll. 1–16; Table 3.8, p. 104, row 1',
     subsystem: 'substrate_network',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -845,7 +902,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'S',
     vaBranch: 'br_sis_i',
     vaLines: '1843',
-    manualSection: 'Section 2.12',
+    manualSection: 'Section 2.11 (pp. 65–66)',
+    manualCitation: 'Ch. 2.11, pp. 65–66, ll. 1–16; Table 3.8, p. 104, row 2',
     subsystem: 'substrate_network',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -868,7 +926,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'GND',
     vaBranch: 'br_sht',
     vaLines: '1207, 1426, 1864–1868',
-    manualSection: 'Section 2.15',
+    manualSection: 'Section 2.15 (p. 93)',
+    manualCitation: 'Ch. 2.14.14, p. 92, l. 13 (Eq. 2.14.14-1); Ch. 2.15, p. 93, l. 18 (Eq. 2.15.0-3)',
     subsystem: 'thermal_selfheating',
     plotCategory: 'temperature_selfheating',
     summary:
@@ -891,7 +950,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'GND',
     vaBranch: 'br_sht',
     vaLines: '1868',
-    manualSection: 'Section 2.15',
+    manualSection: 'Section 2.15 (p. 93)',
+    manualCitation: 'Ch. 2.15, p. 93, ll. 1–24 (Eq. 2.15.0-3); Table 3.16, p. 110, row 3',
     subsystem: 'thermal_selfheating',
     plotCategory: 'temperature_selfheating',
     summary:
@@ -914,7 +974,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'T',
     vaBranch: 'br_sht',
     vaLines: '1738–1754, 1867',
-    manualSection: 'Section 2.15',
+    manualSection: 'Section 2.15 (p. 93)',
+    manualCitation: 'Ch. 2.15, p. 93, l. 11 (Eq. 2.15.0-2); Table 3.16, p. 110, row 1',
     subsystem: 'thermal_selfheating',
     plotCategory: 'temperature_selfheating',
     summary:
@@ -937,7 +998,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'GND',
     vaBranch: 'br_bxf / br_cxf',
     vaLines: '1770–1775, 1878–1879',
-    manualSection: 'Section 2.9.1',
+    manualSection: 'Section 2.9.1 (pp. 57–58)',
+    manualCitation: 'Ch. 2.9.1, p. 57, l. 9 (Eq. 2.9.1-1); Table 3.12, p. 107, rows 1–2',
     subsystem: 'nqs_effects',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -960,7 +1022,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'XF2',
     vaBranch: 'br_bxf1 / br_cxf1 / br_bxf2 / br_cxf2',
     vaLines: '1760–1769, 1873–1876',
-    manualSection: 'Section 2.9.1',
+    manualSection: 'Section 2.9.1 (pp. 57–58)',
+    manualCitation: 'Ch. 2.9.1, p. 57, l. 9 (Eq. 2.9.1-1); Table 3.12, p. 107, rows 1, 3',
     subsystem: 'nqs_effects',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -983,7 +1046,8 @@ export const CIRCUIT_ELEMENTS: CircuitElement[] = [
     toNode: 'N2',
     vaBranch: 'b_n1 / b_n2',
     vaLines: '1933–1975',
-    manualSection: 'Section 2.13.3',
+    manualSection: 'Section 2.13.3 (pp. 71–72)',
+    manualCitation: 'Ch. 2.13.3, p. 71, ll. 9–15 (Eqs. 2.13.3-1 to 2.13.3-4); Table 3.13, p. 108, row 6',
     subsystem: 'noise_correlation',
     plotCategory: 'noise_nqs_substrate',
     summary:
@@ -1006,6 +1070,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'I_B = I(\\langle b \\rangle)',
     vaLine: 909,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 1 (l. 8); VA ll. 909, 1982',
     category: 'terminal_dc',
   },
   {
@@ -1016,6 +1081,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'I_C = I(\\langle c \\rangle)',
     vaLine: 910,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 2 (l. 9); VA ll. 910, 1983',
     category: 'terminal_dc',
   },
   {
@@ -1026,6 +1092,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'I_S = I(\\langle s \\rangle)',
     vaLine: 911,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 3 (l. 10); VA ll. 911, 1984',
     category: 'terminal_dc',
   },
   {
@@ -1036,6 +1103,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'I_{AVL} = \\text{type} \\cdot i_{AVL}',
     vaLine: 912,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 4 (l. 11); VA ll. 912, 1985',
     category: 'terminal_dc',
   },
   {
@@ -1046,6 +1114,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'V_{BE} = V(b, e)',
     vaLine: 914,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 5 (l. 12); VA ll. 914, 1987',
     category: 'terminal_dc',
   },
   {
@@ -1056,6 +1125,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'V_{BC} = V(b, c)',
     vaLine: 915,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 6 (l. 13); VA ll. 915, 1988',
     category: 'terminal_dc',
   },
   {
@@ -1066,6 +1136,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'V_{CE} = V(c, e)',
     vaLine: 916,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 7 (l. 14); VA ll. 916, 1989',
     category: 'terminal_dc',
   },
   {
@@ -1076,6 +1147,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'V_{SC} = V(s, c)',
     vaLine: 917,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 8 (l. 15); VA ll. 917, 1990',
     category: 'terminal_dc',
   },
   {
@@ -1086,6 +1158,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: '\\beta_{DC} = \\frac{I_C}{I_B}',
     vaLine: 919,
     manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 9 (l. 16); VA ll. 919, 1992–1996',
     category: 'figure_of_merit',
   },
   {
@@ -1095,7 +1168,8 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     description: 'Internal transconductance',
     definitionLatex: 'g_{mi} = \\left.\\frac{\\partial i_T}{\\partial v_{B\'E\'}}\\right|_{v_{C\'E\'}} = \\text{type}\\cdot\\text{ddx}(i_T, V(bi))',
     vaLine: 920,
-    manualPage: 114,
+    manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 10 (l. 17); VA ll. 920, 1998',
     category: 'small_signal_conductance',
   },
   {
@@ -1105,7 +1179,8 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     description: 'Transconductance of the parasitic substrate PNP transistor',
     definitionLatex: 'g_{mS} = -\\text{type}\\cdot\\text{ddx}(i_{TS}, V(ci))',
     vaLine: 921,
-    manualPage: 114,
+    manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 11 (l. 18); VA ll. 921, 1999',
     category: 'small_signal_conductance',
   },
   {
@@ -1115,7 +1190,8 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     description: 'Internal base-emitter (input) small-signal resistance',
     definitionLatex: 'r_{\\pi i} = \\frac{1}{g_{\\pi i} - g_{Bt,\\text{int}} + G_{\\min}}, \\quad g_{\\pi i} = \\frac{\\partial (i_{BEi}+i_{REi})}{\\partial v_{B\'E\'}}',
     vaLine: 922,
-    manualPage: 114,
+    manualPage: 113,
+    manualCitation: 'Ch. 4, p. 113, Table row 12 (l. 19); VA ll. 922, 2001–2008',
     category: 'small_signal_conductance',
   },
   {
@@ -1126,6 +1202,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'r_{\\pi x} = \\frac{1}{g_{\\pi x} - g_{Bt,\\text{per}} + G_{\\min}}, \\quad g_{\\pi x} = \\frac{\\partial (i_{BEp}+i_{REp})}{\\partial v_{B^*E\'}}',
     vaLine: 923,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 1 (l. 4); VA ll. 923, 2002–2009',
     category: 'small_signal_conductance',
   },
   {
@@ -1136,6 +1213,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'r_{\\mu i} = \\frac{1}{g_{\\mu i} - g_{AVL} + G_{\\min}}, \\quad g_{\\mu i} = -\\frac{\\partial i_{BCi}}{\\partial V(ci)}',
     vaLine: 924,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 2 (l. 5); VA ll. 924, 2011–2024',
     category: 'small_signal_conductance',
   },
   {
@@ -1146,6 +1224,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'r_{\\mu x} = \\frac{1}{g_{\\mu x} + G_{\\min}}, \\quad g_{\\mu x} = -\\frac{\\partial i_{jBCx}}{\\partial V(ci)}',
     vaLine: 925,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 3 (l. 6); VA ll. 925, 2012–2025',
     category: 'small_signal_conductance',
   },
   {
@@ -1156,6 +1235,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'r_{oi} = \\frac{1}{g_{oi} + g_{AVL} + G_{\\min}}, \\quad g_{oi} = \\frac{\\partial i_T}{\\partial V(ci)}',
     vaLine: 926,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 4 (l. 7); VA ll. 926, 2027–2028',
     category: 'small_signal_conductance',
   },
   {
@@ -1166,6 +1246,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'C_{\\pi i} = C_{jEi} + C_{dEi} = C_{jEi} - \\text{type}\\cdot\\text{ddx}(Q_{dei}, V(ei))',
     vaLine: 927,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 5 (l. 8); VA ll. 927, 2030–2032',
     category: 'small_signal_capacitance',
   },
   {
@@ -1176,6 +1257,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'C_{\\pi x} = C_{jEp} + C_{BEpar}',
     vaLine: 928,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 6 (l. 9); VA ll. 928, 2033',
     category: 'small_signal_capacitance',
   },
   {
@@ -1186,6 +1268,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'C_{\\mu i} = C_{jCi} + C_{dCi} = C_{jCi} - \\text{type}\\cdot\\text{ddx}(Q_{dci}, V(ci))',
     vaLine: 929,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 7 (l. 10); VA ll. 929, 2031–2034',
     category: 'small_signal_capacitance',
   },
   {
@@ -1196,6 +1279,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'C_{\\mu x} = C_{jCx1} + C_{jCx2} + C_{BCpar} + C_{dS}',
     vaLine: 930,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 8 (l. 11); VA ll. 930, 2035–2047',
     category: 'small_signal_capacitance',
   },
   {
@@ -1203,9 +1287,10 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     symbolLatex: 'C_{CS}',
     unit: 'F',
     description: 'Total collector-substrate junction capacitance (internal + perimeter)',
-    definitionLatex: 'C_{CS} = C_{jS} + C_{SCp}',
+    definitionLatex: 'C_{\\text{CS}} = C_{jS} + C_{SCp}',
     vaLine: 931,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 9 (l. 12); VA ll. 931, 2049',
     category: 'small_signal_capacitance',
   },
   {
@@ -1216,6 +1301,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'R_{Bi} = r_{Bi}^*',
     vaLine: 932,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 10 (l. 13); VA ll. 932, 1658',
     category: 'resistance',
   },
   {
@@ -1226,26 +1312,29 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'R_B = r_{Bi}^* + r_{Bx}(T)',
     vaLine: 933,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 11 (l. 14); VA ll. 933, 2050',
     category: 'resistance',
   },
   {
     id: 'RCX',
     symbolLatex: 'R_{Cx}',
     unit: 'Ohm',
-    description: 'External collector series resistance at operating point temperature',
+    description: 'External collector series resistance at operating point temperature (RCX_T)',
     definitionLatex: 'R_{Cx} = r_{Cx}(T)',
     vaLine: 934,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 12 (l. 15); VA ll. 934, 1174',
     category: 'resistance',
   },
   {
     id: 'RE',
     symbolLatex: 'R_E',
     unit: 'Ohm',
-    description: 'Emitter series resistance at operating point temperature',
+    description: 'Emitter series resistance at operating point temperature (RE_T)',
     definitionLatex: 'R_E = r_E(T)',
     vaLine: 935,
     manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 13 (l. 16); VA ll. 935, 1176',
     category: 'resistance',
   },
   {
@@ -1255,7 +1344,8 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     description: 'Small-signal AC forward current gain',
     definitionLatex: '\\beta_{AC} = \\frac{g_{mi}}{g_{\\pi i} + g_{\\pi x} + G_{\\min}}',
     vaLine: 936,
-    manualPage: 115,
+    manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 14 (l. 17); VA ll. 936, 2051',
     category: 'figure_of_merit',
   },
   {
@@ -1265,7 +1355,8 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     description: 'Lateral NQS shunt capacitance across internal base resistance RBI',
     definitionLatex: 'C_{rBi} = f_{CrBi}(C_{jEi} + C_{jCi} + C_{dEi} + C_{dCi})',
     vaLine: 937,
-    manualPage: 115,
+    manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 15 (l. 18); VA ll. 937, 1605',
     category: 'small_signal_capacitance',
   },
   {
@@ -1275,7 +1366,8 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     description: 'Total differential forward transit time at operating point',
     definitionLatex: '\\tau_f = \\tau_{f0} + \\Delta\\tau_{Ef} + \\Delta\\tau_{Bf} + \\Delta\\tau_{Cf}',
     vaLine: 938,
-    manualPage: 115,
+    manualPage: 114,
+    manualCitation: 'Ch. 4, p. 114, Table row 16 (l. 19); VA ll. 938, 1598',
     category: 'figure_of_merit',
   },
   {
@@ -1286,6 +1378,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'f_T = \\frac{g_{mi}}{2\\pi\\left[C_{\\pi i}+C_{\\pi x}+C_{\\mu i}+C_{\\mu x}+\\left(R_{Cx}+R_E+\\frac{R_E+R_B}{\\beta_{AC}}\\right)g_{mi}(C_{\\mu i}+C_{\\mu x})\\right]}',
     vaLine: 939,
     manualPage: 115,
+    manualCitation: 'Ch. 4, p. 115, Table row 1 (l. 4); VA ll. 939, 2053–2059',
     category: 'figure_of_merit',
   },
   {
@@ -1296,6 +1389,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: 'T_K = T_{\\text{dev}} = T_{\\text{amb}} + dT + \\Delta T_j',
     vaLine: 941,
     manualPage: 115,
+    manualCitation: 'Ch. 4, p. 115, Table row 2 (l. 5); VA ll. 941, 2060',
     category: 'thermal',
   },
   {
@@ -1306,6 +1400,7 @@ export const OPERATING_POINT_SPECS: OperatingPointSpec[] = [
     definitionLatex: '\\Delta T_{SH} = V(\\text{br\\_sht})',
     vaLine: 942,
     manualPage: 115,
+    manualCitation: 'Ch. 4, p. 115, Table row 3 (l. 6); VA ll. 942, 2061',
     category: 'thermal',
   },
 ];
@@ -1315,7 +1410,9 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
     id: 'mech-giccr',
     title: '1. Generalized Integral Charge-Control Relation (GICCR) & HBT Weighting',
     manualSections: ['Section 2.2'],
-    manualPages: 'pp. 20–26',
+    manualPages: 'pp. 9–17 (ll. 1–26)',
+    manualCitation: 'Ch. 2.2, pp. 9–17 (Eqs. 2.2.0-1 to 2.2.0-26); Table 3.1, pp. 101–102',
+    vaCitation: 'hicumL2V2p34.va, ll. 1448–1596 (Block HICCR)',
     plotCategory: 'transfer_gummel',
     keyParameters: ['c10', 'qp0', 'hjei', 'ahjei', 'rhjei', 'hjci', 'hf0', 'hfe', 'hfc', 'ich', 'mcf'],
     keyEquations: ['eq-2.2.0-1', 'eq-2.2.0-2', 'eq-2.2.0-3', 'eq-2.2.0-8', 'eq-2.2.0-10', 'eq-2.2.0-21'],
@@ -1332,8 +1429,10 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
   {
     id: 'mech-kirk-critical',
     title: '2. Collector Transport, Quasi-Saturation & Kirk Critical Current ICK',
-    manualSections: ['Section 2.3.1', 'Section 2.16'],
-    manualPages: 'pp. 28–34, 91–95',
+    manualSections: ['Section 2.3.1', 'Section 2.16.1'],
+    manualPages: 'pp. 18–28, 94–98',
+    manualCitation: 'Ch. 2.3.1, pp. 18–28 (Eqs. 2.3.1-1 to 2.3.1-27); Ch. 2.16.1, pp. 94–98; Table 3.10, p. 106',
+    vaCitation: 'hicumL2V2p34.va, ll. 342–533 (HICFCI/HICQFC/HICQFF), 1500–1522 (HICICK)',
     plotCategory: 'critical_current',
     keyParameters: ['rci0', 'vlim', 'vces', 'vpt', 'delck', 'aick', 'thcs', 'ahc', 'fthc', 'latb', 'latl'],
     keyEquations: ['eq-2.3.1-3', 'eq-2.3.1-7', 'eq-2.3.1-16', 'eq-2.3.1-24', 'eq-2.16.1-1'],
@@ -1351,7 +1450,9 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
     id: 'mech-hetero-barrier',
     title: '3. B-C Heterojunction Conduction-Band Barrier Effect',
     manualSections: ['Section 2.3.1', 'Section 2.5'],
-    manualPages: 'pp. 34–36, 45',
+    manualPages: 'pp. 29–31, 44',
+    manualCitation: 'Ch. 2.3.1, pp. 29–31, ll. 1–15 (Eqs. 2.3.1-28 to 2.3.1-37); Ch. 2.5, p. 44, l. 1 (Eq. 2.5.0-5)',
+    vaCitation: 'hicumL2V2p34.va, ll. 499–517 (HICQFF barrier), 1634 (ibh_rec)',
     plotCategory: 'transit_time_ft',
     keyParameters: ['vcbar', 'icbar', 'acbar', 'thcs', 'fthc', 'tbhrec'],
     keyEquations: ['eq-2.3.1-28', 'eq-2.5.0-5'],
@@ -1368,8 +1469,10 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
   {
     id: 'mech-depletion-punchthrough',
     title: '4. Non-Singular Depletion Capacitances & Epitaxial Punch-Through',
-    manualSections: ['Section 2.4.1', 'Section 2.4.2', 'Section 2.4.3'],
-    manualPages: 'pp. 37–43',
+    manualSections: ['Section 2.4.1', 'Section 2.4.2', 'Section 2.4.3', 'Section 2.4.4'],
+    manualPages: 'pp. 32–41',
+    manualCitation: 'Ch. 2.4, pp. 32–41 (Eqs. 2.4.0-2 to 2.4.3-2); Table 3.9, pp. 104–105',
+    vaCitation: 'hicumL2V2p34.va, ll. 240–333 (Macros QJMODF, QJMOD, HICJQ)',
     plotCategory: 'depletion_cap',
     keyParameters: ['cjei0', 'vdei', 'zei', 'ajei', 'cjci0', 'vdci', 'zci', 'vptci', 'cjcx0', 'fbcpar', 'cjs0', 'vpts'],
     keyEquations: ['eq-2.4.1-1', 'eq-2.4.2-4', 'eq-2.4.3-2'],
@@ -1386,8 +1489,10 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
   {
     id: 'mech-base-resistance-crowding',
     title: '5. Internal Base Resistance Conductivity Modulation & 2D/AC Current Crowding',
-    manualSections: ['Section 2.6', 'Section 2.9.2'],
-    manualPages: 'pp. 46–50, 67–68',
+    manualSections: ['Section 2.6', 'Section 2.9.2', 'Section 2.16.2'],
+    manualPages: 'pp. 45–49, 58–59, 98–99',
+    manualCitation: 'Ch. 2.6, pp. 45–49 (Eqs. 2.6.0-6 to 2.6.0-23); Ch. 2.9.2, pp. 58–59; Ch. 2.16.2, pp. 98–99',
+    vaCitation: 'hicumL2V2p34.va, ll. 1603–1608, 1637–1661 (Block HICRBI)',
     plotCategory: 'base_resistance',
     keyParameters: ['rbi0', 'fdqr0', 'fgeo', 'fqi', 'fcrbi', 'rbx'],
     keyEquations: ['eq-2.6.0-7', 'eq-2.6.0-14', 'eq-2.6.0-20', 'eq-2.9.2-1'],
@@ -1405,7 +1510,9 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
     id: 'mech-avalanche-tunneling',
     title: '6. Collector-Base Avalanche Breakdown & B-E Band-to-Band Tunneling',
     manualSections: ['Section 2.10.1', 'Section 2.10.2'],
-    manualPages: 'pp. 68–73',
+    manualPages: 'pp. 60–64',
+    manualCitation: 'Ch. 2.10.1, pp. 60–61 (Eqs. 2.10.1-1 to 2.10.1-5); Ch. 2.10.2, pp. 62–64 (Eqs. 2.10.2-1 to 2.10.2-9)',
+    vaCitation: 'hicumL2V2p34.va, ll. 1617–1631 (HICAVL), 1671–1686 (HICTUN)',
     plotCategory: 'breakdown_tunneling',
     keyParameters: ['favl', 'qavl', 'alfav', 'alqav', 'ibets', 'abet', 'tunode'],
     keyEquations: ['eq-2.10.1-2', 'eq-2.10.2-7'],
@@ -1423,7 +1530,9 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
     id: 'mech-vertical-nqs',
     title: '7. Vertical Non-Quasi-Static (NQS) Excess Delay Networks',
     manualSections: ['Section 2.9.1'],
-    manualPages: 'pp. 65–67',
+    manualPages: 'pp. 57–58',
+    manualCitation: 'Ch. 2.9.1, pp. 57–58, ll. 1–26 (Eq. 2.9.1-1); Table 3.12, p. 107, rows 1–3',
+    vaCitation: 'hicumL2V2p34.va, ll. 1760–1783, 1873–1880 (NQS Bessel/RC nodes xf1, xf2, xf)',
     plotCategory: 'noise_nqs_substrate',
     keyParameters: ['flnqs', 'alit', 'alqf', 't0'],
     keyEquations: ['eq-2.9.1-1'],
@@ -1440,8 +1549,10 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
   {
     id: 'mech-substrate-coupling',
     title: '8. Parasitic Substrate PNP Transistor & RF Substrate Coupling',
-    manualSections: ['Section 2.12'],
-    manualPages: 'pp. 74–76',
+    manualSections: ['Section 2.11', 'Section 2.12'],
+    manualPages: 'pp. 65–68',
+    manualCitation: 'Ch. 2.11, pp. 65–66, ll. 1–16; Ch. 2.12, pp. 67–68 (Eqs. 2.12.0-10 to 2.12.0-12); Tables 3.7–3.8, p. 104',
+    vaCitation: 'hicumL2V2p34.va, ll. 1712–1735 (Sub_Transfer), 1841–1846 (br_sis_i)',
     plotCategory: 'noise_nqs_substrate',
     keyParameters: ['itss', 'msf', 'tsf', 'iscs', 'msc', 'cjs0', 'vds', 'zs', 'vpts', 'cscp0', 'rsu', 'csu'],
     keyEquations: ['eq-2.12.0-10', 'eq-2.4.2-4'],
@@ -1453,13 +1564,15 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
     sgpmComparison:
       'SGPM includes only a single static collector-substrate capacitor CJS without a parasitic substrate transistor iTS, substrate diffusion charge QdS, internal substrate node S\', or bulk RC coupling (rSu, CSu).',
     spatialLocalization:
-      'Spans the extrinsic base B*, n+ buried layer C\',deep trench / sinker perimeter (CSCp), and underlying p-type silicon wafer bulk (S\' to S).',
+      'Spans the extrinsic base B*, n+ buried layer C\', deep trench / sinker perimeter (CSCp), and underlying p-type silicon wafer bulk (S\' to S).',
   },
   {
     id: 'mech-correlated-noise',
     title: '9. High-Frequency Correlated Shot Noise & Flicker Noise',
     manualSections: ['Section 2.13'],
-    manualPages: 'pp. 77–79',
+    manualPages: 'pp. 69–72',
+    manualCitation: 'Ch. 2.13, pp. 69–72 (Fig. 2.13.0/1 & Eqs. 2.13.1-1 to 2.13.3-4); Table 3.13, pp. 107–108',
+    vaCitation: 'hicumL2V2p34.va, ll. 1884–1975 (Block Noise_sources)',
     plotCategory: 'noise_nqs_substrate',
     keyParameters: ['flcono', 'alit', 'alqf', 'kf', 'af', 'cfbe', 'kfre', 'afre'],
     keyEquations: ['eq-2.13.1-1', 'eq-2.13.2-1', 'eq-2.13.3-2'],
@@ -1477,7 +1590,9 @@ export const PHYSICAL_MECHANISMS: PhysicalMechanismGuide[] = [
     id: 'mech-electrothermal',
     title: '10. Physics-Based Temperature Scaling & Self-Heating (flsh)',
     manualSections: ['Section 2.14', 'Section 2.15'],
-    manualPages: 'pp. 79–91',
+    manualPages: 'pp. 73–93',
+    manualCitation: 'Ch. 2.14, pp. 73–92 (Eqs. 2.14.1-1 to 2.14.14-1); Ch. 2.15, p. 93 (Eqs. 2.15.0-2 & 2.15.0-3); Tables 3.15–3.16, pp. 108–110',
+    vaCitation: 'hicumL2V2p34.va, ll. 1015–1428 (Temperature_update), 1738–1754, 1864–1869',
     plotCategory: 'temperature_selfheating',
     keyParameters: ['vgb', 'vge', 'vgc', 'vgs', 'f1vg', 'f2vg', 'zetact', 'zetabet', 'zetaci', 'alvs', 'alt0', 'kt0', 'flsh', 'rth', 'cth', 'zetarth', 'alrth'],
     keyEquations: ['eq-2.14.1-1', 'eq-2.14.2-1', 'eq-2.14.4-1', 'eq-2.14.5-4', 'eq-2.14.6-1', 'eq-2.14.7-4', 'eq-2.14.9-1', 'eq-2.15.0-2'],

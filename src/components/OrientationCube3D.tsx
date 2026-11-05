@@ -39,7 +39,7 @@ const CUBE_FACES: CubeFaceSpec[] = [
       [C, C, C],
       [-C, C, C],
     ],
-    fill: '#F1F5F9',
+    fill: '#EAE8E1',
   },
   {
     id: 'back',
@@ -51,7 +51,7 @@ const CUBE_FACES: CubeFaceSpec[] = [
       [-C, C, -C],
       [C, C, -C],
     ],
-    fill: '#E2E8F0',
+    fill: '#E5E2DA',
   },
   {
     id: 'right',
@@ -87,7 +87,7 @@ const CUBE_FACES: CubeFaceSpec[] = [
       [C, C, -C],
       [-C, C, -C],
     ],
-    fill: '#F8FAFC',
+    fill: '#F7F6F2',
   },
   {
     id: 'bottom',
@@ -99,7 +99,7 @@ const CUBE_FACES: CubeFaceSpec[] = [
       [C, -C, C],
       [-C, -C, C],
     ],
-    fill: '#CBD5E1',
+    fill: '#D8D4CA',
   },
 ];
 

@@ -21,6 +21,7 @@ import {
 import { OrientationCube3D, CameraPresetId } from './OrientationCube3D';
 import { CircuitSymbolGlyph } from './CircuitSymbol3DOverlay';
 import { FormulaView } from './FormulaView';
+import { CitationBadges } from './CitationBadges';
 import {
   Box,
   Layers,
@@ -707,7 +708,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
         entry.material.depthWrite = finalOpacity > 0.78;
 
         entry.edgeMaterial.color.set(
-          isSelected || isHovered || isParamMatch ? '#1E3A8A' : reg.edgeHex
+          isSelected || isHovered || isParamMatch ? '#23435C' : reg.edgeHex
         );
         entry.edgeMaterial.opacity = isSelected || isHovered ? 0.98 : 0.65;
       }
@@ -1108,7 +1109,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                             ? 'bg-[#EDF6F4] text-[#2C6E63]'
                             : p.spatialNature === 'distributed'
                             ? 'bg-[#EEF3F8] text-[#3B5978]'
-                            : 'bg-amber-50 text-amber-800'
+                            : 'bg-[#F4EAE3] text-[#824726]'
                         }`}
                       >
                         {mappedReg ? mappedReg.shortLabel : p.spatialNature}
@@ -1200,7 +1201,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
       {/* DOMINANT 3D SCIENTIFIC ARTBOARD */}
       <div className="bg-[#FAF9F5] rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col">
         {/* Top Artboard Contextual Visibility Bar */}
-        <div className="px-4 py-2 bg-white/80 border-b border-slate-200/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="px-4 py-2 bg-white border-b border-slate-200/70 flex flex-wrap items-center justify-between gap-2 text-xs">
           {/* Layer & Component Visibility Pills */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">
@@ -1412,7 +1413,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                             title={isHidden ? 'Show Region' : 'Hide Region'}
                           >
                             {isHidden ? (
-                              <EyeOff className="w-3 h-3 text-rose-600" />
+                              <EyeOff className="w-3 h-3 text-[#A04A40]" />
                             ) : (
                               <Eye className="w-3 h-3" />
                             )}
@@ -1597,7 +1598,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
           {/* RIGHT FLOATING NAVIGATION & CAMERA TOOLBAR */}
           <div
-            className="absolute top-3 right-3 z-20 flex flex-col gap-1.5 bg-white/92 backdrop-blur-xs border border-slate-200/90 rounded-xl p-1.5 shadow-xs"
+            className="absolute top-3 right-3 z-20 flex flex-col gap-1.5 bg-white border border-slate-200/90 rounded-xl p-1.5 shadow-xs"
             onMouseDown={(e) => e.stopPropagation()}
           >
             <button
@@ -1666,7 +1667,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
           {/* SELECTED REGION CONTEXTUAL BAR (TOP-CENTER) */}
           <div
-            className="absolute top-3 left-1/2 -translate-x-1/2 z-20 hidden md:flex items-center gap-2 bg-white/92 backdrop-blur-xs border border-slate-200/90 rounded-xl px-3 py-1.5 shadow-xs text-xs"
+            className="absolute top-3 left-1/2 -translate-x-1/2 z-20 hidden md:flex items-center gap-2 bg-white border border-slate-200/90 rounded-xl px-3 py-1.5 shadow-xs text-xs"
             onMouseDown={(e) => e.stopPropagation()}
           >
             <span
@@ -1739,7 +1740,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 left: Math.min(mouseScreenPos.x + 16, 620),
                 top: Math.max(mouseScreenPos.y - 16, 12),
               }}
-              className="absolute z-30 pointer-events-none bg-white/96 backdrop-blur-xs border border-slate-300 rounded-xl px-3 py-2 shadow-md max-w-xs text-xs space-y-0.5"
+              className="absolute z-30 pointer-events-none bg-white border border-slate-300 rounded-xl px-3 py-2 shadow-md max-w-xs text-xs space-y-0.5"
             >
               {hoveredComponentSpec ? (
                 <>
@@ -1784,7 +1785,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
 
           {/* BOTTOM FLOATING ARTBOARD CONTROLS: EXPLODED VIEW, CUTAWAY PLANE & OPACITY */}
           <div
-            className="absolute bottom-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-3 bg-white/92 backdrop-blur-xs border border-slate-200/90 rounded-xl px-3.5 py-2 shadow-xs text-xs"
+            className="absolute bottom-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200/90 rounded-xl px-3.5 py-2 shadow-xs text-xs"
             onMouseDown={(e) => e.stopPropagation()}
           >
             {/* Exploded View Slider (0-100%) */}
@@ -2189,11 +2190,26 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
-              <span>HICUM/L2 v2.4.0 Manual Reference</span>
-              <span className="font-mono text-slate-700">
-                {activeRegion.manualSection}
-              </span>
+            <div className="pt-2 border-t border-slate-100 space-y-1.5">
+              <div className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+                Sources · Eq. ({activeEquation.eqNumber}) & {activeEmbeddedComponent.symbolLabel}
+              </div>
+              <CitationBadges
+                compact
+                manualCitation={
+                  activeEquation.manualLines
+                    ? `Eq. (${activeEquation.eqNumber}), ${activeEquation.manualLines}`
+                    : undefined
+                }
+                manualPage={activeEquation.manualPage}
+                vaCitation={activeEquation.vaReference}
+              />
+              <CitationBadges
+                compact
+                manualCitation={activeEmbeddedComponent.manualCitation}
+                vaCitation={activeEmbeddedComponent.vaCitation}
+                sentaurusCitation={activeEmbeddedComponent.sentaurusCitation}
+              />
             </div>
           </div>
 
@@ -2222,6 +2238,12 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                 <div className="text-xs font-bold text-slate-900">
                   {activeRegion.name}
                 </div>
+                <CitationBadges
+                  compact
+                  manualCitation={activeRegion.manualCitation}
+                  vaCitation={activeRegion.vaCitation}
+                  sentaurusCitation={activeRegion.sentaurusCitation}
+                />
                 <p className="text-[11.5px] text-slate-600 leading-relaxed">
                   {activeRegion.description}
                 </p>
@@ -2253,10 +2275,10 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
               </div>
 
               {/* Non-Localized / Conceptual Parameter Distinction */}
-              <div className="p-2.5 rounded-lg bg-amber-50/60 border border-amber-200/80">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-amber-900 mb-1">
+              <div className="p-2.5 rounded-lg bg-[#F4EAE3]/60 border border-[#DFC8B8]/80">
+                <div className="flex items-center justify-between text-[11px] font-semibold text-[#6E3B1F] mb-1">
                   <span className="inline-flex items-center gap-1">
-                    <Info className="w-3 h-3 text-amber-700" />
+                    <Info className="w-3 h-3 text-[#9A5833]" />
                     Conceptual / Global Parameters ({conceptualParams.length})
                   </span>
                   <span className="font-mono text-[9.5px]">No 3D Point Invented</span>
@@ -2266,7 +2288,7 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
                     <button
                       key={p.id}
                       onClick={() => onSelectParamInLab(p.id)}
-                      className="px-1.5 py-0.5 rounded bg-white hover:bg-amber-100 text-amber-950 border border-amber-200 font-mono text-[10px]"
+                      className="px-1.5 py-0.5 rounded bg-white hover:bg-[#EBDACD] text-[#552D17] border border-[#DFC8B8] font-mono text-[10px]"
                       title={`${p.id}: ${p.description} (Conceptual/global parameter)`}
                     >
                       {p.id}

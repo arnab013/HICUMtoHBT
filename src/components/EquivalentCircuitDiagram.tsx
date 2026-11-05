@@ -67,55 +67,55 @@ interface SchematicComponentCoord {
 
 const SCHEMATIC_COORDS: SchematicComponentCoord[] = [
   // Series resistances
-  { id: 'rbx', x: 132, y: 242, w: 66, h: 28, label: 'R_Bx', subLabel: 'Ext. Base', categoryColor: '#1E40AF', kind: 'resistor' },
-  { id: 'rbi', x: 325, y: 242, w: 72, h: 28, label: 'R_bi*', subLabel: 'Pinch Base', categoryColor: '#1E40AF', kind: 'resistor' },
-  { id: 'crbi', x: 325, y: 194, w: 72, h: 26, label: 'C_rBi', subLabel: 'AC Crowding', categoryColor: '#0F766E', kind: 'capacitor' },
-  { id: 'rcx', x: 560, y: 52, w: 66, h: 28, label: 'R_Cx', subLabel: 'Ext. Coll.', categoryColor: '#1E40AF', kind: 'resistor' },
-  { id: 're', x: 560, y: 444, w: 66, h: 28, label: 'R_E', subLabel: 'Emitter Res.', categoryColor: '#1E40AF', kind: 'resistor' },
+  { id: 'rbx', x: 132, y: 242, w: 66, h: 28, label: 'R_Bx', subLabel: 'Ext. Base', categoryColor: '#2B4C65', kind: 'resistor' },
+  { id: 'rbi', x: 325, y: 242, w: 72, h: 28, label: 'R_bi*', subLabel: 'Pinch Base', categoryColor: '#2B4C65', kind: 'resistor' },
+  { id: 'crbi', x: 325, y: 194, w: 72, h: 26, label: 'C_rBi', subLabel: 'AC Crowding', categoryColor: '#2A645E', kind: 'capacitor' },
+  { id: 'rcx', x: 560, y: 52, w: 66, h: 28, label: 'R_Cx', subLabel: 'Ext. Coll.', categoryColor: '#2B4C65', kind: 'resistor' },
+  { id: 're', x: 560, y: 444, w: 66, h: 28, label: 'R_E', subLabel: 'Emitter Res.', categoryColor: '#2B4C65', kind: 'resistor' },
 
   // Parasitic BE isolation capacitances
   { id: 'cbepar1', x: 75, y: 365, w: 68, h: 26, label: 'C_BEpar1', subLabel: 'Outer Spacer', categoryColor: '#64748B', kind: 'capacitor' },
   { id: 'cbepar2', x: 162, y: 365, w: 68, h: 26, label: 'C_BEpar2', subLabel: 'Inner Spacer', categoryColor: '#64748B', kind: 'capacitor' },
 
   // Perimeter B*-E' branches
-  { id: 'cjep', x: 235, y: 335, w: 64, h: 26, label: 'Q_jEp', subLabel: 'Perim. Cap', categoryColor: '#0F766E', kind: 'capacitor' },
-  { id: 'ibep', x: 235, y: 372, w: 64, h: 26, label: 'i_jBEp', subLabel: 'Perim. Diode', categoryColor: '#0F766E', kind: 'diode' },
-  { id: 'ibet', x: 235, y: 409, w: 64, h: 26, label: 'i_BEt', subLabel: 'Zener Tunnel', categoryColor: '#9F1239', kind: 'diode' },
+  { id: 'cjep', x: 235, y: 335, w: 64, h: 26, label: 'Q_jEp', subLabel: 'Perim. Cap', categoryColor: '#2A645E', kind: 'capacitor' },
+  { id: 'ibep', x: 235, y: 372, w: 64, h: 26, label: 'i_jBEp', subLabel: 'Perim. Diode', categoryColor: '#2A645E', kind: 'diode' },
+  { id: 'ibet', x: 235, y: 409, w: 64, h: 26, label: 'i_BEt', subLabel: 'Zener Tunnel', categoryColor: '#8A3B33', kind: 'diode' },
 
   // Extrinsic B-C & B*-C' branches
   { id: 'cjcx1', x: 155, y: 98, w: 72, h: 26, label: "Q'_BCx", subLabel: 'C_jCx1+C_BCp1', categoryColor: '#64748B', kind: 'capacitor' },
-  { id: 'cjcx2', x: 235, y: 146, w: 68, h: 26, label: "Q''_BCx", subLabel: 'C_jCx2+C_BCp2', categoryColor: '#0F766E', kind: 'capacitor' },
-  { id: 'ijbcx', x: 312, y: 146, w: 64, h: 26, label: 'i_jBCx', subLabel: 'Ext. BC Diode', categoryColor: '#0F766E', kind: 'diode' },
-  { id: 'qdsu', x: 386, y: 146, w: 64, h: 26, label: 'Q_dS', subLabel: 'Sub. Storage', categoryColor: '#B45309', kind: 'capacitor' },
+  { id: 'cjcx2', x: 235, y: 146, w: 68, h: 26, label: "Q''_BCx", subLabel: 'C_jCx2+C_BCp2', categoryColor: '#2A645E', kind: 'capacitor' },
+  { id: 'ijbcx', x: 312, y: 146, w: 64, h: 26, label: 'i_jBCx', subLabel: 'Ext. BC Diode', categoryColor: '#2A645E', kind: 'diode' },
+  { id: 'qdsu', x: 386, y: 146, w: 64, h: 26, label: 'Q_dS', subLabel: 'Sub. Storage', categoryColor: '#824726', kind: 'capacitor' },
 
   // Intrinsic Transistor Core (inside dashed box: B', C', E')
-  { id: 'cjei', x: 416, y: 318, w: 62, h: 26, label: 'Q_jEi', subLabel: 'Int. BE Depl', categoryColor: '#0F766E', kind: 'capacitor' },
-  { id: 'qf', x: 416, y: 354, w: 62, h: 26, label: 'Q_f', subLabel: 'Fwd Diff Chg', categoryColor: '#1E40AF', kind: 'capacitor' },
-  { id: 'ibei', x: 416, y: 390, w: 62, h: 26, label: 'i_jBEi', subLabel: 'Int. BE Diode', categoryColor: '#1E40AF', kind: 'diode' },
+  { id: 'cjei', x: 416, y: 318, w: 62, h: 26, label: 'Q_jEi', subLabel: 'Int. BE Depl', categoryColor: '#2A645E', kind: 'capacitor' },
+  { id: 'qf', x: 416, y: 354, w: 62, h: 26, label: 'Q_f', subLabel: 'Fwd Diff Chg', categoryColor: '#2B4C65', kind: 'capacitor' },
+  { id: 'ibei', x: 416, y: 390, w: 62, h: 26, label: 'i_jBEi', subLabel: 'Int. BE Diode', categoryColor: '#2B4C65', kind: 'diode' },
 
-  { id: 'cjci', x: 462, y: 175, w: 62, h: 26, label: 'Q_jCi', subLabel: 'Int. BC Depl', categoryColor: '#0F766E', kind: 'capacitor' },
-  { id: 'qr', x: 530, y: 175, w: 58, h: 26, label: 'Q_r', subLabel: 'Rev Diff Chg', categoryColor: '#1E40AF', kind: 'capacitor' },
-  { id: 'ibci', x: 462, y: 212, w: 62, h: 26, label: 'i_jBCi', subLabel: 'Int. BC Diode', categoryColor: '#1E40AF', kind: 'diode' },
-  { id: 'iavl', x: 530, y: 212, w: 58, h: 26, label: 'i_AVL', subLabel: 'Avalanche', categoryColor: '#9F1239', kind: 'source' },
+  { id: 'cjci', x: 462, y: 175, w: 62, h: 26, label: 'Q_jCi', subLabel: 'Int. BC Depl', categoryColor: '#2A645E', kind: 'capacitor' },
+  { id: 'qr', x: 530, y: 175, w: 58, h: 26, label: 'Q_r', subLabel: 'Rev Diff Chg', categoryColor: '#2B4C65', kind: 'capacitor' },
+  { id: 'ibci', x: 462, y: 212, w: 62, h: 26, label: 'i_jBCi', subLabel: 'Int. BC Diode', categoryColor: '#2B4C65', kind: 'diode' },
+  { id: 'iavl', x: 530, y: 212, w: 58, h: 26, label: 'i_AVL', subLabel: 'Avalanche', categoryColor: '#8A3B33', kind: 'source' },
 
-  { id: 'it', x: 542, y: 312, w: 84, h: 52, label: 'i_T (GICCR)', subLabel: 'i_Tf,NQS - i_Tr', categoryColor: '#1E40AF', kind: 'source' },
+  { id: 'it', x: 542, y: 312, w: 84, h: 52, label: 'i_T (GICCR)', subLabel: 'i_Tf,NQS - i_Tr', categoryColor: '#2B4C65', kind: 'source' },
 
   // Substrate PNP & Coupling Network (right column: C', B*, S', S)
-  { id: 'its', x: 690, y: 176, w: 68, h: 32, label: 'i_TS', subLabel: 'Sub. PNP i_T', categoryColor: '#B45309', kind: 'source' },
-  { id: 'ijsc', x: 690, y: 222, w: 68, h: 26, label: 'i_jSC', subLabel: 'S-C Diode', categoryColor: '#B45309', kind: 'diode' },
-  { id: 'cjs', x: 690, y: 258, w: 68, h: 26, label: 'Q_jS', subLabel: 'Int. S-C Cap', categoryColor: '#B45309', kind: 'capacitor' },
-  { id: 'cscp', x: 772, y: 222, w: 68, h: 26, label: 'C_SCp', subLabel: 'Perim. S-C', categoryColor: '#B45309', kind: 'capacitor' },
-  { id: 'rsu', x: 690, y: 342, w: 66, h: 26, label: 'R_su', subLabel: 'Sub. Bulk R', categoryColor: '#B45309', kind: 'resistor' },
-  { id: 'csu', x: 772, y: 342, w: 66, h: 26, label: 'C_su', subLabel: 'Sub. Bulk C', categoryColor: '#B45309', kind: 'capacitor' },
+  { id: 'its', x: 690, y: 176, w: 68, h: 32, label: 'i_TS', subLabel: 'Sub. PNP i_T', categoryColor: '#824726', kind: 'source' },
+  { id: 'ijsc', x: 690, y: 222, w: 68, h: 26, label: 'i_jSC', subLabel: 'S-C Diode', categoryColor: '#824726', kind: 'diode' },
+  { id: 'cjs', x: 690, y: 258, w: 68, h: 26, label: 'Q_jS', subLabel: 'Int. S-C Cap', categoryColor: '#824726', kind: 'capacitor' },
+  { id: 'cscp', x: 772, y: 222, w: 68, h: 26, label: 'C_SCp', subLabel: 'Perim. S-C', categoryColor: '#824726', kind: 'capacitor' },
+  { id: 'rsu', x: 690, y: 342, w: 66, h: 26, label: 'R_su', subLabel: 'Sub. Bulk R', categoryColor: '#824726', kind: 'resistor' },
+  { id: 'csu', x: 772, y: 342, w: 66, h: 26, label: 'C_su', subLabel: 'Sub. Bulk C', categoryColor: '#824726', kind: 'capacitor' },
 
   // Bottom Row: Adjunct Networks (Fig. 2.1.0/1 b, c, d & Fig. 2.13.0/1 Correlated Noise)
-  { id: 'pterm', x: 68, y: 538, w: 72, h: 32, label: 'P_diss', subLabel: 'Thermal Src', categoryColor: '#9F1239', kind: 'adjunct' },
-  { id: 'rth', x: 152, y: 538, w: 64, h: 32, label: 'R_th(T)', subLabel: 'Thermal Res', categoryColor: '#9F1239', kind: 'adjunct' },
-  { id: 'cth', x: 226, y: 538, w: 64, h: 32, label: 'C_th', subLabel: 'Thermal Cap', categoryColor: '#9F1239', kind: 'adjunct' },
+  { id: 'pterm', x: 68, y: 538, w: 72, h: 32, label: 'P_diss', subLabel: 'Thermal Src', categoryColor: '#8A3B33', kind: 'adjunct' },
+  { id: 'rth', x: 152, y: 538, w: 64, h: 32, label: 'R_th(T)', subLabel: 'Thermal Res', categoryColor: '#8A3B33', kind: 'adjunct' },
+  { id: 'cth', x: 226, y: 538, w: 64, h: 32, label: 'C_th', subLabel: 'Thermal Cap', categoryColor: '#8A3B33', kind: 'adjunct' },
 
-  { id: 'nqs_qf', x: 350, y: 538, w: 96, h: 32, label: 'NQS Q_f (xf)', subLabel: 'RC Delay (alqf)', categoryColor: '#0F766E', kind: 'adjunct' },
-  { id: 'nqs_it', x: 460, y: 538, w: 110, h: 32, label: 'NQS i_T (xf1,xf2)', subLabel: 'Bessel LCR (alit)', categoryColor: '#0F766E', kind: 'adjunct' },
-  { id: 'noise_corr', x: 636, y: 538, w: 138, h: 32, label: 'Correlated Noise (n1,n2)', subLabel: 'HF Shot Cross-Corr', categoryColor: '#1E40AF', kind: 'adjunct' },
+  { id: 'nqs_qf', x: 350, y: 538, w: 96, h: 32, label: 'NQS Q_f (xf)', subLabel: 'RC Delay (alqf)', categoryColor: '#2A645E', kind: 'adjunct' },
+  { id: 'nqs_it', x: 460, y: 538, w: 110, h: 32, label: 'NQS i_T (xf1,xf2)', subLabel: 'Bessel LCR (alit)', categoryColor: '#2A645E', kind: 'adjunct' },
+  { id: 'noise_corr', x: 636, y: 538, w: 138, h: 32, label: 'Correlated Noise (n1,n2)', subLabel: 'HF Shot Cross-Corr', categoryColor: '#2B4C65', kind: 'adjunct' },
 ];
 
 const NODE_COORDS: { id: string; label: string; va: string; x: number; y: number; ext: boolean }[] = [
@@ -183,7 +183,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
       {/* Top Header & Filter Controls */}
       <div className="px-4 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <Cpu className="w-4 h-4 text-blue-800 shrink-0" />
+          <Cpu className="w-4 h-4 text-[#2B4C65] shrink-0" />
           <div>
             <h3 className="text-sm font-semibold text-slate-900">
               Complete HICUM/L2 Equivalent Circuit (Manual Fig. 2.1.0/1 & Fig. 2.13.0/1)
@@ -200,7 +200,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <button
               onClick={() => setNetworkFilter('all')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'all' ? 'bg-blue-800 text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'all' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               All (34)
@@ -208,7 +208,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <button
               onClick={() => setNetworkFilter('main_core')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'main_core' ? 'bg-blue-800 text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'main_core' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Intrinsic Core
@@ -216,7 +216,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <button
               onClick={() => setNetworkFilter('extrinsic_sub')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'extrinsic_sub' ? 'bg-blue-800 text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'extrinsic_sub' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Perimeter & Substrate
@@ -224,7 +224,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <button
               onClick={() => setNetworkFilter('adjuncts')}
               className={`px-2 py-1 rounded-md font-medium transition-colors ${
-                networkFilter === 'adjuncts' ? 'bg-blue-800 text-white' : 'text-slate-600 hover:text-slate-900'
+                networkFilter === 'adjuncts' ? 'bg-[#2B4C65] text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Thermal / NQS / Noise
@@ -235,7 +235,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             onClick={() => setShowLiveValues((v) => !v)}
             className={`px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               showLiveValues
-                ? 'bg-teal-50 border-teal-300 text-teal-800'
+                ? 'bg-[#E6F0EE] border-[#A1C4BE] text-[#22544F]'
                 : 'bg-white border-slate-200 text-slate-600'
             }`}
             title="Show live operating point currents, capacitances, and resistances on schematic components"
@@ -248,7 +248,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             onClick={() => setShowTopologyNotes((v) => !v)}
             className={`px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               showTopologyNotes
-                ? 'bg-blue-50 border-blue-300 text-blue-800'
+                ? 'bg-[#E7EEF4] border-[#A9BFD3] text-[#2B4C65]'
                 : 'bg-white border-slate-200 text-slate-600'
             }`}
           >
@@ -284,25 +284,25 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
 
       {/* Collapsible HICUM Topology Notes Banner */}
       {showTopologyNotes && (
-        <div className="bg-blue-50/60 border-b border-blue-200 px-4 py-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <div className="bg-white p-2.5 rounded-lg border border-blue-100">
-            <div className="font-semibold text-blue-900 mb-1">
+        <div className="bg-[#E7EEF4]/60 border-b border-[#C5D4E2] px-4 py-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div className="bg-white p-2.5 rounded-lg border border-[#DCE6EF]">
+            <div className="font-semibold text-[#23435C] mb-1">
               1. Why Intermediate Perimeter Node B* (`bp`)?
             </div>
             <p className="text-slate-600 text-[11px] leading-relaxed">
               {TOPOLOGY_DESIGN_NOTES.whyBStarNode}
             </p>
           </div>
-          <div className="bg-white p-2.5 rounded-lg border border-blue-100">
-            <div className="font-semibold text-teal-900 mb-1">
+          <div className="bg-white p-2.5 rounded-lg border border-[#DCE6EF]">
+            <div className="font-semibold text-[#1C4642] mb-1">
               2. Why No Explicit Internal Collector Node / Resistor?
             </div>
             <p className="text-slate-600 text-[11px] leading-relaxed">
               {TOPOLOGY_DESIGN_NOTES.whyOmitInternalCollectorNode}
             </p>
           </div>
-          <div className="bg-white p-2.5 rounded-lg border border-blue-100">
-            <div className="font-semibold text-amber-900 mb-1">
+          <div className="bg-white p-2.5 rounded-lg border border-[#DCE6EF]">
+            <div className="font-semibold text-[#6E3B1F] mb-1">
               3. Why Internal Substrate Node S&apos; (`si`)?
             </div>
             <p className="text-slate-600 text-[11px] leading-relaxed">
@@ -313,7 +313,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
       )}
 
       {/* Interactive SVG Schematic Canvas */}
-      <div className="relative overflow-auto bg-[#F8FAFC] p-2">
+      <div className="relative overflow-auto bg-[#F7F6F2] p-2">
         <div
           style={{
             width: `${Math.round(860 * zoom)}px`,
@@ -335,14 +335,14 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
               rx={8}
               fill="#EFF6FF"
               fillOpacity={0.45}
-              stroke="#1E40AF"
+              stroke="#2B4C65"
               strokeWidth={1.5}
               strokeDasharray="6 4"
             />
             <text
               x={414}
               y={155}
-              className="fill-blue-900 font-semibold text-[10.5px] uppercase tracking-wider"
+              className="fill-[#23435C] font-semibold text-[10.5px] uppercase tracking-wider"
             >
               Effective Internal Transistor (1D Intrinsic Core: B&apos;, C&apos;, E&apos;)
             </text>
@@ -363,7 +363,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <text
               x={682}
               y={155}
-              className="fill-amber-900 font-semibold text-[10.5px] uppercase tracking-wider"
+              className="fill-[#6E3B1F] font-semibold text-[10.5px] uppercase tracking-wider"
             >
               Substrate PNP & Coupling (S&apos;, S)
             </text>
@@ -375,8 +375,8 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
               width={756}
               height={76}
               rx={8}
-              fill="#F8FAFC"
-              stroke="#CBD5E1"
+              fill="#F7F6F2"
+              stroke="#D8D4CA"
               strokeWidth={1.2}
             />
             <text
@@ -389,14 +389,14 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <text
               x={350}
               y={518}
-              className="fill-teal-800 font-semibold text-[10px] uppercase tracking-wider"
+              className="fill-[#22544F] font-semibold text-[10px] uppercase tracking-wider"
             >
               (c,d) Vertical NQS Delay Networks (xf, xf1, xf2)
             </text>
             <text
               x={636}
               y={518}
-              className="fill-blue-900 font-semibold text-[10px] uppercase tracking-wider"
+              className="fill-[#23435C] font-semibold text-[10px] uppercase tracking-wider"
             >
               (e) Correlated HF Shot Noise (n1, n2)
             </text>
@@ -472,7 +472,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
                       height={comp.h + 6}
                       rx={7}
                       fill="none"
-                      stroke={isSelected ? '#1E40AF' : '#0F766E'}
+                      stroke={isSelected ? '#2B4C65' : '#2A645E'}
                       strokeWidth={2.2}
                     />
                   )}
@@ -484,8 +484,8 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
                     width={comp.w}
                     height={comp.h}
                     rx={5}
-                    fill={isSelected ? '#DBEAFE' : '#FFFFFF'}
-                    stroke={isSelected ? '#1E40AF' : comp.categoryColor}
+                    fill={isSelected ? '#E7EEF4' : '#FFFFFF'}
+                    stroke={isSelected ? '#2B4C65' : comp.categoryColor}
                     strokeWidth={isSelected ? 2 : 1.3}
                   />
 
@@ -515,7 +515,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
                     y={comp.y + (comp.h > 36 ? 34 : 22)}
                     textAnchor="middle"
                     className={`font-mono text-[8.5px] ${
-                      liveBadge ? 'fill-teal-800 font-semibold' : 'fill-slate-500'
+                      liveBadge ? 'fill-[#22544F] font-semibold' : 'fill-slate-500'
                     }`}
                   >
                     {liveBadge || comp.subLabel}
@@ -544,12 +544,12 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
                     r={nd.ext ? 8.5 : 6.5}
                     fill={
                       isSelected
-                        ? '#1E40AF'
+                        ? '#2B4C65'
                         : nd.ext
                         ? '#0F172A'
                         : '#FFFFFF'
                     }
-                    stroke={isSelected ? '#DBEAFE' : nd.ext ? '#0F172A' : '#1E40AF'}
+                    stroke={isSelected ? '#E7EEF4' : nd.ext ? '#0F172A' : '#2B4C65'}
                     strokeWidth={2}
                   />
                   <text
@@ -557,7 +557,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
                     y={nd.y - 11}
                     textAnchor="middle"
                     className={`font-mono font-bold text-[10.5px] ${
-                      isSelected ? 'fill-blue-800' : 'fill-slate-900'
+                      isSelected ? 'fill-[#2B4C65]' : 'fill-slate-900'
                     }`}
                   >
                     {nd.label}
@@ -573,19 +573,19 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
       <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2 text-[11px] text-slate-600">
         <div className="flex items-center flex-wrap gap-3">
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-xs bg-[#1E40AF]" />
+            <span className="w-2.5 h-2.5 rounded-xs bg-[#2B4C65]" />
             <span>Intrinsic Core & Series R</span>
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-xs bg-[#0F766E]" />
+            <span className="w-2.5 h-2.5 rounded-xs bg-[#2A645E]" />
             <span>Depletion Q_j & NQS Delay</span>
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-xs bg-[#B45309]" />
+            <span className="w-2.5 h-2.5 rounded-xs bg-[#824726]" />
             <span>Substrate PNP & Coupling</span>
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-xs bg-[#9F1239]" />
+            <span className="w-2.5 h-2.5 rounded-xs bg-[#8A3B33]" />
             <span>Breakdown (i_AVL, i_BEt) & Thermal (R_th)</span>
           </span>
           <span className="inline-flex items-center gap-1.5">
@@ -593,7 +593,7 @@ export const EquivalentCircuitDiagram: React.FC<EquivalentCircuitDiagramProps> =
             <span>External Terminal (B, C, E, S, T)</span>
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-white border-2 border-blue-800" />
+            <span className="w-2.5 h-2.5 rounded-full bg-white border-2 border-[#2B4C65]" />
             <span>Internal Node (B*, B&apos;, C&apos;, E&apos;, S&apos;)</span>
           </span>
         </div>

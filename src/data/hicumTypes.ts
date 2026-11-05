@@ -68,6 +68,8 @@ export interface HicumParameter {
   mFactor: string; // e.g., 'M^2', 'M', '1/M', 'M^(1-AF)', '-'
   vaLine: number; // exact line in hicumL2V2p34.va.txt
   manualPages: number[]; // pages in hicum_L2V2p4p0_manual.pdf
+  manualCitation?: string; // e.g., 'Table 3.1, p. 101, row 1 (ll. 21–24); Ch. 2.2, p. 9, ll. 20–22'
+  vaCitation?: string; // e.g., 'hicumL2V2p34.va, l. 663 (eval: ll. 1105, 1324, 1525)'
   circuitElements: string[]; // IDs of CircuitElement
   equations: string[]; // IDs of HicumEquation
   plotCategory: PlotCategoryId;
@@ -97,6 +99,7 @@ export interface HicumEquation {
   section: string; // e.g., '2.2 Quasi-static transfer current'
   sectionId: string; // e.g., '2.2'
   manualPage: number;
+  manualLines?: string; // e.g., 'p. 9, ll. 20–22'
   vaReference: string; // e.g., 'Lines 1448–1596 (Model_evaluation / HICCR)'
   latex: string;
   isBoxedImplemented: boolean; // Marked by frame in manual as implemented in VA
@@ -117,6 +120,8 @@ export interface CircuitNode {
   y: number;
   physicalLocation: string;
   description: string;
+  manualCitation?: string; // e.g., 'Ch. 2.1, p. 8, Fig. 2.1.0/1; p. 7, ll. 15–31'
+  vaCitation?: string; // e.g., 'hicumL2V2p34.va, ll. 628–636'
 }
 
 export interface CircuitElement {
@@ -131,6 +136,8 @@ export interface CircuitElement {
   vaBranch: string; // e.g., 'br_ciei', 'br_bpbi_i', 'br_biei'
   vaLines: string; // e.g., '1815–1818'
   manualSection: string; // e.g., 'Section 2.2'
+  manualCitation?: string; // e.g., 'Ch. 2.2, p. 9, ll. 20–22 (Fig. 2.1.0/1, p. 8)'
+  vaCitation?: string; // e.g., 'hicumL2V2p34.va, ll. 1815–1818'
   subsystem: SubsystemCategory;
   plotCategory: PlotCategoryId;
   summary: string;
@@ -149,6 +156,7 @@ export interface OperatingPointSpec {
   definitionLatex: string;
   vaLine: number;
   manualPage: number;
+  manualCitation?: string; // e.g., 'Ch. 4, p. 113, Table row 1 (l. 8)'
   category: 'terminal_dc' | 'small_signal_conductance' | 'small_signal_capacitance' | 'resistance' | 'figure_of_merit' | 'thermal';
 }
 
@@ -157,6 +165,8 @@ export interface PhysicalMechanismGuide {
   title: string;
   manualSections: string[];
   manualPages: string;
+  manualCitation?: string; // e.g., 'Ch. 2.2, pp. 9–17, ll. 1–26; Table 3.1, pp. 101–102'
+  vaCitation?: string; // e.g., 'hicumL2V2p34.va, ll. 1448–1596'
   plotCategory: PlotCategoryId;
   keyParameters: string[];
   keyEquations: string[];

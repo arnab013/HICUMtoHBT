@@ -501,8 +501,8 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                 }}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
                   active
-                    ? 'bg-blue-800 text-white shadow-sm'
-                    : 'bg-white text-slate-700 border border-slate-200/80 hover:border-blue-300 hover:text-blue-800'
+                    ? 'bg-[#2B4C65] text-white shadow-sm'
+                    : 'bg-white text-slate-700 border border-slate-200/80 hover:border-[#A9BFD3] hover:text-[#2B4C65]'
                 }`}
                 title={cat.subtitle}
               >
@@ -523,7 +523,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             }
             className={`px-2 py-1 rounded border font-mono text-[11px] transition-colors ${
               useLogY
-                ? 'bg-teal-50 border-teal-300 text-teal-800 font-semibold'
+                ? 'bg-[#E6F0EE] border-[#A1C4BE] text-[#22544F] font-semibold'
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
             }`}
             title="Toggle Logarithmic / Linear Y-Axis"
@@ -540,7 +540,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             }
             className={`px-2 py-1 rounded border font-mono text-[11px] transition-colors ${
               useLogX
-                ? 'bg-teal-50 border-teal-300 text-teal-800 font-semibold'
+                ? 'bg-[#E6F0EE] border-[#A1C4BE] text-[#22544F] font-semibold'
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
             }`}
             title="Toggle Logarithmic / Linear X-Axis"
@@ -553,12 +553,12 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
               onClick={() => setShowBaselineComparison((v) => !v)}
               className={`px-2.5 py-1 rounded border text-[11px] font-medium flex items-center gap-1 transition-colors ${
                 showBaselineComparison
-                  ? 'bg-amber-50 border-amber-300 text-amber-900'
+                  ? 'bg-[#F4EAE3] border-[#CFAE97] text-[#6E3B1F]'
                   : 'bg-white border-slate-200 text-slate-600'
               }`}
               title="Overlay dashed baseline curves from the verified Manual card to compare against your adjusted parameters"
             >
-              <Sparkles className="w-3 h-3 text-amber-600" />
+              <Sparkles className="w-3 h-3 text-[#A8653D]" />
               <span>Baseline Overlay ({modifiedCount} modified)</span>
             </button>
           )}
@@ -569,10 +569,10 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
       <div className="px-4 pt-3 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <LineChart className="w-4 h-4 text-blue-800 shrink-0" />
+            <LineChart className="w-4 h-4 text-[#2B4C65] shrink-0" />
             <h3 className="text-sm font-semibold text-slate-900">{plotData.title}</h3>
             {selectedParamName && (
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-mono bg-blue-50 text-blue-800 border border-blue-200">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-mono bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2]">
                 Linked to: {selectedParamName}
               </span>
             )}
@@ -583,13 +583,13 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
         {/* Provenance distinction badge: Verified Manual Card vs Illustrative User Adjustment */}
         <div className="flex items-center gap-1.5 shrink-0">
           {modifiedCount === 0 ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#E6F0EE] text-[#22544F] border border-[#C0D8D4]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#2F726A]" />
               Verified Manual Model Card
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-900 border border-amber-200">
-              <Sliders className="w-3.5 h-3.5 text-amber-700" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#F4EAE3] text-[#6E3B1F] border border-[#DFC8B8]">
+              <Sliders className="w-3.5 h-3.5 text-[#9A5833]" />
               Illustrative Sweep ({modifiedCount} param{modifiedCount > 1 ? 's' : ''} adjusted vs. Manual dashed)
             </span>
           )}
@@ -633,7 +633,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
         {Object.values(hiddenSeries).some(Boolean) && (
           <button
             onClick={() => setHiddenSeries({})}
-            className="text-[11px] text-blue-700 hover:underline flex items-center gap-1 ml-auto"
+            className="text-[11px] text-[#2E4C66] hover:underline flex items-center gap-1 ml-auto"
           >
             <RotateCcw className="w-3 h-3" />
             Show All
@@ -662,8 +662,8 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             y={padTop}
             width={plotW}
             height={plotH}
-            fill="#F8FAFC"
-            stroke="#E2E8F0"
+            fill="#F7F6F2"
+            stroke="#E5E2DA"
             strokeWidth={1}
             rx={4}
           />
@@ -676,7 +676,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                 y1={t.pos}
                 x2={padLeft + plotW}
                 y2={t.pos}
-                stroke="#E2E8F0"
+                stroke="#E5E2DA"
                 strokeDasharray={idx === 0 || idx === yTicks.length - 1 ? undefined : '3 3'}
                 strokeWidth={1}
               />
@@ -699,7 +699,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                 y1={padTop}
                 x2={t.pos}
                 y2={padTop + plotH}
-                stroke="#E2E8F0"
+                stroke="#E5E2DA"
                 strokeDasharray={idx === 0 || idx === xTicks.length - 1 ? undefined : '3 3'}
                 strokeWidth={1}
               />
@@ -743,7 +743,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                   y1={padTop}
                   x2={opMarker.x}
                   y2={padTop + plotH}
-                  stroke="#0F766E"
+                  stroke="#2A645E"
                   strokeWidth={1.5}
                   strokeDasharray="4 3"
                 />
@@ -754,14 +754,14 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                   height={18}
                   rx={4}
                   fill="#F0FDFA"
-                  stroke="#99F6E4"
+                  stroke="#C0D8D4"
                   strokeWidth={1}
                 />
                 <text
                   x={Math.min(opMarker.x + 54, padLeft + plotW - 55)}
                   y={padTop + 18}
                   textAnchor="middle"
-                  className="fill-teal-800 font-mono text-[9.5px] font-semibold"
+                  className="fill-[#22544F] font-mono text-[9.5px] font-semibold"
                 >
                   OP: {opMarker.label}
                 </text>
@@ -867,7 +867,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
         {/* Interactive Cursor Readout Bar */}
         <div className="mx-2 mb-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between flex-wrap gap-2 text-xs">
           <div className="flex items-center gap-2 text-slate-600">
-            <Crosshair className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+            <Crosshair className="w-3.5 h-3.5 text-[#2E4C66] shrink-0" />
             {hoverIndex !== null && hoveredX !== null ? (
               <span className="font-mono font-semibold text-slate-800">
                 {plotData.xLabel} = {formatReadoutValue(hoveredX, plotData.xUnit)}
@@ -906,8 +906,8 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
                       <span
                         className={`px-1 py-0.2 rounded text-[10px] ${
                           Number(pctDelta) >= 0
-                            ? 'bg-amber-100 text-amber-900'
-                            : 'bg-blue-100 text-blue-900'
+                            ? 'bg-[#EBDACD] text-[#6E3B1F]'
+                            : 'bg-[#DCE6EF] text-[#23435C]'
                         }`}
                       >
                         {Number(pctDelta) >= 0 ? `+${pctDelta}%` : `${pctDelta}%`}
@@ -924,7 +924,7 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
       {/* Physical Regime & Governing Equations Strip */}
       <div className="border-t border-slate-200 bg-slate-50/70 px-4 py-3">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 mb-2">
-          <Info className="w-3.5 h-3.5 text-blue-800" />
+          <Info className="w-3.5 h-3.5 text-[#2B4C65]" />
           <span>Physical Regimes & Governing HICUM/L2 Equations in This Plot</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
@@ -932,12 +932,12 @@ export const InteractivePlotPanel: React.FC<InteractivePlotPanelProps> = ({
             <div
               key={idx}
               onClick={() => onSelectEquation && onSelectEquation(reg.eqId)}
-              className="bg-white rounded-lg border border-slate-200/90 p-2.5 hover:border-blue-300 transition-all cursor-pointer flex flex-col justify-between"
+              className="bg-white rounded-lg border border-slate-200/90 p-2.5 hover:border-[#A9BFD3] transition-all cursor-pointer flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="text-xs font-semibold text-slate-800">{reg.title}</span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 shrink-0">
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2] shrink-0">
                     {reg.eqId}
                   </span>
                 </div>

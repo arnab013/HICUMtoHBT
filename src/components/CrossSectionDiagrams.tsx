@@ -41,7 +41,7 @@ const PHYSICAL_REGIONS: PhysicalRegionSpec[] = [
     name: 'Polysilicon & Mono-Crystalline Emitter Window',
     dopingTag: 'n+ Poly / n+ Mono-Si',
     manualRef: 'Sections 2.2.2, 2.8.1 (Figs. 2.2.0/2, 2.8.1/1)',
-    color: '#1E40AF',
+    color: '#2B4C65',
     spatialClassification: 'localized',
     description:
       'Heavily doped n+ polysilicon and single-crystal emitter window feeding electrons into the intrinsic base. Stores neutral emitter hole charge ΔQ_Ef at high injection and contributes emitter contact/poly/interfacial series resistance R_E.',
@@ -58,7 +58,7 @@ const PHYSICAL_REGIONS: PhysicalRegionSpec[] = [
     name: 'B-E Oxide Sidewall Spacer & Emitter Perimeter Junction',
     dopingTag: 'SiO2/Si3N4 Spacer & n+/p+ Sidewall',
     manualRef: 'Sections 2.3.2, 2.4.1, 2.8.3, 2.9 (Fig. 2.8.3/1)',
-    color: '#0F766E',
+    color: '#2A645E',
     spatialClassification: 'localized',
     description:
       'Dielectric sidewall spacer separating the emitter poly/pedestal from the extrinsic base poly, plus the high-field peripheral B*-E\' junction surrounding the emitter stripe.',
@@ -111,7 +111,7 @@ const PHYSICAL_REGIONS: PhysicalRegionSpec[] = [
     name: 'Intrinsic Collector Epitaxial Layer & SIC Pedestal',
     dopingTag: 'n- Epi / n-SIC Pedestal',
     manualRef: 'Sections 2.2.1, 2.2.2, 2.4.2, 2.10 (Fig. 2.2.0/2)',
-    color: '#B45309',
+    color: '#824726',
     spatialClassification: 'distributed',
     description:
       'Lightly doped n-type epitaxial collector beneath the intrinsic base. Governs the B\'-C\' space-charge width, Kirk critical current onset I_CK(V_C\'E\'), high-current base push-out Δτ_fh, SiGe/Si heterojunction barrier (vcbar), and impact ionization i_AVL.',
@@ -145,7 +145,7 @@ const PHYSICAL_REGIONS: PhysicalRegionSpec[] = [
     name: 'p- Silicon Substrate & STI / DTI Trench Isolation',
     dopingTag: 'p- Substrate / Oxide Trench',
     manualRef: 'Sections 2.11, 2.12 (Fig. 2.11.0/1)',
-    color: '#9F1239',
+    color: '#8A3B33',
     spatialClassification: 'distributed',
     description:
       'P-type silicon wafer substrate and shallow/deep trench oxide isolation surrounding the subcollector. Models collector-substrate junction depletion (C_jS, C_SCp), parasitic PNP action (i_TS), and lossy bulk coupling (R_su, C_su).',
@@ -184,10 +184,10 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 text-xs font-mono font-semibold">
+              <span className="px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2] text-xs font-mono font-semibold">
                 Physical Structure & Spatial Localization Map
               </span>
-              <span className="px-2.5 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200 text-xs font-mono font-medium">
+              <span className="px-2.5 py-0.5 rounded bg-[#E6F0EE] text-[#22544F] border border-[#C0D8D4] text-xs font-mono font-medium">
                 Manual Figs. 2.2.0/2, 2.7.0/1, 2.8.1–3, 2.11.0/1
               </span>
             </div>
@@ -201,17 +201,17 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
 
           {/* Spatial Taxonomy Pill Counters */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 shrink-0">
-            <div className="px-3 py-2 rounded-lg bg-teal-50/70 border border-teal-200">
-              <div className="text-[11px] font-medium text-teal-800">Physically Localized</div>
-              <div className="text-lg font-bold font-mono text-teal-950">{counts.localized} params</div>
+            <div className="px-3 py-2 rounded-lg bg-[#E6F0EE]/70 border border-[#C0D8D4]">
+              <div className="text-[11px] font-medium text-[#22544F]">Physically Localized</div>
+              <div className="text-lg font-bold font-mono text-[#153733]">{counts.localized} params</div>
             </div>
-            <div className="px-3 py-2 rounded-lg bg-blue-50/70 border border-blue-200">
-              <div className="text-[11px] font-medium text-blue-800">Distributed 2D/3D</div>
-              <div className="text-lg font-bold font-mono text-blue-950">{counts.distributed} params</div>
+            <div className="px-3 py-2 rounded-lg bg-[#E7EEF4]/70 border border-[#C5D4E2]">
+              <div className="text-[11px] font-medium text-[#2B4C65]">Distributed 2D/3D</div>
+              <div className="text-lg font-bold font-mono text-[#1A3247]">{counts.distributed} params</div>
             </div>
-            <div className="px-3 py-2 rounded-lg bg-amber-50/70 border border-amber-200">
-              <div className="text-[11px] font-medium text-amber-800">Conceptual / Thermal</div>
-              <div className="text-lg font-bold font-mono text-amber-950">{counts.conceptual} params</div>
+            <div className="px-3 py-2 rounded-lg bg-[#F4EAE3]/70 border border-[#DFC8B8]">
+              <div className="text-[11px] font-medium text-[#824726]">Conceptual / Thermal</div>
+              <div className="text-lg font-bold font-mono text-[#552D17]">{counts.conceptual} params</div>
             </div>
             <div className="px-3 py-2 rounded-lg bg-slate-100 border border-slate-200">
               <div className="text-[11px] font-medium text-slate-700">Simulator Flags</div>
@@ -226,7 +226,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             onClick={() => setActiveFigureTab('cross_section')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeFigureTab === 'cross_section'
-                ? 'bg-blue-800 text-white shadow-2xs'
+                ? 'bg-[#2B4C65] text-white shadow-2xs'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -236,7 +236,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             onClick={() => setActiveFigureTab('bandgap_grading')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeFigureTab === 'bandgap_grading'
-                ? 'bg-blue-800 text-white shadow-2xs'
+                ? 'bg-[#2B4C65] text-white shadow-2xs'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -246,7 +246,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             onClick={() => setActiveFigureTab('resistance_isolation')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeFigureTab === 'resistance_isolation'
-                ? 'bg-blue-800 text-white shadow-2xs'
+                ? 'bg-[#2B4C65] text-white shadow-2xs'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -262,14 +262,14 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-blue-800" />
+                  <Layers className="w-4 h-4 text-[#2B4C65]" />
                   <span>Click any physical region in the SiGe HBT cross-section to inspect its compact model elements</span>
                 </span>
               </div>
 
               <svg
                 viewBox="0 0 720 430"
-                className="w-full h-auto bg-[#F8FAFC] rounded-lg border border-slate-200 select-none"
+                className="w-full h-auto bg-[#F7F6F2] rounded-lg border border-slate-200 select-none"
               >
                 {/* P- Substrate Bottom Layer */}
                 <g
@@ -282,14 +282,14 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     width={660}
                     height={65}
                     rx={4}
-                    fill={selectedRegionId === 'substrate_trench' ? '#FECDD3' : '#FFE4E6'}
-                    stroke="#9F1239"
+                    fill={selectedRegionId === 'substrate_trench' ? '#E2C4BF' : '#F3E3E1'}
+                    stroke="#8A3B33"
                     strokeWidth={selectedRegionId === 'substrate_trench' ? 2.5 : 1.3}
                   />
-                  <text x={360} y={372} textAnchor="middle" className="fill-rose-950 font-bold text-[12px]">
+                  <text x={360} y={372} textAnchor="middle" className="fill-[#5A251F] font-bold text-[12px]">
                     p⁻ Silicon Wafer Substrate (Nodes S&apos;, S · R_su, C_su, C_jS, C_SCp, i_TS)
                   </text>
-                  <text x={360} y={390} textAnchor="middle" className="fill-rose-800 font-mono text-[10px]">
+                  <text x={360} y={390} textAnchor="middle" className="fill-[#8A3B33] font-mono text-[10px]">
                     Click to inspect Collector-Substrate Junction & Intra-Device Substrate Coupling
                   </text>
                 </g>
@@ -299,8 +299,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                   onClick={() => setSelectedRegionId('substrate_trench')}
                   className="cursor-pointer"
                 >
-                  <rect x={45} y={145} width={38} height={205} fill="#E2E8F0" stroke="#64748B" strokeWidth={1.5} />
-                  <rect x={637} y={145} width={38} height={205} fill="#E2E8F0" stroke="#64748B" strokeWidth={1.5} />
+                  <rect x={45} y={145} width={38} height={205} fill="#E5E2DA" stroke="#64748B" strokeWidth={1.5} />
+                  <rect x={637} y={145} width={38} height={205} fill="#E5E2DA" stroke="#64748B" strokeWidth={1.5} />
                   <text
                     x={64}
                     y={250}
@@ -332,8 +332,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     y={285}
                     width={554}
                     height={55}
-                    fill={selectedRegionId === 'buried_layer_sinker' ? '#FDE68A' : '#FEF3C7'}
-                    stroke="#B45309"
+                    fill={selectedRegionId === 'buried_layer_sinker' ? '#DFC8B8' : '#F4EAE3'}
+                    stroke="#824726"
                     strokeWidth={selectedRegionId === 'buried_layer_sinker' ? 2.5 : 1.4}
                   />
                   {/* Right n+ Sinker plug */}
@@ -342,8 +342,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     y={145}
                     width={92}
                     height={140}
-                    fill={selectedRegionId === 'buried_layer_sinker' ? '#FDE68A' : '#FEF3C7'}
-                    stroke="#B45309"
+                    fill={selectedRegionId === 'buried_layer_sinker' ? '#DFC8B8' : '#F4EAE3'}
+                    stroke="#824726"
                     strokeWidth={selectedRegionId === 'buried_layer_sinker' ? 2.5 : 1.4}
                   />
                   {/* Collector metal contact C */}
@@ -351,16 +351,16 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                   <text x={591} y={134} textAnchor="middle" className="fill-white font-mono font-bold text-[11px]">
                     Terminal C
                   </text>
-                  <text x={320} y={316} textAnchor="middle" className="fill-amber-950 font-bold text-[12px]">
+                  <text x={320} y={316} textAnchor="middle" className="fill-[#552D17] font-bold text-[12px]">
                     n⁺ Subcollector Buried Layer & Sinker (R_Cx = r_KC + r_sink + r_bl → Node C&apos;)
                   </text>
-                  <text x={591} y={220} textAnchor="middle" className="fill-amber-950 font-mono font-semibold text-[10px]">
+                  <text x={591} y={220} textAnchor="middle" className="fill-[#552D17] font-mono font-semibold text-[10px]">
                     n⁺ Sinker
                   </text>
                 </g>
 
                 {/* Shallow Trench Isolation (STI) */}
-                <rect x={460} y={145} width={85} height={55} fill="#CBD5E1" stroke="#64748B" strokeWidth={1.2} />
+                <rect x={460} y={145} width={85} height={55} fill="#D8D4CA" stroke="#64748B" strokeWidth={1.2} />
                 <text x={502} y={176} textAnchor="middle" className="fill-slate-700 font-mono text-[9.5px] font-semibold">
                   STI Oxide
                 </text>
@@ -386,14 +386,14 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     width={130}
                     height={90}
                     fill={selectedRegionId === 'intrinsic_collector_epi' ? '#FDBA74' : '#FED7AA'}
-                    stroke="#B45309"
+                    stroke="#824726"
                     strokeDasharray="4 2"
                     strokeWidth={1.6}
                   />
-                  <text x={275} y={232} textAnchor="middle" className="fill-amber-950 font-bold text-[11px]">
+                  <text x={275} y={232} textAnchor="middle" className="fill-[#552D17] font-bold text-[11px]">
                     n-SIC / Epi Collector (C&apos;)
                   </text>
-                  <text x={275} y={248} textAnchor="middle" className="fill-amber-900 font-mono text-[9.5px]">
+                  <text x={275} y={248} textAnchor="middle" className="fill-[#6E3B1F] font-mono text-[9.5px]">
                     I_CK, Q_jCi, i_AVL, Δτ_fh, v_cbar
                   </text>
                 </g>
@@ -408,14 +408,14 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     y={152}
                     width={160}
                     height={43}
-                    fill={selectedRegionId === 'intrinsic_sige_base' ? '#99F6E4' : '#CCFBF1'}
-                    stroke="#0F766E"
+                    fill={selectedRegionId === 'intrinsic_sige_base' ? '#C0D8D4' : '#E6F0EE'}
+                    stroke="#2A645E"
                     strokeWidth={selectedRegionId === 'intrinsic_sige_base' ? 2.5 : 1.6}
                   />
-                  <text x={275} y={171} textAnchor="middle" className="fill-teal-950 font-bold text-[11px]">
+                  <text x={275} y={171} textAnchor="middle" className="fill-[#153733] font-bold text-[11px]">
                     p-SiGe Intrinsic Base (Node B&apos;)
                   </text>
-                  <text x={275} y={186} textAnchor="middle" className="fill-teal-900 font-mono text-[9.5px]">
+                  <text x={275} y={186} textAnchor="middle" className="fill-[#1C4642] font-mono text-[9.5px]">
                     Q_p0, i_T, R_bi*, C_rBi, Q_jEi, Q_f
                   </text>
                 </g>
@@ -431,8 +431,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     y={145}
                     width={112}
                     height={50}
-                    fill={selectedRegionId === 'extrinsic_base_link' ? '#BFDBFE' : '#DBEAFE'}
-                    stroke="#1E40AF"
+                    fill={selectedRegionId === 'extrinsic_base_link' ? '#C5D4E2' : '#E7EEF4'}
+                    stroke="#2B4C65"
                     strokeWidth={selectedRegionId === 'extrinsic_base_link' ? 2.5 : 1.4}
                   />
                   {/* Right extrinsic base */}
@@ -441,8 +441,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     y={145}
                     width={105}
                     height={50}
-                    fill={selectedRegionId === 'extrinsic_base_link' ? '#BFDBFE' : '#DBEAFE'}
-                    stroke="#1E40AF"
+                    fill={selectedRegionId === 'extrinsic_base_link' ? '#C5D4E2' : '#E7EEF4'}
+                    stroke="#2B4C65"
                     strokeWidth={selectedRegionId === 'extrinsic_base_link' ? 2.5 : 1.4}
                   />
                   {/* Base terminal contact B */}
@@ -450,16 +450,16 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                   <text x={128} y={134} textAnchor="middle" className="fill-white font-mono font-bold text-[11px]">
                     Terminal B
                   </text>
-                  <text x={139} y={168} textAnchor="middle" className="fill-blue-950 font-bold text-[10px]">
+                  <text x={139} y={168} textAnchor="middle" className="fill-[#1A3247] font-bold text-[10px]">
                     p⁺ Extrinsic Base
                   </text>
-                  <text x={139} y={182} textAnchor="middle" className="fill-blue-900 font-mono text-[9px]">
+                  <text x={139} y={182} textAnchor="middle" className="fill-[#23435C] font-mono text-[9px]">
                     R_Bx → Node B*
                   </text>
-                  <text x={407} y={168} textAnchor="middle" className="fill-blue-950 font-bold text-[10px]">
+                  <text x={407} y={168} textAnchor="middle" className="fill-[#1A3247] font-bold text-[10px]">
                     p⁺ Link Base (B*)
                   </text>
-                  <text x={407} y={182} textAnchor="middle" className="fill-blue-900 font-mono text-[9px]">
+                  <text x={407} y={182} textAnchor="middle" className="fill-[#23435C] font-mono text-[9px]">
                     C_jCx1,2 · i_jBCx
                   </text>
                 </g>
@@ -475,8 +475,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     width={28}
                     height={62}
                     rx={3}
-                    fill={selectedRegionId === 'be_spacer_perim' ? '#5EEAD4' : '#99F6E4'}
-                    stroke="#0F766E"
+                    fill={selectedRegionId === 'be_spacer_perim' ? '#5EEAD4' : '#C0D8D4'}
+                    stroke="#2A645E"
                     strokeWidth={selectedRegionId === 'be_spacer_perim' ? 2.5 : 1.4}
                   />
                   <rect
@@ -485,8 +485,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     width={28}
                     height={62}
                     rx={3}
-                    fill={selectedRegionId === 'be_spacer_perim' ? '#5EEAD4' : '#99F6E4'}
-                    stroke="#0F766E"
+                    fill={selectedRegionId === 'be_spacer_perim' ? '#5EEAD4' : '#C0D8D4'}
+                    stroke="#2A645E"
                     strokeWidth={selectedRegionId === 'be_spacer_perim' ? 2.5 : 1.4}
                   />
                   <text
@@ -494,7 +494,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     y={124}
                     textAnchor="middle"
                     transform="rotate(-90, 196, 124)"
-                    className="fill-teal-950 font-mono font-bold text-[8.5px]"
+                    className="fill-[#153733] font-mono font-bold text-[8.5px]"
                   >
                     BE Spacer
                   </text>
@@ -503,7 +503,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     y={124}
                     textAnchor="middle"
                     transform="rotate(-90, 354, 124)"
-                    className="fill-teal-950 font-mono font-bold text-[8.5px]"
+                    className="fill-[#153733] font-mono font-bold text-[8.5px]"
                   >
                     BE Spacer
                   </text>
@@ -516,18 +516,18 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                 >
                   <path
                     d="M 190 58 L 360 58 L 360 92 L 340 92 L 340 152 L 210 152 L 210 92 L 190 92 Z"
-                    fill={selectedRegionId === 'emitter_stack' ? '#93C5FD' : '#DBEAFE'}
-                    stroke="#1E40AF"
+                    fill={selectedRegionId === 'emitter_stack' ? '#93C5FD' : '#E7EEF4'}
+                    stroke="#2B4C65"
                     strokeWidth={selectedRegionId === 'emitter_stack' ? 2.5 : 1.6}
                   />
                   <rect x={242} y={28} width={66} height={30} rx={3} fill="#0F172A" />
                   <text x={275} y={47} textAnchor="middle" className="fill-white font-mono font-bold text-[11px]">
                     Terminal E
                   </text>
-                  <text x={275} y={108} textAnchor="middle" className="fill-blue-950 font-bold text-[11.5px]">
+                  <text x={275} y={108} textAnchor="middle" className="fill-[#1A3247] font-bold text-[11.5px]">
                     n⁺ Poly / Mono Emitter (E → E&apos;)
                   </text>
-                  <text x={275} y={125} textAnchor="middle" className="fill-blue-900 font-mono text-[9.5px]">
+                  <text x={275} y={125} textAnchor="middle" className="fill-[#23435C] font-mono text-[9.5px]">
                     R_E, ΔQ_Ef (tef0, gtfe, hfe)
                   </text>
                 </g>
@@ -542,8 +542,8 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                   onClick={() => setSelectedRegionId(reg.id)}
                   className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-all ${
                     selectedRegionId === reg.id
-                      ? 'bg-blue-800 text-white border-blue-800'
-                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-300'
+                      ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-[#A9BFD3]'
                   }`}
                 >
                   {reg.name.split(' ')[0]} {reg.name.split(' ')[1]}
@@ -556,14 +556,14 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
           <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between space-y-4">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <span className="px-2.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 font-mono text-xs font-semibold">
+                <span className="px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] border border-[#C5D4E2] font-mono text-xs font-semibold">
                   {activeRegion.dopingTag}
                 </span>
                 <span
                   className={`px-2.5 py-0.5 rounded text-xs font-medium border ${
                     activeRegion.spatialClassification === 'localized'
-                      ? 'bg-teal-50 text-teal-800 border-teal-200'
-                      : 'bg-blue-50 text-blue-800 border-blue-200'
+                      ? 'bg-[#E6F0EE] text-[#22544F] border-[#C0D8D4]'
+                      : 'bg-[#E7EEF4] text-[#2B4C65] border-[#C5D4E2]'
                   }`}
                 >
                   {activeRegion.spatialClassification === 'localized'
@@ -590,7 +590,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                 <ul className="space-y-1.5">
                   {activeRegion.physicalMechanisms.map((m, i) => (
                     <li key={i} className="text-xs text-slate-700 flex items-start gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-teal-700 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#2A645E] shrink-0 mt-0.5" />
                       <span>{m}</span>
                     </li>
                   ))}
@@ -607,7 +607,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     <button
                       key={elId}
                       onClick={() => onSelectElementInLab(elId)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-semibold bg-teal-50 text-teal-900 border border-teal-200 hover:bg-teal-100 transition-colors"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-semibold bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] hover:bg-[#D6E7E3] transition-colors"
                     >
                       <Cpu className="w-3 h-3" />
                       <span>{elId}</span>
@@ -627,7 +627,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                     <button
                       key={pId}
                       onClick={() => onSelectParamInLab(pId)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-blue-50 text-blue-900 border border-blue-200 hover:bg-blue-100 transition-colors"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] hover:bg-[#DCE6EF] transition-colors"
                     >
                       <span>{pId}</span>
                       <ArrowUpRight className="w-3 h-3" />
@@ -640,7 +640,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             {/* Stage 5 Sentaurus TCAD -> Blender MCP Readiness Banner */}
             <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/90">
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
-                <Box className="w-4 h-4 text-blue-800 shrink-0" />
+                <Box className="w-4 h-4 text-[#2B4C65] shrink-0" />
                 <span>Stage 5 Ready: 3D Sentaurus TCAD & Blender MCP Mapping</span>
               </div>
               <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
@@ -660,7 +660,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             <p className="text-xs text-slate-600 mb-3">
               Spatial variation of doping concentration <FormulaView latex="N_E(x), N_B(x), N_C(x)" inline /> and effective bandgap voltage <FormulaView latex="V_{Ge}(x)" inline /> across the 1D intrinsic SiGe HBT coordinate <FormulaView latex="x" inline />.
             </p>
-            <svg viewBox="0 0 680 340" className="w-full h-auto bg-[#F8FAFC] rounded-lg border border-slate-200 p-2">
+            <svg viewBox="0 0 680 340" className="w-full h-auto bg-[#F7F6F2] rounded-lg border border-slate-200 p-2">
               {/* Vertical region dividers */}
               <line x1={80} y1={30} x2={80} y2={295} stroke="#334155" strokeWidth={1.5} />
               <line x1={80} y1={295} x2={640} y2={295} stroke="#334155" strokeWidth={1.5} />
@@ -668,13 +668,13 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
               <line x1={430} y1={30} x2={430} y2={295} stroke="#94A3B8" strokeDasharray="4 4" />
 
               {/* Region Headers */}
-              <text x={155} y={48} textAnchor="middle" className="fill-blue-900 font-bold text-[12px]">
+              <text x={155} y={48} textAnchor="middle" className="fill-[#23435C] font-bold text-[12px]">
                 n⁺ Emitter (N_E)
               </text>
-              <text x={330} y={48} textAnchor="middle" className="fill-teal-900 font-bold text-[12px]">
+              <text x={330} y={48} textAnchor="middle" className="fill-[#1C4642] font-bold text-[12px]">
                 p-SiGe Graded Base (N_B)
               </text>
-              <text x={535} y={48} textAnchor="middle" className="fill-amber-900 font-bold text-[12px]">
+              <text x={535} y={48} textAnchor="middle" className="fill-[#6E3B1F] font-bold text-[12px]">
                 n⁻ Epi Collector (N_C)
               </text>
 
@@ -682,10 +682,10 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
               <path
                 d="M 90 75 L 180 75 Q 215 75 230 140 Q 255 110 310 115 Q 395 125 430 185 Q 465 215 620 215"
                 fill="none"
-                stroke="#1E40AF"
+                stroke="#2B4C65"
                 strokeWidth={2.5}
               />
-              <text x={135} y={68} className="fill-blue-900 font-mono font-semibold text-[11px]">
+              <text x={135} y={68} className="fill-[#23435C] font-mono font-semibold text-[11px]">
                 log N(x) Doping
               </text>
 
@@ -693,13 +693,13 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
               <path
                 d="M 90 205 L 195 205 L 245 235 L 415 268 L 445 195 L 620 195"
                 fill="none"
-                stroke="#9F1239"
+                stroke="#8A3B33"
                 strokeWidth={2.5}
               />
-              <text x={325} y={245} textAnchor="middle" className="fill-rose-900 font-mono font-bold text-[11px]">
+              <text x={325} y={245} textAnchor="middle" className="fill-[#74312A] font-mono font-bold text-[11px]">
                 Graded Bandgap V_Ge(x) (Ge Mole Fraction)
               </text>
-              <text x={455} y={185} className="fill-rose-900 font-mono text-[10px]">
+              <text x={455} y={185} className="fill-[#74312A] font-mono text-[10px]">
                 BC Barrier (vcbar, icbar)
               </text>
 
@@ -731,7 +731,7 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
                 <button
                   key={p}
                   onClick={() => onSelectParamInLab(p)}
-                  className="px-2.5 py-1 rounded bg-blue-50 text-blue-900 border border-blue-200 text-xs font-mono hover:bg-blue-100"
+                  className="px-2.5 py-1 rounded bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] text-xs font-mono hover:bg-[#DCE6EF]"
                 >
                   {p} ↗
                 </button>
@@ -756,13 +756,13 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             <div className="mt-3 flex gap-1.5">
               <button
                 onClick={() => onSelectElementInLab('rbx')}
-                className="px-2.5 py-1 rounded bg-teal-50 text-teal-900 border border-teal-200 text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
               >
                 Element: rbx ↗
               </button>
               <button
                 onClick={() => onSelectParamInLab('rbx')}
-                className="px-2.5 py-1 rounded bg-blue-50 text-blue-900 border border-blue-200 text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] text-xs font-mono"
               >
                 Param: rbx ↗
               </button>
@@ -782,13 +782,13 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             <div className="mt-3 flex gap-1.5">
               <button
                 onClick={() => onSelectElementInLab('rcx')}
-                className="px-2.5 py-1 rounded bg-teal-50 text-teal-900 border border-teal-200 text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
               >
                 Element: rcx ↗
               </button>
               <button
                 onClick={() => onSelectParamInLab('rcx')}
-                className="px-2.5 py-1 rounded bg-blue-50 text-blue-900 border border-blue-200 text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E7EEF4] text-[#23435C] border border-[#C5D4E2] text-xs font-mono"
               >
                 Param: rcx ↗
               </button>
@@ -808,19 +808,19 @@ export const CrossSectionDiagrams: React.FC<CrossSectionDiagramsProps> = ({
             <div className="mt-3 flex gap-1.5 flex-wrap">
               <button
                 onClick={() => onSelectElementInLab('cjs')}
-                className="px-2.5 py-1 rounded bg-teal-50 text-teal-900 border border-teal-200 text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
               >
                 Element: cjs ↗
               </button>
               <button
                 onClick={() => onSelectElementInLab('cscp')}
-                className="px-2.5 py-1 rounded bg-teal-50 text-teal-900 border border-teal-200 text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
               >
                 Element: cscp ↗
               </button>
               <button
                 onClick={() => onSelectElementInLab('rsu')}
-                className="px-2.5 py-1 rounded bg-teal-50 text-teal-900 border border-teal-200 text-xs font-mono"
+                className="px-2.5 py-1 rounded bg-[#E6F0EE] text-[#1C4642] border border-[#C0D8D4] text-xs font-mono"
               >
                 Element: rsu ↗
               </button>

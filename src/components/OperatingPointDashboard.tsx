@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { OperatingPointSpec } from '../data/hicumTypes';
 import { FormulaView } from './FormulaView';
+import { CitationBadges } from './CitationBadges';
 import { Activity, Cpu, Zap, Thermometer, Gauge, Sliders } from 'lucide-react';
 
 interface OperatingPointDashboardProps {
@@ -53,33 +54,33 @@ const CATEGORY_META: Record<
 > = {
   figure_of_merit: {
     label: 'Figures of Merit (Ch. 4)',
-    badgeClass: 'bg-[#DBEAFE] text-[#1E40AF] border-[#BFDBFE]',
-    icon: <Gauge className="w-4 h-4 text-[#1E40AF]" />,
+    badgeClass: 'bg-[#E7EEF4] text-[#2B4C65] border-[#C5D4E2]',
+    icon: <Gauge className="w-4 h-4 text-[#2B4C65]" />,
   },
   terminal_dc: {
     label: 'Terminal Voltages & Currents',
-    badgeClass: 'bg-[#CCFBF1] text-[#0F766E] border-[#99F6E4]',
-    icon: <Zap className="w-4 h-4 text-[#0F766E]" />,
+    badgeClass: 'bg-[#E6F0EE] text-[#2A645E] border-[#C0D8D4]',
+    icon: <Zap className="w-4 h-4 text-[#2A645E]" />,
   },
   small_signal_conductance: {
     label: 'Small-Signal Transconductance & Resistances',
-    badgeClass: 'bg-[#E0E7FF] text-[#4338CA] border-[#C7D2FE]',
-    icon: <Activity className="w-4 h-4 text-[#4338CA]" />,
+    badgeClass: 'bg-[#ECEAF3] text-[#4A4F7A] border-[#D3D1E2]',
+    icon: <Activity className="w-4 h-4 text-[#4A4F7A]" />,
   },
   small_signal_capacitance: {
     label: 'Small-Signal Hybrid-π Capacitances',
-    badgeClass: 'bg-[#F1F5F9] text-[#334155] border-[#CBD5E1]',
+    badgeClass: 'bg-[#EAE8E1] text-[#334155] border-[#D8D4CA]',
     icon: <Cpu className="w-4 h-4 text-[#334155]" />,
   },
   resistance: {
     label: 'Operating-Point Series Resistances',
-    badgeClass: 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]',
-    icon: <Sliders className="w-4 h-4 text-[#B45309]" />,
+    badgeClass: 'bg-[#F4EAE3] text-[#824726] border-[#DFC8B8]',
+    icon: <Sliders className="w-4 h-4 text-[#824726]" />,
   },
   thermal: {
     label: 'Electro-Thermal Operating State',
-    badgeClass: 'bg-[#FFE4E6] text-[#9F1239] border-[#FECDD3]',
-    icon: <Thermometer className="w-4 h-4 text-[#9F1239]" />,
+    badgeClass: 'bg-[#F3E3E1] text-[#8A3B33] border-[#E2C4BF]',
+    icon: <Thermometer className="w-4 h-4 text-[#8A3B33]" />,
   },
 };
 
@@ -105,11 +106,11 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
       : specs.filter((s) => s.category === selectedCategory);
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-lg shadow-sm overflow-hidden">
-      <div className="px-5 py-4 bg-[#F8FAFC] border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3">
+    <div className="bg-white border border-[#E5E2DA] rounded-lg shadow-sm overflow-hidden">
+      <div className="px-5 py-4 bg-[#F7F6F2] border-b border-[#E5E2DA] flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#DBEAFE] text-[#1E40AF] font-semibold">
+            <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] font-semibold">
               Manual Chapter 4 (pp. 113–115) & VA Lines 1980–2063
             </span>
           </div>
@@ -126,8 +127,8 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
             onClick={() => setSelectedCategory('all')}
             className={`px-2.5 py-1 text-xs font-medium rounded border transition-colors ${
               selectedCategory === 'all'
-                ? 'bg-[#1E40AF] text-white border-[#1E40AF]'
-                : 'bg-white text-[#475569] border-[#CBD5E1] hover:bg-[#F1F5F9]'
+                ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
+                : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
             }`}
           >
             All ({specs.length})
@@ -138,8 +139,8 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
               onClick={() => setSelectedCategory(cat)}
               className={`px-2.5 py-1 text-xs font-medium rounded border transition-colors ${
                 selectedCategory === cat
-                  ? 'bg-[#1E40AF] text-white border-[#1E40AF]'
-                  : 'bg-white text-[#475569] border-[#CBD5E1] hover:bg-[#F1F5F9]'
+                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
+                  : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
               }`}
             >
               {CATEGORY_META[cat].label.split(' ')[0]}
@@ -149,7 +150,7 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
       </div>
 
       {/* Key Highlight Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-4 bg-[#F8FAFC]/60 border-b border-[#E2E8F0]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-4 bg-[#F7F6F2]/60 border-b border-[#E5E2DA]">
         {[
           { id: 'FT', label: 'Transit Freq. fT', unit: 'Hz' },
           { id: 'TF', label: 'Forward Transit τf', unit: 's' },
@@ -167,18 +168,18 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
           return (
             <div
               key={item.id}
-              className="bg-white border border-[#E2E8F0] rounded p-2.5 flex flex-col justify-between"
+              className="bg-white border border-[#E5E2DA] rounded p-2.5 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono font-semibold text-[#1E40AF]">
+                <span className="text-[11px] font-mono font-semibold text-[#2B4C65]">
                   {item.id}
                 </span>
                 {Math.abs(diffPct) > 0.05 && (
                   <span
                     className={`text-[10px] font-mono px-1 rounded ${
                       diffPct > 0
-                        ? 'bg-[#CCFBF1] text-[#0F766E]'
-                        : 'bg-[#FEF3C7] text-[#B45309]'
+                        ? 'bg-[#E6F0EE] text-[#2A645E]'
+                        : 'bg-[#F4EAE3] text-[#824726]'
                     }`}
                   >
                     {diffPct > 0 ? '+' : ''}
@@ -199,7 +200,7 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#F1F5F9] border-b border-[#CBD5E1] text-[11px] font-mono uppercase text-[#475569]">
+            <tr className="bg-[#EAE8E1] border-b border-[#D8D4CA] text-[11px] font-mono uppercase text-[#475569]">
               <th className="py-2.5 px-4">OP Variable</th>
               <th className="py-2.5 px-3">Live Value</th>
               <th className="py-2.5 px-3">Baseline (Test Card)</th>
@@ -207,7 +208,7 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
               <th className="py-2.5 px-4">Description & VA Ref</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E2E8F0] text-xs">
+          <tbody className="divide-y divide-[#E5E2DA] text-xs">
             {filteredSpecs.map((spec) => {
               const val = opValues[spec.id];
               const refVal = refOpValues?.[spec.id];
@@ -219,13 +220,13 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
               return (
                 <tr
                   key={spec.id}
-                  className={`hover:bg-[#F8FAFC] transition-colors ${
-                    changed ? 'bg-[#DBEAFE]/15' : ''
+                  className={`hover:bg-[#F7F6F2] transition-colors ${
+                    changed ? 'bg-[#E7EEF4]/15' : ''
                   }`}
                 >
                   <td className="py-2.5 px-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-[#1E40AF] text-xs">
+                      <span className="font-mono font-bold text-[#2B4C65] text-xs">
                         {spec.id}
                       </span>
                       <span className="text-[#64748B]">
@@ -246,9 +247,13 @@ export const OperatingPointDashboard: React.FC<OperatingPointDashboardProps> = (
                   </td>
                   <td className="py-2.5 px-4">
                     <div className="text-[#334155] font-medium">{spec.description}</div>
-                    <div className="text-[11px] font-mono text-[#64748B] mt-0.5">
-                      Manual p.{spec.manualPage} · VA line {spec.vaLine}
-                    </div>
+                    <CitationBadges
+                      className="mt-1"
+                      compact
+                      manualCitation={spec.manualCitation}
+                      manualPage={spec.manualPage}
+                      vaCitation={`hicumL2V2p34.va, l. ${spec.vaLine}`}
+                    />
                   </td>
                 </tr>
               );

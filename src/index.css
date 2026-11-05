@@ -3,40 +3,210 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-serif: 'Source Serif 4', Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Solid Matte Scientific Palette */
+    --matte-canvas: #F3F2EE;
+    --matte-surface: #FFFFFF;
+    --matte-surface-alt: #EAE8E1;
+    --matte-sidebar: #1D2530;
+    --matte-sidebar-hover: #273241;
+    --matte-sidebar-active: #2E4C66;
+    --matte-border: #D8D4CA;
+    --matte-border-strong: #BFC5CE;
+    --matte-slate-blue: #2B4C65;
+    --matte-teal: #2A645E;
+    --matte-copper: #9A5833;
+    --matte-amber: #9E6B24;
+  }
+
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #F8FAFC;
-    color: #0F172A;
+    background-color: var(--matte-canvas);
+    color: #161E29;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, .font-scientific {
-    font-family: 'Source Serif 4', Georgia, Cambria, serif;
+    font-family: var(--font-serif);
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
   }
 }
 
-.katex {
-  font-size: 1.03em;
+/* Smooth Dashboard View & Panel Animations */
+/* End states use `transform: none` and no fill-mode, so finished views never become a
+   containing block for position:fixed descendants (e.g. the fullscreen 3D artboard). */
+@keyframes matteFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.katex-display {
-  margin: 0.65em 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0.25rem 0;
+@keyframes matteScaleFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-/* Custom subtle scrollbars for scientific panels */
+@keyframes matteDrawerIn {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+.animate-view-enter {
+  animation: matteFadeSlideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-card-enter {
+  animation: matteScaleFadeIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-drawer-in {
+  animation: matteDrawerIn 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-view-enter,
+  .animate-card-enter,
+  .animate-drawer-in {
+    animation: none;
+  }
+}
+
+/* Solid Matte Surface & Interactive Transitions */
+.matte-card {
+  background-color: #FFFFFF;
+  border: 1px solid #D8D4CA;
+  border-radius: 0.625rem;
+  transition: border-color 180ms ease, transform 180ms ease, background-color 180ms ease;
+}
+
+.matte-card:hover {
+  border-color: #B4BDC8;
+}
+
+.matte-btn-transition {
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 120ms ease;
+}
+
+.matte-btn-transition:active {
+  transform: translateY(0.5px);
+}
+
+/* Citation Pill Styling */
+.citation-badge-manual {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  background-color: #E7EEF4;
+  color: #23435C;
+  border: 1px solid #C5D4E2;
+  border-radius: 0.25rem;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.citation-badge-manual:hover {
+  background-color: #2B4C65;
+  color: #FFFFFF;
+  border-color: #2B4C65;
+}
+
+.citation-badge-va {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  background-color: #E6F0EE;
+  color: #22544F;
+  border: 1px solid #C0D8D4;
+  border-radius: 0.25rem;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.citation-badge-va:hover {
+  background-color: #2A645E;
+  color: #FFFFFF;
+  border-color: #2A645E;
+}
+
+.citation-badge-tcad {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  background-color: #F4EAE3;
+  color: #824726;
+  border: 1px solid #DFC8B8;
+  border-radius: 0.25rem;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.citation-badge-tcad:hover {
+  background-color: #9A5833;
+  color: #FFFFFF;
+  border-color: #9A5833;
+}
+
+/* Custom subtle scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #EDEBE4;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #B8B4A9;
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #8D897F;
+}
+
+/* KaTeX font tuning */
+.katex {
+  font-size: 1.04em !important;
+  color: #0F172A;
+}
+
+.katex-display {
+  margin: 0.5em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
 }

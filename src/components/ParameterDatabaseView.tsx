@@ -5,17 +5,8 @@ import {
   SpatialNature,
 } from '../data/hicumTypes';
 import { FormulaView } from './FormulaView';
-import {
-  Search,
-  Filter,
-  Sliders,
-  BookOpen,
-  Code2,
-  Compass,
-  CheckCircle2,
-  ArrowUpRight,
-  Layers,
-} from 'lucide-react';
+import { CitationBadges } from './CitationBadges';
+import { Search, Filter, ArrowUpRight, Layers } from 'lucide-react';
 
 interface ParameterDatabaseViewProps {
   parameters: HicumParameter[];
@@ -32,22 +23,22 @@ const SPATIAL_BADGES: Record<
 > = {
   localized: {
     label: 'Physically Localized',
-    className: 'bg-[#CCFBF1] text-[#0F766E] border-[#99F6E4]',
+    className: 'bg-[#E6F0EE] text-[#2A645E] border-[#C0D8D4]',
     tooltip: 'Directly maps to a distinct physical junction, layer, or contact region in the 3D SiGe HBT.',
   },
   distributed: {
     label: 'Distributed / 2D-3D',
-    className: 'bg-[#DBEAFE] text-[#1E40AF] border-[#BFDBFE]',
+    className: 'bg-[#E7EEF4] text-[#2B4C65] border-[#C5D4E2]',
     tooltip: 'Represents a spatially distributed resistance, capacitance partitioning, or 2D/3D current spreading effect.',
   },
   conceptual: {
     label: 'Empirical / Smoothing / Thermal',
-    className: 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]',
+    className: 'bg-[#F4EAE3] text-[#824726] border-[#DFC8B8]',
     tooltip: 'Mathematical smoothing constant, global temperature coefficient, or lumped compact-model parameter.',
   },
   flag: {
     label: 'Model Control Flag',
-    className: 'bg-[#F1F5F9] text-[#334155] border-[#CBD5E1]',
+    className: 'bg-[#EAE8E1] text-[#334155] border-[#D8D4CA]',
     tooltip: 'Simulator switch or version/topology selector.',
   },
 };
@@ -85,14 +76,14 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
   return (
     <div className="space-y-5">
       {/* Header & Filter Controls */}
-      <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 shadow-sm">
+      <div className="bg-white border border-[#E5E2DA] rounded-lg p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#DBEAFE] text-[#1E40AF] font-semibold">
-                Manual Chapter 3 (Sections 3.1–3.17 · pp. 100–111)
+              <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#E7EEF4] text-[#2B4C65] font-semibold">
+                Manual Chapter 3 (Tables 3.1–3.17 · pp. 101–111)
               </span>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#CCFBF1] text-[#0F766E] font-medium">
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#E6F0EE] text-[#2A645E] font-medium">
                 {parameters.length} Verified Parameters
               </span>
             </div>
@@ -112,8 +103,8 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
               onClick={() => setViewMode('table')}
               className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors ${
                 viewMode === 'table'
-                  ? 'bg-[#1E40AF] text-white border-[#1E40AF]'
-                  : 'bg-white text-[#475569] border-[#CBD5E1] hover:bg-[#F1F5F9]'
+                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
+                  : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
               }`}
             >
               Structured Table View
@@ -122,8 +113,8 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
               onClick={() => setViewMode('cards')}
               className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors ${
                 viewMode === 'cards'
-                  ? 'bg-[#1E40AF] text-white border-[#1E40AF]'
-                  : 'bg-white text-[#475569] border-[#CBD5E1] hover:bg-[#F1F5F9]'
+                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
+                  : 'bg-white text-[#475569] border-[#D8D4CA] hover:bg-[#EAE8E1]'
               }`}
             >
               Detailed Physics Cards
@@ -132,7 +123,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
         </div>
 
         {/* Search & Filters */}
-        <div className="mt-4 pt-4 border-t border-[#E2E8F0] grid grid-cols-1 md:grid-cols-12 gap-3">
+        <div className="mt-4 pt-4 border-t border-[#E5E2DA] grid grid-cols-1 md:grid-cols-12 gap-3">
           <div className="md:col-span-5 relative">
             <Search className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -140,7 +131,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search parameter name (e.g. c10, rbi0, hjei, thcs, vcbar), mechanism, or region..."
-              className="w-full pl-9 pr-3 py-2 text-xs bg-[#F8FAFC] border border-[#CBD5E1] rounded focus:outline-none focus:border-[#1E40AF] focus:bg-white text-[#0F172A]"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-[#F7F6F2] border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65] focus:bg-white text-[#0F172A]"
             />
           </div>
 
@@ -149,7 +140,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
             <select
               value={selectedSection}
               onChange={(e) => setSelectedSection(e.target.value)}
-              className="w-full py-2 px-2.5 text-xs bg-[#F8FAFC] border border-[#CBD5E1] rounded focus:outline-none focus:border-[#1E40AF] text-[#0F172A]"
+              className="w-full py-2 px-2.5 text-xs bg-[#F7F6F2] border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65] text-[#0F172A]"
             >
               <option value="all">All 17 Manual Sections ({parameters.length} parameters)</option>
               {sections.map((sec) => {
@@ -168,7 +159,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
             <select
               value={selectedSpatial}
               onChange={(e) => setSelectedSpatial(e.target.value)}
-              className="w-full py-2 px-2.5 text-xs bg-[#F8FAFC] border border-[#CBD5E1] rounded focus:outline-none focus:border-[#1E40AF] text-[#0F172A]"
+              className="w-full py-2 px-2.5 text-xs bg-[#F7F6F2] border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65] text-[#0F172A]"
             >
               <option value="all">All Spatial Classifications</option>
               <option value="localized">Physically Localized (Junction/Layer)</option>
@@ -186,7 +177,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
             className={`px-2 py-0.5 text-[11px] font-mono rounded border transition-colors ${
               selectedSection === 'all'
                 ? 'bg-[#0F172A] text-white border-[#0F172A]'
-                : 'bg-[#F8FAFC] text-[#475569] border-[#E2E8F0] hover:bg-[#E2E8F0]'
+                : 'bg-[#F7F6F2] text-[#475569] border-[#E5E2DA] hover:bg-[#E5E2DA]'
             }`}
           >
             All ({parameters.length})
@@ -197,8 +188,8 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
               onClick={() => setSelectedSection(sec.id)}
               className={`px-2 py-0.5 text-[11px] font-mono rounded border transition-colors ${
                 selectedSection === sec.id
-                  ? 'bg-[#1E40AF] text-white border-[#1E40AF]'
-                  : 'bg-[#F8FAFC] text-[#475569] border-[#E2E8F0] hover:bg-[#E2E8F0]'
+                  ? 'bg-[#2B4C65] text-white border-[#2B4C65]'
+                  : 'bg-[#F7F6F2] text-[#475569] border-[#E5E2DA] hover:bg-[#E5E2DA]'
               }`}
               title={sec.title}
             >
@@ -218,11 +209,11 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
       </div>
 
       {viewMode === 'table' ? (
-        <div className="bg-white border border-[#E2E8F0] rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white border border-[#E5E2DA] rounded-lg shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F1F5F9] border-b border-[#CBD5E1] text-[11px] font-mono uppercase text-[#475569]">
+                <tr className="bg-[#EAE8E1] border-b border-[#D8D4CA] text-[11px] font-mono uppercase text-[#475569]">
                   <th className="py-2.5 px-3">Sec / #</th>
                   <th className="py-2.5 px-3">Parameter</th>
                   <th className="py-2.5 px-3">Symbol</th>
@@ -235,7 +226,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                   <th className="py-2.5 px-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] text-xs">
+              <tbody className="divide-y divide-[#E5E2DA] text-xs">
                 {filteredParams.map((p) => {
                   const isSelected = selectedParamId === p.id;
                   const activeVal = activeParamValues[p.id] ?? p.testValue;
@@ -247,14 +238,14 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                       onClick={() => onSelectParam(p.id, false)}
                       className={`cursor-pointer transition-colors ${
                         isSelected
-                          ? 'bg-[#DBEAFE]/35 hover:bg-[#DBEAFE]/50'
-                          : 'hover:bg-[#F8FAFC]'
+                          ? 'bg-[#E7EEF4]/35 hover:bg-[#E7EEF4]/50'
+                          : 'hover:bg-[#F7F6F2]'
                       }`}
                     >
                       <td className="py-2.5 px-3 font-mono text-[11px] text-[#64748B] whitespace-nowrap">
                         §{p.section}.{p.tableNo}
                       </td>
-                      <td className="py-2.5 px-3 font-mono font-bold text-[#1E40AF] whitespace-nowrap">
+                      <td className="py-2.5 px-3 font-mono font-bold text-[#2B4C65] whitespace-nowrap">
                         {p.name}
                       </td>
                       <td className="py-2.5 px-3 whitespace-nowrap">
@@ -265,14 +256,18 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                         <div className="text-[11px] text-[#475569] line-clamp-2 mt-0.5">
                           {p.physicalMeaning}
                         </div>
+                        <CitationBadges
+                          className="mt-1.5"
+                          compact
+                          manualCitation={p.manualCitation}
+                          manualPage={p.manualPages[0]}
+                          vaCitation={p.vaCitation || `hicumL2V2p34.va, l. ${p.vaLine}`}
+                        />
                         <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                          <span className="text-[10px] font-mono text-[#64748B]">
-                            Manual p.{p.manualPages.join(',')} · VA L{p.vaLine}
-                          </span>
                           {p.circuitElements.slice(0, 3).map((el) => (
                             <span
                               key={el}
-                              className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#F1F5F9] text-[#334155] border border-[#CBD5E1]"
+                              className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#EAE8E1] text-[#334155] border border-[#D8D4CA]"
                             >
                               EC:{el}
                             </span>
@@ -282,7 +277,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                       <td className="py-2.5 px-3 font-mono text-[11px] text-[#64748B] whitespace-nowrap">
                         {p.defaultDisplay}
                       </td>
-                      <td className="py-2.5 px-3 font-mono text-[11px] font-medium text-[#0F766E] whitespace-nowrap">
+                      <td className="py-2.5 px-3 font-mono text-[11px] font-medium text-[#2A645E] whitespace-nowrap">
                         {p.testDisplay}
                       </td>
                       <td
@@ -297,7 +292,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                             const v = parseFloat(e.target.value);
                             if (!Number.isNaN(v)) onUpdateParamValue(p.id, v);
                           }}
-                          className="w-24 px-2 py-1 text-xs font-mono bg-white border border-[#CBD5E1] rounded focus:outline-none focus:border-[#1E40AF]"
+                          className="w-24 px-2 py-1 text-xs font-mono bg-white border border-[#D8D4CA] rounded focus:outline-none focus:border-[#2B4C65]"
                         />
                       </td>
                       <td className="py-2.5 px-3 font-mono text-[11px] text-[#475569] whitespace-nowrap">
@@ -323,7 +318,7 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                             e.stopPropagation();
                             onSelectParam(p.id, true);
                           }}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded bg-[#1E40AF] text-white hover:bg-[#1E3A8A] transition-colors"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded bg-[#2B4C65] text-white hover:bg-[#23435C] transition-colors"
                         >
                           Lab <ArrowUpRight className="w-3 h-3" />
                         </button>
@@ -343,12 +338,12 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
             return (
               <div
                 key={p.id}
-                className="bg-white border border-[#E2E8F0] rounded-lg p-4 shadow-sm hover:border-[#94A3B8] transition-all flex flex-col justify-between"
+                className="bg-white border border-[#E5E2DA] rounded-lg p-4 shadow-sm hover:border-[#94A3B8] transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-base text-[#1E40AF]">
+                      <span className="font-mono font-bold text-base text-[#2B4C65]">
                         {p.name}
                       </span>
                       <span className="text-sm text-[#334155]">
@@ -370,27 +365,27 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                     {p.physicalMeaning}
                   </div>
 
-                  <div className="mt-2 p-2.5 rounded bg-[#F8FAFC] border border-[#E2E8F0] text-[11px] text-[#475569]">
+                  <div className="mt-2 p-2.5 rounded bg-[#F7F6F2] border border-[#E5E2DA] text-[11px] text-[#475569]">
                     <strong className="text-[#0F172A]">Operation & Curve Effect:</strong>{' '}
                     {p.operationEffect}
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-[#E2E8F0]">
+                <div className="mt-3 pt-3 border-t border-[#E5E2DA]">
                   <div className="grid grid-cols-3 gap-2 text-[11px] font-mono mb-2.5">
-                    <div className="bg-[#F8FAFC] p-1.5 rounded border border-[#E2E8F0]">
+                    <div className="bg-[#F7F6F2] p-1.5 rounded border border-[#E5E2DA]">
                       <div className="text-[9px] text-[#64748B] uppercase">Default</div>
                       <div className="font-semibold text-[#0F172A]">
                         {p.defaultDisplay} {p.unit !== '-' ? p.unit : ''}
                       </div>
                     </div>
-                    <div className="bg-[#CCFBF1]/30 p-1.5 rounded border border-[#99F6E4]">
-                      <div className="text-[9px] text-[#0F766E] uppercase">Manual Test</div>
-                      <div className="font-semibold text-[#0F766E]">
+                    <div className="bg-[#E6F0EE]/30 p-1.5 rounded border border-[#C0D8D4]">
+                      <div className="text-[9px] text-[#2A645E] uppercase">Manual Test</div>
+                      <div className="font-semibold text-[#2A645E]">
                         {p.testDisplay} {p.unit !== '-' ? p.unit : ''}
                       </div>
                     </div>
-                    <div className="bg-[#F8FAFC] p-1.5 rounded border border-[#E2E8F0]">
+                    <div className="bg-[#F7F6F2] p-1.5 rounded border border-[#E5E2DA]">
                       <div className="text-[9px] text-[#64748B] uppercase">Range / M</div>
                       <div className="font-semibold text-[#0F172A] truncate">
                         {p.rangeStr} ({p.mFactor || '1'})
@@ -398,14 +393,20 @@ export const ParameterDatabaseView: React.FC<ParameterDatabaseViewProps> = ({
                     </div>
                   </div>
 
+                  <CitationBadges
+                    className="mb-2.5"
+                    compact
+                    manualCitation={p.manualCitation}
+                    manualPage={p.manualPages[0]}
+                    vaCitation={p.vaCitation || `hicumL2V2p34.va, l. ${p.vaLine}`}
+                  />
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-mono text-[#64748B]">
-                      §{p.section} (p.{p.manualPages[0]}) · VA L{p.vaLine} · Active:{' '}
-                      <strong>{activeVal}</strong>
+                    <span className="text-[10px] font-mono text-[#526071]">
+                      §{p.section} · Active: <strong>{activeVal}</strong>
                     </span>
                     <button
                       onClick={() => onSelectParam(p.id, true)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded bg-[#1E40AF] text-white hover:bg-[#1E3A8A]"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded bg-[#2B4C65] text-white hover:bg-[#23435C]"
                     >
                       Inspect & Plot <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>

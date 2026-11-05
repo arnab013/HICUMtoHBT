@@ -40,6 +40,9 @@ export interface Sentaurus3DRegionSpec {
   /** Camera focus target in micrometers [x, y_up, z] when double-clicked */
   focusCenterUm: [number, number, number];
   manualSection: string;
+  manualCitation?: string; // e.g., 'Ch. 2.8.3, p. 56, ll. 1–15; Fig. 2.7.0/3, p. 53'
+  sentaurusCitation?: string; // e.g., 'sentaurus_sige_hbt.cmd, ll. 24, 34, 86–87, 103, 114–115'
+  vaCitation?: string; // e.g., 'hicumL2V2p34.va, ll. 628, 1836–1840'
   description: string;
   localizedVsDistributedNote: string;
   nodesInRegion: string[];
@@ -102,6 +105,9 @@ export interface Embedded3DComponentSpec {
   }[];
   /** Key equation ID from hicumEquations.ts */
   primaryEquationId: string;
+  manualCitation?: string;
+  vaCitation?: string;
+  sentaurusCitation?: string;
   physicalOriginNote: string;
 }
 
@@ -129,7 +135,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, 0.52, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, 0.315, 0.0],
-    manualSection: 'Section 2.8.1 (Fig. 2.8.1/1)',
+    manualSection: 'Section 2.8.3 (p. 56) & Section 2.7 (p. 53, Fig. 2.7.0/3)',
+    manualCitation: 'Ch. 2.8.3, p. 56, ll. 1–15; Ch. 2.7, p. 53, Fig. 2.7.0/3; Table 3.6, p. 104, row 8',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 24, 41, 59, 103, 114–115 (Contact: emitter)',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 649–650, 1836–1840',
     description:
       'Top metallization contact strip for the emitter terminal (E) at Y_min = −0.300 μm across the full emitter width W_emi = 0.15 μm (X ∈ [−0.075, +0.075] μm).',
     localizedVsDistributedNote:
@@ -167,7 +176,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, 0.38, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, 0.185, 0.0],
-    manualSection: 'Sections 2.2.2 & 2.8.1 (Fig. 2.8.1/1)',
+    manualSection: 'Section 2.8.3 (p. 56) & Section 2.13.2 (p. 70)',
+    manualCitation: 'Ch. 2.8.3, p. 56, ll. 1–15; Ch. 2.13.2, p. 70, l. 16 (Eq. 2.13.2-1); Table 3.6, p. 104, row 8',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 24, 34, 59, 86–87, 131–134 (R.Emitter)',
+    vaCitation: 'hicumL2V2p34.va, ll. 683, 1176, 1395, 1836–1840, 1915',
     description:
       'Heavily doped n⁺ PolySilicon emitter pedestal (half-width X_er = 0.075 μm, full width W_emi = 0.15 μm, height H_emi = 0.225 μm from Y_emi = −0.075 μm to Y_min = −0.300 μm, doped 10²⁰ cm⁻³).',
     localizedVsDistributedNote:
@@ -205,7 +217,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, 0.23, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, 0.063, 0.0],
-    manualSection: 'Sections 2.2.2, 2.3.1, 2.4.1',
+    manualSection: 'Sections 2.2 (p. 9), 2.3.1 (p. 25), 2.4.1 (p. 33), 2.5 (p. 42)',
+    manualCitation: 'Ch. 2.3.1, p. 25, ll. 6–10 (Eq. 2.3.1-11); Ch. 2.4.1, p. 33, l. 16 (Eq. 2.4.1-1); Ch. 2.5, p. 42, l. 15',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 37, 183–192 (Impl.Emi / BaseLine.Emi)',
+    vaCitation: 'hicumL2V2p34.va, ll. 496–498, 1435–1436, 1454, 1815–1818',
     description:
       'Shallow n⁺ monocrystalline emitter region formed by dopant out-diffusion (PeakEmi = 5×10¹⁹ cm⁻³) from R.Emitter into the top of R.SiGeBase across X ∈ [−0.075, +0.075] μm.',
     localizedVsDistributedNote:
@@ -243,7 +258,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.08, 0.28, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [-0.112, 0.15, 0.0],
-    manualSection: 'Sections 2.3.2, 2.4.1, 2.8.3, 2.9 (Fig. 2.8.3/1)',
+    manualSection: 'Sections 2.4.1 (p. 34), 2.5 (p. 43), 2.7 (p. 51), 2.10.2 (p. 63)',
+    manualCitation: 'Ch. 2.5, p. 43, l. 1 (Eq. 2.5.0-2); Ch. 2.7, p. 51, l. 15 (Eq. 2.7.0-25); Ch. 2.10.2, p. 63, l. 9 (Eq. 2.10.2-7)',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 28, 47 (Xbcr); SiGe_sprocess.txt, ll. 68–76 (nitride spacer)',
+    vaCitation: 'hicumL2V2p34.va, ll. 985–986, 1664–1686, 1807–1814, 1822–1823',
     description:
       'Silicon nitride (Si₃N₄) sidewall dielectric spacer occupying the 75 nm lateral separation between the n⁺ poly-emitter edge (X_er = 0.075 μm) and the p⁺ poly-base inner edge (X_bcr = 0.150 μm).',
     localizedVsDistributedNote:
@@ -281,7 +299,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.16, 0.40, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [-0.337, 0.225, 0.0],
-    manualSection: 'Section 2.7 (Fig. 2.7.0/1)',
+    manualSection: 'Section 2.8.1 (p. 54, Fig. 2.8.1/1)',
+    manualCitation: 'Ch. 2.8.1, p. 54, ll. 1–15 (Eq. 2.8.1-1, Fig. 2.8.1/1); Table 3.6, p. 104, row 6',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 20, 43, 58–59, 91–93, 102, 106–108 (R.BaseContR)',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 639–641, 1796–1800',
     description:
       'Aluminium base contact blocks R.BaseContR spanning |X| ∈ [0.225, 0.450] μm and Y_sde ∈ [−0.300, −0.150] μm ontop of R.Baseright.',
     localizedVsDistributedNote:
@@ -319,7 +340,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.12, 0.24, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [-0.30, 0.112, 0.0],
-    manualSection: 'Sections 2.5 & 2.7 (Figs. 2.7.0/1, 2.7.0/2)',
+    manualSection: 'Sections 2.4.3 (p. 40), 2.7 (p. 52), 2.8.1 (p. 54)',
+    manualCitation: 'Ch. 2.4.3, p. 40, ll. 5–26 (Eq. 2.4.3-2); Ch. 2.7, p. 52, Fig. 2.7.0/2; Ch. 2.8.1, p. 54, l. 13 (Eq. 2.8.1-1)',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 20, 28, 33, 47, 58, 82–84, 124–129 (R.Baseright)',
+    vaCitation: 'hicumL2V2p34.va, ll. 681, 969–982, 1175, 1394, 1796–1800',
     description:
       'Heavily doped p⁺ PolySilicon extrinsic base layer (Boron 10²⁰ cm⁻³, thickness H_bc = 75 nm) extending from |X| = 0.450 μm inward to |X| = 0.150 μm, overlapping R.SiGeBase across |X| ∈ [0.150, 0.225] μm by dWb = 75 nm.',
     localizedVsDistributedNote:
@@ -357,7 +381,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, 0.10, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, 0.032, 0.0],
-    manualSection: 'Sections 2.2, 2.3.1, 2.5, 2.13, 2.14 (Fig. 2.2.0/2)',
+    manualSection: 'Sections 2.2 (pp. 9–17), 2.3.1 (pp. 18–31), 2.6 (pp. 45–49), 2.9 (pp. 57–59)',
+    manualCitation: 'Ch. 2.2, pp. 9–17 (Eqs. 2.2.0-1 to 2.2.0-10); Ch. 2.6, pp. 45–49 (Eqs. 2.6.0-7 to 2.6.0-20); Ch. 2.9, pp. 57–59',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 22, 32, 36, 54, 57, 79–81, 150–159, 194–205 (R.SiGeBase & Prof.Mole)',
+    vaCitation: 'hicumL2V2p34.va, ll. 1448–1608, 1637–1661, 1801–1805',
     description:
       '75 nm epitaxial SiliconGermanium base mesa (X ∈ [−0.225, +0.225] μm, Y_sde ∈ [−0.075, 0.0] μm) with linear Ge mole fraction grading from 0% at the B-E interface to 16% at the B-C interface and Gaussian Boron doping (PeakBas = 5×10¹⁸ cm⁻³).',
     localizedVsDistributedNote:
@@ -429,7 +456,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, 0.0, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, -0.09, 0.0],
-    manualSection: 'Sections 2.2.1, 2.2.2, 2.4.2, 2.10 (Fig. 2.2.0/2)',
+    manualSection: 'Sections 2.3.1 (pp. 19–31), 2.4.2 (pp. 35–39), 2.10.1 (pp. 60–61), 2.15 (p. 93)',
+    manualCitation: 'Ch. 2.3.1, p. 23, ll. 4–12 (Eq. 2.3.1-7); Ch. 2.4.2, p. 37, l. 3 (Eq. 2.4.2-4); Ch. 2.10.1, p. 60, l. 14 (Eq. 2.10.1-2)',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 31, 38, 172–181 (Impl.Col / BaseLine.Col)',
+    vaCitation: 'hicumL2V2p34.va, ll. 490–533, 1471, 1500–1522, 1617–1631, 1824–1825',
     description:
       'Selectively Implanted Collector (SIC) pedestal implanted through the emitter window across X ∈ [−0.150, +0.150] μm with Phosphorus peak 10¹⁸ cm⁻³ centered at depth Y = 0.075 μm.',
     localizedVsDistributedNote:
@@ -488,7 +518,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, -0.06, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, -0.22, 0.0],
-    manualSection: 'Sections 2.4.2 & 2.6 (Fig. 2.7.0/2)',
+    manualSection: 'Sections 2.4.3 (pp. 39–41), 2.5 (p. 43), 2.7 (p. 52, Fig. 2.7.0/2)',
+    manualCitation: 'Ch. 2.4.3, p. 40, ll. 5–26 (Eq. 2.4.3-2); Ch. 2.5, p. 43, l. 10 (Eq. 2.5.0-4); Ch. 2.7, p. 52, Fig. 2.7.0/2',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 26, 31, 45, 56, 63–75, 119–122 (R.Substrate Upper Mesa)',
+    vaCitation: 'hicumL2V2p34.va, ll. 969–982, 1690–1696, 1793–1795, 1820–1821',
     description:
       'Trapezoidal active silicon collector mesa rising from the buried subcollector at Y_sub = 0.30 μm (|X| ≤ 0.325 μm) to the SiGe base interface at Y_bas = 0.0 μm (|X| ≤ 0.225 μm).',
     localizedVsDistributedNote:
@@ -534,7 +567,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.10, -0.02, 0.0],
     extrudeZUm: [-0.54, 0.54],
     focusCenterUm: [0.51, -0.15, 0.0],
-    manualSection: 'Sections 2.4.2, 2.8.3, 2.12',
+    manualSection: 'Sections 2.4.4 (p. 41), 2.7 (pp. 50–52), 2.15 (p. 93)',
+    manualCitation: 'Ch. 2.4.4, p. 41, ll. 10–18; Ch. 2.7, pp. 50–52 (Figs. 2.7.0/1–2); Ch. 2.15, p. 93, ll. 1–24',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 26, 70–72, 95–98 (R.Insulation / BAB)',
+    vaCitation: 'hicumL2V2p34.va, ll. 719–720, 748–749, 1703–1709, 1864–1868',
     description:
       'Sloped SiO₂ Shallow Trench Isolation (STI) regions etched to depth Y_sub = 0.30 μm between the active collector mesa and the collector sinker mesa (and along the outer device perimeter).',
     localizedVsDistributedNote:
@@ -580,7 +616,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.20, -0.03, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.90, -0.15, 0.0],
-    manualSection: 'Section 2.8.2 (Fig. 2.8.2/1)',
+    manualSection: 'Section 2.8.2 (p. 55, Fig. 2.8.2/1)',
+    manualCitation: 'Ch. 2.8.2, p. 55, ll. 1–12 (Eq. 2.8.2-1, Fig. 2.8.2/1); Table 3.6, p. 104, row 7',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 19, 23, 49–52, 67–70, 139–148 (Impl.ColCont)',
+    vaCitation: 'hicumL2V2p34.va, ll. 682, 1174, 1393, 1831–1835',
     description:
       'Heavily doped trapezoidal n⁺ collector sinker mesa (Phosphorus 10²⁰ cm⁻³) rising from Y_sub = 0.30 μm (|X| ∈ [0.70, 1.10] μm) to Y_bas = 0.0 μm (|X| ∈ [0.80, 1.00] μm).',
     localizedVsDistributedNote:
@@ -618,7 +657,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.24, 0.26, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.90, 0.15, 0.0],
-    manualSection: 'Section 2.8.2 (Fig. 2.8.2/1)',
+    manualSection: 'Section 2.8.2 (p. 55, Fig. 2.8.2/1)',
+    manualCitation: 'Ch. 2.8.2, p. 55, ll. 1–12 (Eq. 2.8.2-1, Fig. 2.8.2/1); Table 3.6, p. 104, row 7',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 19, 23, 49–50, 88–90, 104, 110–112 (R.CollectorCont)',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 648, 1831–1835',
     description:
       'Aluminium collector contact column R.CollectorCont spanning |X| ∈ [0.800, 1.000] μm and Y_sde ∈ [−0.300, 0.000] μm.',
     localizedVsDistributedNote:
@@ -656,7 +698,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, -0.18, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, -0.36, 0.0],
-    manualSection: 'Sections 2.8.2 & 2.11 (Fig. 2.8.2/1)',
+    manualSection: 'Sections 2.4.4 (p. 41), 2.8.2 (p. 55), 2.11–2.12 (pp. 65–68)',
+    manualCitation: 'Ch. 2.4.4, p. 41, ll. 4–18; Ch. 2.8.2, p. 55, l. 9 (Eq. 2.8.2-1); Ch. 2.12, p. 67, l. 22 (Eq. 2.12.0-10)',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 56, 161–170 (Impl.SubCol / BaseLine.SubCol)',
+    vaCitation: 'hicumL2V2p34.va, ll. 1699, 1712–1735, 1826–1827, 1831–1835',
     description:
       'Heavily doped n⁺ buried subcollector sheet (Peak 2×10¹⁹ cm⁻³ at Y_sub = 0.30 μm) bridging the active collector mesa under the emitter to the lateral collector sinker mesa.',
     localizedVsDistributedNote:
@@ -694,7 +739,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, -0.34, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, -0.51, 0.0],
-    manualSection: 'Sections 2.11 & 2.12 (Fig. 2.11.0/1)',
+    manualSection: 'Sections 2.11 (pp. 65–66) & 2.12 (pp. 67–68)',
+    manualCitation: 'Ch. 2.11, pp. 65–66, ll. 1–16; Ch. 2.12, pp. 67–68 (Eqs. 2.12.0-10 to 2.12.0-12); Tables 3.7–3.8, p. 104',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 30, 55, 63–75 (R.Substrate); SiGe_sprocess.txt, ll. 12–18',
+    vaCitation: 'hicumL2V2p34.va, ll. 687–693, 1712–1735, 1841–1846',
     description:
       'Lightly doped p⁻ silicon substrate wafer (Boron 10¹⁵ cm⁻³) below the n⁺ buried subcollector.',
     localizedVsDistributedNote:
@@ -732,7 +780,10 @@ export const SENTAURUS_3D_REGIONS: Sentaurus3DRegionSpec[] = [
     explodeVectorUm: [0.0, -0.46, 0.0],
     extrudeZUm: [-0.55, 0.55],
     focusCenterUm: [0.0, -0.615, 0.0],
-    manualSection: 'Section 2.12 (Fig. 2.11.0/1)',
+    manualSection: 'Section 2.11 (pp. 65–66)',
+    manualCitation: 'Ch. 2.11, pp. 65–66, ll. 1–16; Ch. 2.1, p. 8, Fig. 2.1.0/1; Table 3.8, p. 104, rows 1–2',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 55, 64–65 (Ymax); SiGe_sprocess.txt, l. 112 (contact name=substrate)',
+    vaCitation: 'hicumL2V2p34.va, ll. 628, 652–653, 1841–1846',
     description:
       'Bottom substrate contact metallization plane at Y_max = +0.600 μm (extending to back-side wafer contact in sprocess).',
     localizedVsDistributedNote:
@@ -886,6 +937,9 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     symbolPosUm: [0.0, 0.19, 0.0],
     orientation: 'vertical',
     primaryEquationId: 'eq-2.8.1-1',
+    manualCitation: 'Ch. 2.8.3, p. 56, ll. 1–15; Table 3.6, p. 104, row 8',
+    vaCitation: 'hicumL2V2p34.va, ll. 683, 1176, 1395, 1836–1840',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 86–87, 131–134 (R.Emitter)',
     physicalOriginNote:
       'Located vertically inside the n⁺ PolySilicon emitter pedestal (R.Emitter, X ∈ [−0.075, +0.075] μm, Y_sde ∈ [−0.30, −0.075] μm) between external contact E and mono-emitter window E\'.',
   },
@@ -905,7 +959,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     wireWaypoints: [
       { posUm: [-0.34, 0.11, 0.0], hostRegionId: 'extrinsic_base_poly', hostSide: 'left' },
     ],
-    primaryEquationId: 'eq-2.5.0-1',
+    primaryEquationId: 'eq-2.8.1-1',
+    manualCitation: 'Ch. 2.8.1, p. 54, ll. 1–15 (Eq. 2.8.1-1, Fig. 2.8.1/1); Table 3.6, p. 104, row 6',
+    vaCitation: 'hicumL2V2p34.va, ll. 681, 1175, 1394, 1796–1800',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 82–84, 124–129 (R.Baseright)',
     physicalOriginNote:
       'Located in the p⁺ extrinsic polysilicon base layer (R.Baseright, |X| ∈ [0.150, 0.450] μm) and link overlap dWb = 75 nm connecting base contact B to perimeter base node B*.',
   },
@@ -922,7 +979,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "B'",
     symbolPosUm: [-0.11, 0.024, 0.0],
     orientation: 'horizontal',
-    primaryEquationId: 'eq-2.5.1-1',
+    primaryEquationId: 'eq-2.6.0-7',
+    manualCitation: 'Ch. 2.6, p. 45, l. 12 (Eq. 2.6.0-7); p. 47, l. 6 (Eq. 2.6.0-14); p. 48, l. 12 (Eq. 2.6.0-20)',
+    vaCitation: 'hicumL2V2p34.va, ll. 676–680, 1637–1661, 1801–1805',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 79–81, 150–159 (R.SiGeBase)',
     physicalOriginNote:
       'Laterally distributed across the 75 nm p-SiGe base layer (R.SiGeBase) from the emitter window perimeter (B*) to the intrinsic base center (B\'); modulated by conductivity and emitter crowding.',
   },
@@ -939,9 +999,12 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "B'",
     symbolPosUm: [-0.11, 0.056, 0.0],
     orientation: 'horizontal',
-    primaryEquationId: 'eq-2.5.3-1',
+    primaryEquationId: 'eq-2.9.2-1',
+    manualCitation: 'Ch. 2.9.2, p. 58, l. 19 (Eq. 2.9.2-1); p. 59, l. 18 (Eq. 2.9.2-4); Table 3.6, p. 103, row 5',
+    vaCitation: 'hicumL2V2p34.va, ll. 680, 1603–1608, 1803',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 79–81 (R.SiGeBase)',
     physicalOriginNote:
-      'Shunts R_bi* between B* and B\' inside R.SiGeBase to model high-frequency lateral AC current crowding (C_rBi = f_CrBi · C_i · Q_p0).',
+      'Shunts R_bi* between B* and B\' inside R.SiGeBase to model high-frequency lateral AC current crowding (C_rBi = f_CrBi · (C_jEi + C_jCi + C_dEi + C_dCi)).',
   },
   {
     id: 'cbepar1',
@@ -956,7 +1019,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: 'E',
     symbolPosUm: [-0.115, 0.22, 0.0],
     orientation: 'horizontal',
-    primaryEquationId: 'eq-2.8.3-1',
+    primaryEquationId: 'eq-2.7.0-25',
+    manualCitation: 'Ch. 2.7, p. 51, l. 15 (Eq. 2.7.0-25); p. 53, Fig. 2.7.0/3; Table 3.11, p. 107, rows 1–2',
+    vaCitation: 'hicumL2V2p34.va, ll. 746–747, 985–986, 1822–1823',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 28, 47; SiGe_sprocess.txt, ll. 68–76',
     physicalOriginNote:
       'Originates across the 75 nm Si₃N₄ nitride sidewall spacer separating the n⁺ poly-emitter pedestal (X = 0.075 μm) from the p⁺ extrinsic poly-base (X = 0.150 μm).',
   },
@@ -973,7 +1039,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "E'",
     symbolPosUm: [-0.135, 0.092, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.3.2-1',
+    primaryEquationId: 'eq-2.4.1-1',
+    manualCitation: 'Ch. 2.4.1, p. 33, l. 16 (Eq. 2.4.1-1); p. 34, ll. 19–22; Table 3.9, p. 105, rows 5–8',
+    vaCitation: 'hicumL2V2p34.va, ll. 703–706, 1668, 1814',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 41, 47, 183–192 (Perimeter of Impl.Emi)',
     physicalOriginNote:
       'Localized at the peripheral B*-E\' junction corner beneath the nitride sidewall spacer at |X| ≈ 0.075–0.150 μm.',
   },
@@ -990,7 +1059,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "E'",
     symbolPosUm: [-0.088, 0.092, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.4.1-2',
+    primaryEquationId: 'eq-2.5.0-2',
+    manualCitation: 'Ch. 2.5, p. 43, ll. 1–5 (Eq. 2.5.0-2); Table 3.2, p. 102, rows 5–8',
+    vaCitation: 'hicumL2V2p34.va, ll. 671–674, 1664–1665, 1812–1813',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 41, 47, 183–192',
     physicalOriginNote:
       'Hole injection and recombination diode along the emitter perimeter interface between B* and E\'.',
   },
@@ -1007,7 +1079,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "E'",
     symbolPosUm: [-0.175, 0.095, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.9.0-1',
+    primaryEquationId: 'eq-2.10.2-7',
+    manualCitation: 'Ch. 2.10.2, p. 63, l. 9 (Eq. 2.10.2-7); p. 64, Fig. 2.10.2/1; Table 3.4, p. 103, rows 1–3',
+    vaCitation: 'hicumL2V2p34.va, ll. 694–696, 1671–1686, 1807–1811',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 124–134, 183–192 (n+/p+ perimeter overlap)',
     physicalOriginNote:
       'Occurs at the heavily doped peripheral n⁺/p⁺ B-E junction (tunode=1 at B*-E\') under reverse B-E bias.',
   },
@@ -1024,7 +1099,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "E'",
     symbolPosUm: [-0.042, 0.052, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.4.1-1',
+    primaryEquationId: 'eq-2.5.0-1',
+    manualCitation: 'Ch. 2.5, p. 42, l. 15 (Eq. 2.5.0-1) & p. 44, l. 1 (Eq. 2.5.0-5); Table 3.2, p. 102, rows 1–4, 9',
+    vaCitation: 'hicumL2V2p34.va, ll. 667–670, 675, 1435–1436, 1634, 1815–1817',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 183–192 (Impl.Emi)',
     physicalOriginNote:
       'Intrinsic B\'-E\' junction injection and space-charge recombination across the mono-emitter window X ∈ [−0.075, +0.075] μm at Y_emi = −0.075 μm.',
   },
@@ -1041,7 +1119,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "E'",
     symbolPosUm: [0.032, 0.052, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.3.1-1',
+    primaryEquationId: 'eq-2.4.1-1',
+    manualCitation: 'Ch. 2.4.1, p. 33, l. 16 (Eq. 2.4.1-1); p. 34, ll. 2–18; Table 3.9, pp. 104–105, rows 1–4',
+    vaCitation: 'hicumL2V2p34.va, ll. 699–702, 1454, 1818',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 79–81, 183–192 (Impl.Emi / R.SiGeBase)',
     physicalOriginNote:
       'Depletion charge stored in the intrinsic B\'-E\' space-charge layer between Impl.Emi and R.SiGeBase.',
   },
@@ -1058,7 +1139,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "E'",
     symbolPosUm: [0.068, 0.038, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.2.2-1',
+    primaryEquationId: 'eq-2.3.1-1',
+    manualCitation: 'Ch. 2.3.1, p. 18, ll. 6–11 (Eq. 2.3.1-1); pp. 21–31; Table 3.10, p. 106, rows 1–17',
+    vaCitation: 'hicumL2V2p34.va, ll. 490–533, 725–744, 1599, 1818',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 79–81, 172–205 (R.SiGeBase + Impl.Col)',
     physicalOriginNote:
       'Total mobile minority charge stored across the neutral emitter (ΔQ_Ef), graded p-SiGe base (Q_Bf), and high-current Kirk collector push-out zone (ΔQ_fh).',
   },
@@ -1076,6 +1160,9 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     symbolPosUm: [0.088, -0.055, 0.0],
     orientation: 'vertical',
     primaryEquationId: 'eq-2.2.0-1',
+    manualCitation: 'Ch. 2.2, p. 9, ll. 20–22 (Eq. 2.2.0-1); p. 10, l. 4 (Eq. 2.2.0-3); Table 3.1, pp. 101–102, rows 1–11',
+    vaCitation: 'hicumL2V2p34.va, ll. 663–666, 1448–1596, 1829–1830',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 79–81, 172–205 (1D E\'-B\'-C\' column)',
     physicalOriginNote:
       'Primary vertical electron transport stream injected at E\', accelerated by the 0→16% Ge drift field across the 75 nm R.SiGeBase, and swept through the n-SIC collector (C\').',
   },
@@ -1092,7 +1179,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "C'",
     symbolPosUm: [-0.072, -0.075, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.3.1-3',
+    primaryEquationId: 'eq-2.4.2-4',
+    manualCitation: 'Ch. 2.4.2, p. 37, ll. 3–15 (Eqs. 2.4.2-4 to 2.4.2-7); Table 3.9, p. 105, rows 9–12',
+    vaCitation: 'hicumL2V2p34.va, ll. 707–710, 1471, 1825',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 54, 79–81, 172–181 (Ybas = 0.0 B-C junction)',
     physicalOriginNote:
       'Intrinsic B\'-C\' depletion capacitance across the metallurgical interface Y_bas = 0.0 μm between R.SiGeBase and the n-SIC pedestal (Impl.Col).',
   },
@@ -1109,7 +1199,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "C'",
     symbolPosUm: [-0.015, -0.075, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.4.2-1',
+    primaryEquationId: 'eq-2.5.0-3',
+    manualCitation: 'Ch. 2.5, p. 43, l. 8 (Eq. 2.5.0-3); Table 3.3, pp. 102–103, rows 1–2',
+    vaCitation: 'hicumL2V2p34.va, ll. 684–685, 1614, 1824',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 54, 79–81, 172–181',
     physicalOriginNote:
       'Intrinsic base-collector junction diode across Y_bas = 0.0 μm (active in saturation and inverse operation).',
   },
@@ -1126,7 +1219,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "B'",
     symbolPosUm: [0.038, -0.075, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.10.0-1',
+    primaryEquationId: 'eq-2.10.1-2',
+    manualCitation: 'Ch. 2.10.1, p. 60, ll. 11–18 (Eqs. 2.10.1-1 to 2.10.1-4); Table 3.5, p. 103, rows 1–3',
+    vaCitation: 'hicumL2V2p34.va, ll. 697–698, 1617–1631, 1824',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 38, 172–181 (Impl.Col PeakCol = 1e18 cm-3)',
     physicalOriginNote:
       'Generated in the high electric-field zone of the n-SIC collector pedestal (Impl.Col, Peak 10¹⁸ cm⁻³) near the B\'-C\' junction under high V_CB.',
   },
@@ -1143,7 +1239,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "C'",
     symbolPosUm: [-0.275, -0.085, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.6.0-1',
+    primaryEquationId: 'eq-2.4.3-2',
+    manualCitation: 'Ch. 2.4.3, p. 40, ll. 5–26 (Eqs. 2.4.3-1 & 2.4.3-2); Ch. 2.7, p. 51, l. 12 (Eq. 2.7.0-24)',
+    vaCitation: 'hicumL2V2p34.va, ll. 711–714, 969–982, 1696, 1793–1794',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 63–75, 82–84 (Extrinsic base-collector overlap)',
     physicalOriginNote:
       'Outer fraction (1 − f_BCpar) of the extrinsic base-collector and STI capacitance connected between external base node B and internal collector C\'.',
   },
@@ -1160,7 +1259,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "C'",
     symbolPosUm: [-0.205, -0.085, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.6.0-2',
+    primaryEquationId: 'eq-2.4.3-2',
+    manualCitation: 'Ch. 2.4.3, p. 40, ll. 5–26 (Eqs. 2.4.3-1 & 2.4.3-2); Table 3.9, p. 105, rows 13–16',
+    vaCitation: 'hicumL2V2p34.va, ll. 711–714, 969–982, 1690, 1795, 1821',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 43, 47, 63–75, 79–81',
     physicalOriginNote:
       'Inner fraction (f_BCpar) of the extrinsic B-C depletion capacitance across the collector mesa periphery beneath B*.',
   },
@@ -1177,7 +1279,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "C'",
     symbolPosUm: [-0.142, -0.085, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.4.2-2',
+    primaryEquationId: 'eq-2.5.0-3',
+    manualCitation: 'Ch. 2.5, p. 43, l. 10 (Eq. 2.5.0-4); Table 3.3, p. 103, rows 3–4',
+    vaCitation: 'hicumL2V2p34.va, ll. 686–687, 1693, 1820',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 43, 47, 63–75',
     physicalOriginNote:
       'Extrinsic B*-C\' junction diode across the outer active collector mesa periphery (|X| ∈ [0.150, 0.225] μm).',
   },
@@ -1199,7 +1304,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
       { posUm: [0.90, -0.36, 0.0], hostRegionId: 'buried_subcollector', hostSide: 'right' },
       { posUm: [0.90, -0.15, 0.0], hostRegionId: 'collector_sinker', hostSide: 'right' },
     ],
-    primaryEquationId: 'eq-2.8.2-1',
+    primaryEquationId: 'eq-2.8.1-1',
+    manualCitation: 'Ch. 2.8.2, p. 55, ll. 1–12 (Eq. 2.8.2-1, Fig. 2.8.2/1); Table 3.6, p. 104, row 7',
+    vaCitation: 'hicumL2V2p34.va, ll. 682, 1174, 1393, 1831–1835',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 139–148 (Impl.ColCont), 161–170 (Impl.SubCol)',
     physicalOriginNote:
       'Lumped resistance combining the horizontal n⁺ buried subcollector sheet (Impl.SubCol at Y_sub = 0.30 μm), vertical n⁺ collector sinker plug (Impl.ColCont at X ∈ [0.70, 1.10] μm), and Al contact R.CollectorCont.',
   },
@@ -1216,7 +1324,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "S'",
     symbolPosUm: [-0.175, -0.32, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.11.0-1',
+    primaryEquationId: 'eq-2.12.0-10',
+    manualCitation: 'Ch. 2.12, p. 67, l. 22 (Eq. 2.12.0-10); p. 68, ll. 4–8; Table 3.7, p. 104, rows 1–2, 5',
+    vaCitation: 'hicumL2V2p34.va, ll. 689–691, 1712–1725, 1819',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 63–75, 161–170 (B* -> C\' -> S\')',
     physicalOriginNote:
       'Parasitic p-n-p transistor transfer current from the p⁺ extrinsic base (B*), across the n-collector/buried layer (C\'), into the p⁻ silicon substrate (S\') when B-C is forward biased.',
   },
@@ -1236,7 +1347,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     wireWaypoints: [
       { posUm: [-0.34, -0.36, 0.0], hostRegionId: 'buried_subcollector', hostSide: 'left' },
     ],
-    primaryEquationId: 'eq-2.11.0-2',
+    primaryEquationId: 'eq-2.4.2-4',
+    manualCitation: 'Ch. 2.4.4, p. 41, ll. 4–18; Table 3.9, p. 105, rows 17–20',
+    vaCitation: 'hicumL2V2p34.va, ll. 715–718, 1699, 1827',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 56, 63–75, 161–170 (Impl.SubCol / R.Substrate)',
     physicalOriginNote:
       'Depletion capacitance at the bottom metallurgical junction between the n⁺ buried subcollector (Impl.SubCol) and the p⁻ silicon substrate (R.Substrate).',
   },
@@ -1253,7 +1367,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: "C'",
     symbolPosUm: [-0.26, -0.43, 0.0],
     orientation: 'vertical',
-    primaryEquationId: 'eq-2.11.0-3',
+    primaryEquationId: 'eq-2.12.0-10',
+    manualCitation: 'Ch. 2.12, p. 67, ll. 10–15; Table 3.7, p. 104, rows 3–4',
+    vaCitation: 'hicumL2V2p34.va, ll. 687–688, 1735, 1826',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 56, 63–75, 161–170',
     physicalOriginNote:
       'p⁻ substrate to n⁺ buried subcollector p-n junction diode between S\' and C\'.',
   },
@@ -1270,7 +1387,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: 'S',
     symbolPosUm: [0.08, -0.55, 0.0],
     orientation: 'horizontal',
-    primaryEquationId: 'eq-2.12.0-1',
+    primaryEquationId: 'eq-2.12.0-10',
+    manualCitation: 'Ch. 2.11, pp. 65–66, ll. 1–16; Table 3.8, p. 104, row 1',
+    vaCitation: 'hicumL2V2p34.va, ll. 692, 1841–1846',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 30, 55, 63–75 (R.Substrate)',
     physicalOriginNote:
       'Distributed 3D ohmic spreading resistance through the lightly doped p⁻ silicon wafer (10¹⁵ cm⁻³) between internal substrate node S\' and bottom contact S.',
   },
@@ -1287,7 +1407,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: 'S',
     symbolPosUm: [0.08, -0.48, 0.0],
     orientation: 'horizontal',
-    primaryEquationId: 'eq-2.12.0-1',
+    primaryEquationId: 'eq-2.12.0-10',
+    manualCitation: 'Ch. 2.11, pp. 65–66, ll. 1–16; Table 3.8, p. 104, row 2',
+    vaCitation: 'hicumL2V2p34.va, ll. 693, 1843',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 30, 55, 63–75 (R.Substrate)',
     physicalOriginNote:
       'Silicon permittivity capacitance shunting R_su across the p⁻ substrate wafer between S\' and S.',
   },
@@ -1304,7 +1427,10 @@ export const EMBEDDED_3D_COMPONENTS: Embedded3DComponentSpec[] = [
     toNodePinId: 'T',
     symbolPosUm: [0.22, -0.09, 0.0],
     orientation: 'horizontal',
-    primaryEquationId: 'eq-2.13.0-1',
+    primaryEquationId: 'eq-2.15.0-2',
+    manualCitation: 'Ch. 2.14.14, p. 92, l. 13 (Eq. 2.14.14-1); Ch. 2.15, p. 93, ll. 11–18 (Eqs. 2.15.0-2 & 2.15.0-3); Table 3.16, p. 110',
+    vaCitation: 'hicumL2V2p34.va, ll. 790–791, 1207, 1738–1754, 1864–1868',
+    sentaurusCitation: 'sentaurus_sige_hbt.cmd, ll. 95–98, 172–181 (Impl.Col & R.Insulation STI)',
     physicalOriginNote:
       'Joule heat dissipation P_diss = i_T·v_C\'E\' + ... peaks in the high-field n-SIC collector and spreads outward through the silicon mesa and STI trenches (modeled by R_th and C_th at node T).',
   },
