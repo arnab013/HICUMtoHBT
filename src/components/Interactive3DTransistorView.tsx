@@ -94,12 +94,12 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
   onUpdateBias,
 }) => {
   // Primary Workspace State
-  const [viewModePreset, setViewModePreset] = useState<ViewModePreset>('cross_section');
+  const [viewModePreset, setViewModePreset] = useState<ViewModePreset>('assembled_3d');
   const [interactionTool, setInteractionTool] = useState<InteractionTool>('orbit');
-  const [activeCameraPreset, setActiveCameraPreset] = useState<CameraPresetId | null>('front');
+  const [activeCameraPreset, setActiveCameraPreset] = useState<CameraPresetId | null>('iso');
   const [explodePct, setExplodePct] = useState<number>(0); // 0 to 100
-  const [cutawayAxis, setCutawayAxis] = useState<CutawayAxis>('z_cross');
-  const [cutawayPos, setCutawayPos] = useState<number>(0.02); // in um
+  const [cutawayAxis, setCutawayAxis] = useState<CutawayAxis>('none');
+  const [cutawayPos, setCutawayPos] = useState<number>(0.0); // in um
   const [globalOpacity, setGlobalOpacity] = useState<number>(0.94);
 
   // Visibility & Hover Toggles
@@ -158,17 +158,17 @@ export const Interactive3DTransistorView: React.FC<Interactive3DTransistorViewPr
   const svgOverlayRef = useRef<SVGSVGElement | null>(null);
 
   const cameraStateRef = useRef({
-    theta: 0.14,
-    phi: Math.PI / 2 - 0.12,
-    radius: 25.5,
-    targetTheta: 0.14,
-    targetPhi: Math.PI / 2 - 0.12,
-    targetRadius: 25.5,
+    theta: 0.48,
+    phi: Math.PI / 2 - 0.32,
+    radius: 27.0,
+    targetTheta: 0.48,
+    targetPhi: Math.PI / 2 - 0.32,
+    targetRadius: 27.0,
     panX: 0.0,
-    panY: -1.1,
+    panY: -1.0,
     panZ: 0.0,
     targetPanX: 0.0,
-    targetPanY: -1.1,
+    targetPanY: -1.0,
     targetPanZ: 0.0,
     currentExplode: 0.0,
     targetExplode: 0.0,
